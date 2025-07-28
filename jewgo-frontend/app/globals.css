@@ -1,0 +1,392 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import 'leaflet/dist/leaflet.css';
+
+/* Custom CSS Variables */
+:root {
+  --jewgo-primary: #3B82F6;
+  --jewgo-primary-dark: #2563EB;
+  --jewgo-secondary: #10B981;
+  --jewgo-accent: #F59E0B;
+  --jewgo-purple: #8B5CF6;
+  --jewgo-gray: #6B7280;
+  --jewgo-light: #F3F4F6;
+  --jewgo-dark: #1F2937;
+  --mint-green: #A8E6CF;
+}
+
+/* Leaflet Map Customizations */
+.leaflet-container {
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  padding: 0;
+}
+
+.leaflet-popup-tip {
+  background: white;
+}
+
+.custom-marker {
+  background: transparent;
+  border: none;
+}
+
+/* Kosher Badge Styles */
+.kosher-badge {
+  @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.bg-kosher-orb {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.bg-kosher-km {
+  @apply bg-green-100 text-green-800;
+}
+
+.bg-kosher-kdm {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.bg-kosher-diamond-k {
+  @apply bg-purple-100 text-purple-800;
+}
+
+.bg-kosher-unknown {
+  @apply bg-red-100 text-red-800;
+}
+
+/* Restaurant Card Styles */
+.restaurant-card {
+  @apply bg-white rounded-xl shadow-soft border border-gray-100 overflow-hidden transition-all duration-300;
+}
+
+.restaurant-card:hover {
+  @apply shadow-lg border-jewgo-primary/20 scale-[1.02];
+}
+
+/* Search Bar Styles */
+.search-bar {
+  @apply w-full px-4 py-3 rounded-xl bg-white border border-gray-200 focus:border-jewgo-primary focus:ring-jewgo-primary/20 focus:outline-none transition-all duration-200 shadow-soft;
+}
+
+/* Filter Button Styles */
+.filter-button {
+  @apply px-2 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-soft flex flex-col items-center justify-center gap-1 min-h-[50px];
+}
+
+.filter-button.active {
+  @apply bg-jewgo-primary text-white shadow-lg;
+}
+
+.filter-button:not(.active) {
+  @apply bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md;
+}
+
+/* Action Button Styles */
+.action-button {
+  @apply bg-jewgo-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-soft hover:shadow-lg;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  @apply animate-spin rounded-full border-2 border-gray-300 border-t-jewgo-primary;
+}
+
+/* Skeleton Loading */
+.skeleton {
+  @apply animate-pulse bg-gray-200 rounded;
+}
+
+/* Pagination Button */
+.pagination-button {
+  @apply px-3 py-2 rounded-lg text-sm font-medium transition-colors;
+}
+
+.pagination-button.active {
+  @apply bg-jewgo-primary text-white;
+}
+
+.pagination-button:not(.active) {
+  @apply bg-white text-gray-700 hover:bg-gray-50 border border-gray-200;
+}
+
+/* Agency Badge Colors */
+.agency-badge-orb {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.agency-badge-km {
+  @apply bg-green-100 text-green-800;
+}
+
+.agency-badge-kdm {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.agency-badge-diamond-k {
+  @apply bg-purple-100 text-purple-800;
+}
+
+/* Header Gradient */
+.header-gradient {
+  @apply bg-gradient-to-r from-jewgo-primary to-jewgo-secondary;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg;
+}
+
+.bottom-nav-button {
+  @apply flex flex-col items-center justify-center py-2 px-3 text-xs font-medium transition-colors;
+}
+
+.bottom-nav-button.active {
+  @apply text-jewgo-primary;
+}
+
+.bottom-nav-button:not(.active) {
+  @apply text-gray-500 hover:text-gray-700;
+}
+
+/* Tooltip */
+.tooltip {
+  @apply absolute z-10 px-2 py-1 text-xs text-white bg-gray-900 rounded opacity-0 pointer-events-none transition-opacity;
+}
+
+.tooltip.show {
+  @apply opacity-100;
+}
+
+/* Focus Ring */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-jewgo-primary/20 focus:ring-offset-2;
+}
+
+/* Smooth Transitions */
+.smooth-transition {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+/* Shadow Utilities */
+.shadow-soft {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-medium {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-strong {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Gradient Utilities */
+.gradient-primary {
+  background: linear-gradient(135deg, var(--jewgo-primary), var(--jewgo-primary-dark));
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, var(--jewgo-secondary), #059669);
+}
+
+/* Text Gradient */
+.text-gradient {
+  background: linear-gradient(135deg, var(--jewgo-primary), var(--jewgo-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes filterPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.animate-filter-pulse {
+  animation: filterPulse 0.3s ease-in-out;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+  .restaurant-card {
+    @apply rounded-lg;
+  }
+  
+  .search-bar {
+    @apply rounded-lg px-3 py-2;
+  }
+  
+  .filter-button {
+    @apply px-1 py-1.5 text-xs min-h-[40px];
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .smooth-transition,
+  .restaurant-card,
+  .filter-button,
+  .action-button {
+    transition: none;
+  }
+  
+  .animate-fade-in-up,
+  .animate-slide-in-right,
+  .animate-filter-pulse {
+    animation: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .restaurant-card {
+    @apply border-2 border-gray-800;
+  }
+  
+  .filter-button:not(.active) {
+    @apply border-2 border-gray-800;
+  }
+} 
+
+/* Range Slider Styles */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-track {
+  background: #e5e7eb;
+  height: 8px;
+  border-radius: 4px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #3b82f6;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: #2563eb;
+  transform: scale(1.1);
+}
+
+.slider::-moz-range-track {
+  background: #e5e7eb;
+  height: 8px;
+  border-radius: 4px;
+  border: none;
+}
+
+.slider::-moz-range-thumb {
+  background: #3b82f6;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.slider::-moz-range-thumb:hover {
+  background: #2563eb;
+  transform: scale(1.1);
+} 
+
+/* Line Clamp Utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Enhanced line-clamp for better browser support */
+.line-clamp-2-enhanced {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+  max-height: 2.8rem;
+}
+
+/* Hide scrollbar for horizontal scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+} 
