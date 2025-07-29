@@ -64,7 +64,19 @@ export default function HomePage() {
       },
       (error) => {
         console.log('Error getting location:', error);
+        
+        // Handle specific geolocation errors gracefully
+        if (error.code === 1) {
+          console.log('Geolocation permission denied or blocked by policy');
+          // Continue without location - app will work with default behavior
+        } else if (error.code === 2) {
+          console.log('Geolocation position unavailable');
+        } else if (error.code === 3) {
+          console.log('Geolocation request timed out');
+        }
+        
         setLocationLoading(false);
+        // Don't set an error state - just continue without location
       },
       {
         enableHighAccuracy: true,
