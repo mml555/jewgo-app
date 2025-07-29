@@ -109,11 +109,11 @@ export default function HomePage() {
       }
       
       const data = await response.json();
-      console.log('Restaurants fetched:', data.restaurants?.length || 0);
+      console.log('Restaurants fetched:', data.data?.length || 0);
       
-      if (data.restaurants) {
-        setAllRestaurants(data.restaurants);
-        setDisplayedRestaurants(data.restaurants.slice(0, itemsPerPage));
+      if (data.data) {
+        setAllRestaurants(data.data);
+        setDisplayedRestaurants(data.data.slice(0, itemsPerPage));
       } else {
         setApiError('No restaurants data received');
       }

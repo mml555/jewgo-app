@@ -95,10 +95,10 @@ export default function LiveMapPage() {
         }
         const data = await response.json();
         
-        if (data.success && data.restaurants) {
-          console.log('Live map API returned restaurants:', data.restaurants.length);
-          console.log('Live map setting allRestaurants:', data.restaurants.length);
-          setAllRestaurants(data.restaurants);
+        if (data.success && data.data) {
+          console.log('Live map API returned restaurants:', data.data.length);
+          console.log('Live map setting allRestaurants:', data.data.length);
+          setAllRestaurants(data.data);
         } else {
           throw new Error(data.error || 'Failed to fetch restaurants');
         }
@@ -109,10 +109,10 @@ export default function LiveMapPage() {
         }
         const data = await response.json();
         
-        if (data.success && data.restaurants) {
-          console.log('Live map API returned restaurants:', data.restaurants.length);
-          console.log('Live map setting allRestaurants:', data.restaurants.length);
-          setAllRestaurants(data.restaurants);
+        if (data.success && data.data) {
+          console.log('Live map API returned restaurants:', data.data.length);
+          console.log('Live map setting allRestaurants:', data.data.length);
+          setAllRestaurants(data.data);
         } else {
           throw new Error(data.error || 'Failed to fetch restaurants');
         }
