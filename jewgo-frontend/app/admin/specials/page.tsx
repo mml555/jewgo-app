@@ -40,6 +40,11 @@ export default function SpecialsManagementPage() {
   };
 
   const handlePayment = async (specialId: number) => {
+    if (!selectedSpecial) {
+      console.error('No special selected for payment');
+      return;
+    }
+    
     try {
       const apiUrl = process.env.NODE_ENV === 'production' 
         ? 'https://jewgo.onrender.com/api/admin/specials'
