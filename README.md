@@ -1,136 +1,158 @@
-# JewGo - Kosher Restaurant Discovery App
+# Jewgo Frontend
 
-A modern web application for discovering kosher restaurants and eateries with advanced filtering, mapping, and community features.
+A modern, mobile-first restaurant directory application built with Next.js, TypeScript, and Tailwind CSS.
 
-## 🚀 Quick Start
+## Features
+
+- **Modern UI**: Clean, responsive design matching the Jewgo brand
+- **Restaurant Directory**: Browse 246+ kosher restaurants
+- **Search & Filter**: Find restaurants by name, category, and location
+- **Mobile-First**: Optimized for mobile devices with touch-friendly interface
+- **Real-time Data**: Connected to Flask backend API
+- **Kosher Categories**: Meat, Dairy, Pareve, and Unknown classifications
+- **Star Ratings**: Restaurant ratings and reviews
+- **Price Ranges**: Average price information for each restaurant
+
+## Tech Stack
+
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **Backend**: Flask API (running on port 8081)
+
+## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+ 
-- Python 3.8+
-- Google Maps API key
-- Google Places API key
+- npm or yarn
+- Flask backend running on port 8081
 
 ### Installation
 
-1. **Clone the repository**
+1. **Install dependencies**:
    ```bash
-   git clone https://github.com/mml555/jewgo.git
-   cd jewgo
-   ```
-
-2. **Install dependencies**
-   ```bash
-   # Frontend dependencies
+   cd jewgo-frontend
    npm install
-   
-   # Backend dependencies  
-   pip install -r requirements.txt
    ```
 
-3. **Set up environment variables**
+2. **Start the development server**:
    ```bash
-   # Copy environment templates
-   cp .env.example .env.local
-   cp .env.example .env
-   
-   # Edit with your API keys
-   nano .env.local
-   nano .env
-   ```
-
-4. **Start development servers**
-   ```bash
-   # Frontend (Next.js)
    npm run dev
-   
-   # Backend (Flask) - in another terminal
-   python app.py
    ```
 
-## 🌟 Features
+3. **Open your browser**:
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-- **Restaurant Discovery**: Search and filter kosher restaurants
-- **Interactive Maps**: Google Maps integration with restaurant locations
-- **Advanced Filtering**: Filter by agency, dietary restrictions, categories
-- **Community Features**: Add new restaurants, reviews, and specials
-- **Mobile Responsive**: Optimized for all device sizes
-- **Real-time Data**: Live updates from Google Places API
+### Build for Production
 
-## 🛠 Tech Stack
+```bash
+npm run build
+npm start
+```
 
-### Frontend
-- **Next.js 15.3.3** - React framework
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Google Maps API** - Interactive maps
-- **React Leaflet** - Alternative mapping
-
-### Backend  
-- **Flask** - Python web framework
-- **SQLite** - Database
-- **Google Places API** - Restaurant data
-- **CORS** - Cross-origin requests
-
-## 📁 Project Structure
+## Project Structure
 
 ```
-jewgo/
-├── app/                    # Next.js app directory
-│   ├── page.tsx           # Main explore page
-│   ├── live-map/          # Interactive map view
-│   ├── restaurant/[id]/   # Restaurant detail pages
-│   └── ...                # Other pages
+jewgo-frontend/
+├── app/                    # Next.js App Router
+│   ├── globals.css        # Global styles
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Home page
 ├── components/            # React components
-├── app.py                # Flask backend server
-├── database_manager.py   # Database operations
-├── requirements.txt      # Python dependencies
-└── package.json         # Node.js dependencies
+│   ├── Header.tsx         # App header with logo
+│   ├── SearchBar.tsx      # Search functionality
+│   ├── CategoryNav.tsx    # Category navigation
+│   ├── ActionButtons.tsx  # Action buttons
+│   ├── RestaurantCard.tsx # Restaurant card component
+│   ├── RestaurantGrid.tsx # Restaurant grid layout
+│   └── BottomNavigation.tsx # Bottom navigation
+├── types/                 # TypeScript type definitions
+│   └── restaurant.ts      # Restaurant data types
+├── public/                # Static assets
+└── package.json           # Dependencies and scripts
 ```
 
-## 🚀 Deployment
+## API Integration
 
-### Frontend (Cloudflare Pages)
-1. Connect GitHub repository to Cloudflare Pages
-2. Set build command: `npm run build`
-3. Set build output directory: `out`
-4. Add environment variables:
-   - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
-   - `NEXT_PUBLIC_BACKEND_URL`
-   - `NODE_ENV=production`
+The frontend connects to the Flask backend API running on port 8081:
 
-### Backend (Render/Railway/Heroku)
-1. Deploy to your preferred platform
-2. Add environment variables:
-   - `FLASK_SECRET_KEY`
-   - `GOOGLE_PLACES_API_KEY`
-   - `GOOGLE_KNOWLEDGE_GRAPH_API_KEY`
+- **Restaurants**: `/api/restaurants`
+- **Search**: `/api/restaurants?query=...`
+- **Statistics**: `/api/statistics`
+- **States**: `/api/states`
 
-## 🔧 Environment Variables
+## Design System
 
-### Frontend (.env.local)
-```env
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
-NEXT_PUBLIC_BACKEND_URL=https://your-backend-url.com
+### Colors
+- **Primary**: `#4ade80` (Light mint green)
+- **Secondary**: `#374151` (Dark grey)
+- **Accent**: `#10b981` (Darker green)
+
+### Kosher Type Colors
+- **Meat**: `#ef4444` (Red)
+- **Dairy**: `#3b82f6` (Blue)
+- **Pareve**: `#f59e0b` (Yellow)
+- **Unknown**: `#6b7280` (Grey)
+
+## Features in Detail
+
+### 1. Search & Discovery
+- Real-time search with instant results
+- Category-based filtering (Mikvahs, Shuls, Specials, Eatery, Stores)
+- Advanced filters for location and kosher type
+
+### 2. Restaurant Cards
+- High-quality restaurant images
+- Kosher type badges
+- Star ratings and price ranges
+- Short descriptions
+- "View Eatery" links
+
+### 3. Mobile Navigation
+- Bottom navigation bar
+- Touch-friendly interface
+- Responsive grid layout (2 columns on mobile)
+
+### 4. Data Integration
+- 246+ restaurants from database
+- Real-time API calls
+- Error handling and loading states
+
+## Development
+
+### Adding New Features
+
+1. **New Components**: Add to `components/` directory
+2. **Types**: Extend `types/restaurant.ts`
+3. **Styling**: Use Tailwind classes or extend `globals.css`
+4. **API**: Update backend endpoints as needed
+
+### Code Style
+
+- Use TypeScript for all components
+- Follow React functional component patterns
+- Use Tailwind CSS for styling
+- Implement proper error handling
+- Add loading states for better UX
+
+## Deployment
+
+### Vercel (Recommended)
+```bash
+npm run build
+vercel --prod
 ```
 
-### Backend (.env)
-```env
-FLASK_SECRET_KEY=your_flask_secret_key
-GOOGLE_PLACES_API_KEY=your_google_places_api_key
-GOOGLE_KNOWLEDGE_GRAPH_API_KEY=your_google_knowledge_graph_api_key
-DATABASE_URL=sqlite:///restaurants.db
-```
+### Other Platforms
+The app can be deployed to any platform that supports Next.js:
+- Netlify
+- AWS Amplify
+- DigitalOcean App Platform
+- Self-hosted servers
 
-## 📝 API Endpoints
-
-### Backend API (Flask)
-- `GET /api/restaurants` - Search restaurants
-- `GET /api/restaurants/{id}` - Get restaurant details
-- `GET /api/categories` - Get restaurant categories
-- `GET /api/states` - Get available states
-- `GET /health` - Health check
-
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -138,10 +160,10 @@ DATABASE_URL=sqlite:///restaurants.db
 4. Test thoroughly
 5. Submit a pull request
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License.
+This project is part of the Jewgo restaurant directory application.
 
----
+## Support
 
-**Last Updated:** 2025-07-29 01:49 UTC - Force Cloudflare Pages to pick up latest commit 
+For support or questions, please contact the development team. 
