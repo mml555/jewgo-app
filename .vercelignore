@@ -1,0 +1,31 @@
+# Backend files (not needed for frontend deployment)
+app.py
+app_production.py
+database_manager.py
+database_manager_v2.py
+config.py
+requirements.txt
+gunicorn.conf.py
+setup_*.py
+env.local
+env.production.example
+venv/
+*.db
+*.sqlite
+
+# Documentation (not needed for deployment)
+DEPLOYMENT_GUIDE.md
+NEON_SETUP_GUIDE.md
+POSTGRESQL_SETUP.md
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Development files
+.DS_Store
+*.log 

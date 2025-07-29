@@ -1,12 +1,9 @@
 {
   "version": 2,
   "name": "jewgo-frontend",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
+  "buildCommand": "cd jewgo-frontend && npm run build",
+  "outputDirectory": "jewgo-frontend/.next",
+  "installCommand": "cd jewgo-frontend && npm install",
   "routes": [
     {
       "src": "/(.*)",
