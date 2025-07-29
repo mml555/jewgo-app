@@ -1,0 +1,8 @@
+# Ensure all routes work properly
+/*    /index.html   200
+
+# Handle API routes
+/api/*  https://jewgo.onrender.com/api/:splat  200
+
+# Force HTTPS
+http://jewgo-app.pages.dev/* https://jewgo-app.pages.dev/:splat 301! 
