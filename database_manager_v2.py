@@ -134,11 +134,23 @@ class EnhancedDatabaseManager:
                     logger.error("PostgreSQL connection failed, trying with minimal config", 
                                error=str(pg_error), database_url=self.database_url)
                     # Fallback to minimal configuration
-                    self.engine = create_engine(
-                        self.database_url,
-                        echo=False,
-                        pool_pre_ping=True
-                    )
+                    try:
+                        self.engine = create_engine(
+                            self.database_url,
+                            echo=False,
+                            pool_pre_ping=True
+                        )
+                    except Exception as min_error:
+                        logger.error("PostgreSQL connection completely failed, falling back to SQLite", 
+                                   error=str(min_error), database_url=self.database_url)
+                        # Fallback to SQLite for development
+                        self.database_url = 'sqlite:///restaurants_fallback.db'
+                        self.engine = create_engine(
+                            self.database_url,
+                            echo=False,
+                            connect_args={"check_same_thread": False}
+                        )
+                        logger.warning("Using SQLite fallback database", fallback_url=self.database_url)
             
             # Test the connection
             with self.engine.connect() as conn:
