@@ -35,7 +35,7 @@ export default function GoogleMapsLoader({ children }: GoogleMapsLoaderProps) {
 
       // Load Google Maps API
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDHgNdax5xsC0bMFyh0xp11rLWa12N7THE&libraries=places,geometry&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=your_google_maps_api_key_here&libraries=places,geometry&loading=async`;
       script.async = true;
       script.defer = true;
       

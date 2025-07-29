@@ -38,7 +38,7 @@ export default function SimpleMap({ restaurants, onRestaurantSelect }: SimpleMap
       }
 
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDHgNdax5xsC0bMFyh0xp11rLWa12N7THE&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=your_google_maps_api_key_here&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = () => setMapLoaded(true);

@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class EnhancedPlacesSearch:
     def __init__(self, db_path: str = "restaurants.db", api_key: str = None):
         self.db_path = db_path
-        self.api_key = api_key or "AIzaSyDHgNdax5xsC0bMFyh0xp11rLWa12N7THE"
+        self.api_key = api_key or "your_google_places_api_key_here"
         
     def connect_db(self):
         """Connect to the database."""

@@ -2,6 +2,8 @@
 
 A modern, mobile-first web application for discovering kosher restaurants, bakeries, and grocery stores in your area.
 
+**🚀 Latest Update: Configured for Cloudflare Pages deployment with fixed dependencies (2025-07-29)**
+
 ## 🌟 Features
 
 - **Restaurant Discovery**: Find kosher restaurants, bakeries, and grocery stores
@@ -16,7 +18,7 @@ A modern, mobile-first web application for discovering kosher restaurants, baker
 ## 🏗️ Tech Stack
 
 ### Frontend
-- **Next.js 14** - React framework with App Router
+- **Next.js 15** - React framework with App Router
 - **TypeScript** - Type-safe JavaScript
 - **Tailwind CSS** - Utility-first CSS framework
 - **Google Maps API** - Interactive maps and location services
@@ -37,13 +39,12 @@ A modern, mobile-first web application for discovering kosher restaurants, baker
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/jewgo-app.git
-   cd jewgo-app
+   git clone https://github.com/mml555/jewgo.git
+   cd jewgo
    ```
 
-2. **Setup Frontend**
+2. **Install dependencies**
    ```bash
-   cd jewgo-frontend
    npm install
    ```
 
@@ -59,18 +60,10 @@ A modern, mobile-first web application for discovering kosher restaurants, baker
 
 4. **Environment Variables**
    
-   Create `.env` files in both root and frontend directories:
-   
-   **Root `.env`:**
-   ```env
-   GOOGLE_MAPS_API_KEY=your_google_maps_api_key
-   GOOGLE_PLACES_API_KEY=your_google_places_api_key
-   FLASK_ENV=development
-   ```
-   
-   **Frontend `.env.local`:**
+   Create `.env.local` file:
    ```env
    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   NEXT_PUBLIC_BACKEND_URL=http://localhost:8081
    ```
 
 5. **Run Development Servers**
@@ -82,7 +75,6 @@ A modern, mobile-first web application for discovering kosher restaurants, baker
    
    **Frontend (Terminal 2):**
    ```bash
-   cd jewgo-frontend
    npm run dev
    ```
 
@@ -122,34 +114,28 @@ A modern, mobile-first web application for discovering kosher restaurants, baker
 ## 🏗️ Project Structure
 
 ```
-jewgo-app/
-├── jewgo-frontend/          # Next.js frontend
-│   ├── app/                # App Router pages
-│   ├── components/         # React components
-│   ├── types/             # TypeScript definitions
-│   ├── utils/             # Utility functions
-│   └── public/            # Static assets
-├── app.py                 # Flask backend server
-├── database_manager.py    # Database operations
-├── requirements.txt       # Python dependencies
-└── README.md             # This file
+jewgo/
+├── app/                    # Next.js App Router pages
+├── components/             # React components
+├── types/                  # TypeScript definitions
+├── utils/                  # Utility functions
+├── public/                 # Static assets
+├── app.py                  # Flask backend server
+├── database_manager.py     # Database operations
+├── requirements.txt        # Python dependencies
+└── README.md              # This file
 ```
 
 ## 🚀 Deployment
 
 ### Cloudflare Pages Deployment
 
-1. **Build the Frontend**
-   ```bash
-   cd jewgo-frontend
-   npm run build
-   ```
+This app is configured for Cloudflare Pages deployment:
 
-2. **Deploy to Cloudflare Pages**
-   - Connect your GitHub repository to Cloudflare Pages
-   - Set build command: `npm run build`
-   - Set build output directory: `out`
-   - Configure environment variables
+1. **Automatic Deployment**: Connected to GitHub repository
+2. **Build Command**: `npm run build`
+3. **Build Output Directory**: `out`
+4. **Environment Variables**: Set in Cloudflare Pages dashboard
 
 ### Backend Deployment
 
