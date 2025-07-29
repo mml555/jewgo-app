@@ -4,12 +4,6 @@
   "buildCommand": "cd jewgo-frontend && npm run build",
   "outputDirectory": "jewgo-frontend/.next",
   "installCommand": "cd jewgo-frontend && npm install",
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
   "env": {
     "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY": "@google_maps_api_key",
     "NEXT_PUBLIC_BACKEND_URL": "@backend_url"
