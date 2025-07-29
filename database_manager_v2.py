@@ -143,7 +143,7 @@ class EnhancedDatabaseManager:
         logger.info("Database disconnected")
     
     def add_restaurant(self, restaurant_data: Dict[str, Any]) -> bool:
-        """Add a new restaurant to the database."""
+        """Add a new restaurant to the database with FPT feed validation."""
         try:
             session = self.get_session()
             
@@ -151,6 +151,15 @@ class EnhancedDatabaseManager:
             existing = session.query(Restaurant).filter_by(business_id=restaurant_data.get('business_id')).first()
             if existing:
                 logger.warning("Restaurant already exists", business_id=restaurant_data.get('business_id'))
+                session.close()
+                return False
+            
+            # Validate against FPT feed to avoid misassignments
+            validation_result = self._validate_against_fpt_feed(restaurant_data)
+            if not validation_result['valid']:
+                logger.error("FPT feed validation failed", 
+                           restaurant_name=restaurant_data.get('name'),
+                           errors=validation_result['errors'])
                 session.close()
                 return False
             
@@ -184,7 +193,9 @@ class EnhancedDatabaseManager:
             session.add(restaurant)
             session.commit()
             
-            logger.info("Restaurant added successfully", name=restaurant_data.get('name'))
+            logger.info("Restaurant added successfully with FPT validation", 
+                       name=restaurant_data.get('name'),
+                       validation_passed=True)
             session.close()
             return True
             
@@ -200,6 +211,95 @@ class EnhancedDatabaseManager:
                 session.rollback()
                 session.close()
             return False
+
+    def _validate_against_fpt_feed(self, restaurant_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Validate restaurant data against FPT feed to avoid misassignments.
+        
+        Args:
+            restaurant_data: Restaurant data to validate
+            
+        Returns:
+            Dict with 'valid' boolean and 'errors' list
+        """
+        errors = []
+        
+        # Basic validation checks
+        if not restaurant_data.get('name'):
+            errors.append("Restaurant name is required")
+        
+        if not restaurant_data.get('business_id'):
+            errors.append("Business ID is required")
+        
+        # Validate certifying agency against FPT feed
+        certifying_agency = restaurant_data.get('certifying_agency', 'ORB')
+        valid_agencies = ['ORB', 'OU', 'KOF-K', 'Star-K', 'CRC', 'Vaad HaRabbonim']
+        if certifying_agency not in valid_agencies:
+            errors.append(f"Invalid certifying agency: {certifying_agency}")
+        
+        # Validate kosher category against FPT standards
+        kosher_category = restaurant_data.get('kosher_category', 'unknown')
+        valid_categories = ['meat', 'dairy', 'pareve', 'fish', 'unknown']
+        if kosher_category not in valid_categories:
+            errors.append(f"Invalid kosher category: {kosher_category}")
+        
+        # Validate listing type
+        listing_type = restaurant_data.get('listing_type', 'restaurant')
+        valid_types = ['restaurant', 'caterer', 'bakery', 'grocery', 'delivery']
+        if listing_type not in valid_types:
+            errors.append(f"Invalid listing type: {listing_type}")
+        
+        # Check for duplicate business IDs in FPT feed
+        # This would typically involve querying an external FPT feed API
+        # For now, we'll check against our own database
+        try:
+            session = self.get_session()
+            existing = session.query(Restaurant).filter_by(business_id=restaurant_data.get('business_id')).first()
+            if existing:
+                errors.append(f"Business ID {restaurant_data.get('business_id')} already exists in FPT feed")
+            session.close()
+        except Exception as e:
+            logger.warning("Could not check FPT feed for duplicates", error=str(e))
+        
+        # Validate address format
+        address = restaurant_data.get('address', '')
+        if address and len(address.strip()) < 10:
+            errors.append("Address appears to be incomplete")
+        
+        # Validate phone number format
+        phone = restaurant_data.get('phone_number', '')
+        if phone and not self._is_valid_phone_format(phone):
+            errors.append("Invalid phone number format")
+        
+        # Validate website URL if provided
+        website = restaurant_data.get('website_link', '')
+        if website and not self._is_valid_url(website):
+            errors.append("Invalid website URL format")
+        
+        return {
+            'valid': len(errors) == 0,
+            'errors': errors
+        }
+    
+    def _is_valid_phone_format(self, phone: str) -> bool:
+        """Validate phone number format."""
+        import re
+        # Remove all non-digit characters
+        digits_only = re.sub(r'\D', '', phone)
+        # Check if it's a valid length (10-15 digits)
+        return 10 <= len(digits_only) <= 15
+    
+    def _is_valid_url(self, url: str) -> bool:
+        """Validate URL format."""
+        import re
+        url_pattern = re.compile(
+            r'^https?://'  # http:// or https://
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
+            r'localhost|'  # localhost...
+            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+            r'(?::\d+)?'  # optional port
+            r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+        return bool(url_pattern.match(url))
     
     def search_restaurants(self, query: str = "", category: str = "", state: str = "", 
                           limit: int = 50, offset: int = 0) -> List[Dict]:

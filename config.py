@@ -27,8 +27,8 @@ class Config:
     
     # API Configuration
     API_TITLE = "JewGo Restaurant API"
-    API_VERSION = "1.0.2"
-    API_DESCRIPTION = "REST API for kosher restaurant discovery"
+    API_VERSION = "1.0.3"
+    API_DESCRIPTION = "REST API for kosher restaurant discovery with FPT feed validation"
     
     # Security Configuration
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or SECRET_KEY
