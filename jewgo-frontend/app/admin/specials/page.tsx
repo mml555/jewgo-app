@@ -10,6 +10,7 @@ interface SpecialsManagementProps {
 export default function SpecialsManagementPage() {
   const [specials, setSpecials] = useState<RestaurantSpecial[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedSpecial, setSelectedSpecial] = useState<RestaurantSpecial | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
