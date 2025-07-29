@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, MapPin, X } from 'lucide-react';
 
 interface UserLocation {
   latitude: number;
   longitude: number;
   accuracy?: number;
 }
-
-
 
 interface UnifiedSearchBarProps {
   onRestaurantSearch: (query: string) => void;
@@ -27,86 +26,39 @@ export default function UnifiedSearchBar({
 }: UnifiedSearchBarProps) {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteRef = useRef<any>(null);
-
-  // Initialize Google Places Autocomplete
-  useEffect(() => {
-    const initializeWhenReady = () => {
-      if (typeof window !== 'undefined' && window.google && window.google.maps && window.google.maps.places && inputRef.current) {
-        initializePlacesAutocomplete();
-      } else {
-        // Retry after a short delay if Google Maps API is not yet loaded
-        setTimeout(initializeWhenReady, 100);
-      }
-    };
-
-    initializeWhenReady();
-  }, []);
-
-  // Initialize Google Places Autocomplete for location search
-  const initializePlacesAutocomplete = () => {
-    if (!window.google || !window.google.maps || !window.google.maps.places) {
-      console.log('Google Places API not loaded');
-      return;
-    }
-
-    try {
-      if (!inputRef.current) {
-        console.log('Input ref not available');
-        return;
-      }
-
-      // Store reference to autocomplete
-      autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-        types: ['geocode', 'establishment'],
-        componentRestrictions: { country: 'us' },
-        fields: ['formatted_address', 'geometry', 'name', 'place_id']
-      });
-
-      autocompleteRef.current.addListener('place_changed', () => {
-        const place = autocompleteRef.current.getPlace();
-        console.log('Google Places place selected:', place);
-        
-        if (place.geometry && place.geometry.location) {
-          const location: UserLocation = {
-            latitude: place.geometry.location.lat(),
-            longitude: place.geometry.location.lng()
-          };
-          
-          console.log('Calling onLocationSearch with:', location, place.formatted_address);
-          onLocationSearch(location, place.formatted_address || place.name || '');
-          setQuery(place.formatted_address || place.name || '');
-        }
-      });
-
-      console.log('Google Places Autocomplete initialized');
-    } catch (error) {
-      console.error('Error initializing Google Places Autocomplete:', error);
-    }
-  };
 
   // Check if Google Maps API is loaded
   const isGoogleMapsLoaded = () => {
     return typeof window !== 'undefined' && 
            window.google && 
            window.google.maps && 
-           window.google.maps.Geocoder &&
-           window.google.maps.places;
+           window.google.maps.Geocoder;
   };
-
-
-
-
-
-
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
+    
+    // Generate suggestions based on input
+    if (value.trim().length > 2) {
+      const filteredSuggestions = restaurants
+        .filter(restaurant => 
+          (restaurant.name?.toLowerCase().includes(value.toLowerCase()) || false) ||
+          (restaurant.address?.toLowerCase().includes(value.toLowerCase()) || false) ||
+          (restaurant.city?.toLowerCase().includes(value.toLowerCase()) || false)
+        )
+        .map(restaurant => restaurant.name || 'Unknown Restaurant')
+        .slice(0, 5);
+      
+      setSuggestions(filteredSuggestions);
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
   };
-
-
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -124,8 +76,10 @@ export default function UnifiedSearchBar({
     setIsSearching(true);
     
     try {
-      if (!window.google || !window.google.maps || !window.google.maps.Geocoder) {
+      if (!isGoogleMapsLoaded()) {
         console.error('Google Maps API not loaded');
+        // Fallback: just search restaurants
+        onRestaurantSearch(query);
         return;
       }
       
@@ -145,127 +99,106 @@ export default function UnifiedSearchBar({
         onLocationSearch(userLocation, query);
       } else {
         console.log('No results found for address:', query);
+        // Fallback: search restaurants
+        onRestaurantSearch(query);
       }
     } catch (error) {
-      console.error('Geocoding error:', error);
+      console.error('Error in location search:', error);
+      // Fallback: search restaurants
+      onRestaurantSearch(query);
     } finally {
       setIsSearching(false);
+      setShowSuggestions(false);
     }
   };
 
   const handleSmartSearch = () => {
     if (!query.trim()) return;
     
-    console.log('Search button clicked with query:', query);
+    // Check if it looks like a location (contains common location keywords)
+    const locationKeywords = ['street', 'avenue', 'road', 'drive', 'lane', 'boulevard', 'way', 'plaza', 'square', 'park'];
+    const isLocationQuery = locationKeywords.some(keyword => 
+      query.toLowerCase().includes(keyword)
+    ) || /\d/.test(query); // Contains numbers (like addresses)
     
-    // Check if it looks like a location search (zip code, city, address)
-    const isLocationSearch = 
-      query.match(/^\d{5}$/) || // 5-digit zip code
-      query.match(/^\d{3}\s\d{2}$/) || // 3+2 zip code format
-      query.includes(',') || // Contains comma (city, state)
-      query.match(/^(street|avenue|road|drive|lane|blvd|st|ave|rd|dr|ln|blvd|way|plaza|circle|court|ct)/i) || // Street address
-      query.match(/^(miami|hollywood|boca|fort lauderdale|aventura|doral|kendall|hialeah|coral gables|south beach|north beach|mid beach|brickell|wynwood|design district|little havana|coconut grove|key biscayne|sunny isles|bal harbour|surfside|bay harbor|north miami|north miami beach|miami gardens|op locka|miami lakes|weston|plantation|tamarac|pembroke pines|miramar|sunrise|lauderdale lakes|lauderhill|margate|coral springs|parkland|lighthouse point|deerfield beach|delray beach|boynton beach|lake worth|west palm beach|palm beach gardens|jupiter|tequesta|palm city|stuart|port st lucie|vero beach|melbourne|orlando|tampa|naples|fort myers|sarasota|bradenton|clearwater|st petersburg|gainesville|jacksonville|tallahassee|pensacola|panama city|destin|fort walton beach|daytona beach|cocoa beach|space coast|treasure coast|gold coast)/i) || // Common Florida cities
-      query.match(/^\d+\s+[a-zA-Z]/) || // Number followed by street name
-      query.match(/^(north|south|east|west|n|s|e|w)\s+[a-zA-Z]/i) || // Directional addresses
-      query.match(/^(fl|florida)$/i); // State abbreviation
-    
-    console.log('Is location search:', isLocationSearch);
-    
-    if (isLocationSearch) {
-      console.log('Executing location search...');
+    if (isLocationQuery && isGoogleMapsLoaded()) {
       handleLocationSearch();
     } else {
-      console.log('Executing restaurant search...');
-      // Treat as restaurant search
       onRestaurantSearch(query);
     }
   };
 
-
+  const handleSuggestionClick = (suggestion: string) => {
+    setQuery(suggestion);
+    setShowSuggestions(false);
+    onRestaurantSearch(suggestion);
+  };
 
   const handleClear = () => {
     setQuery('');
-    onRestaurantSearch('');
-    inputRef.current?.focus();
+    setShowSuggestions(false);
+    setSuggestions([]);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <div className="relative">
-        {/* Search Icon */}
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Search className="h-5 w-5 text-gray-400" />
         </div>
-
-        {/* Search Input */}
+        
         <input
           ref={inputRef}
           type="text"
-          placeholder={isGoogleMapsLoaded() ? placeholder : "Loading maps..."}
           value={query}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          className="w-full pl-12 pr-24 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent transition-all duration-200"
-          autoComplete="off"
-          disabled={!isGoogleMapsLoaded()}
+          placeholder={placeholder}
+          className="block w-full pl-10 pr-20 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent bg-white shadow-sm"
         />
-
-        {/* Right Side Actions */}
-        <div className="absolute inset-y-0 right-0 pr-3 flex items-center space-x-2">
-          {query && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="p-1 text-gray-400 hover:text-jewgo-primary transition-colors duration-200"
-              title="Clear search"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          )}
-          
-          {/* Location Button */}
+        
+        {query && (
           <button
-            type="button"
-            onClick={onUseCurrentLocation}
-            className="p-1 text-green-600 hover:text-green-800 transition-colors duration-200"
-            title="Use current location"
+            onClick={handleClear}
+            className="absolute inset-y-0 right-16 pr-3 flex items-center"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <X className="h-5 w-5 text-gray-400 hover:text-gray-600" />
           </button>
-
-          {/* Search Button */}
-          <button
-            type="button"
-            onClick={() => query.trim() && handleSmartSearch()}
-            disabled={isSearching || !query.trim() || !isGoogleMapsLoaded()}
-            className="p-1 text-gray-400 hover:text-jewgo-primary transition-colors duration-200 disabled:text-gray-300"
-            title={!isGoogleMapsLoaded() ? "Loading maps..." : "Search"}
-          >
-            {isSearching ? (
-              <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            ) : !isGoogleMapsLoaded() ? (
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            ) : (
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            )}
-          </button>
-        </div>
+        )}
+        
+        <button
+          onClick={onUseCurrentLocation}
+          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+          title="Use current location"
+        >
+          <MapPin className="h-5 w-5 text-jewgo-primary hover:text-jewgo-primary-dark" />
+        </button>
       </div>
 
+      {/* Suggestions dropdown */}
+      {showSuggestions && suggestions.length > 0 && (
+        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          {suggestions.map((suggestion, index) => (
+            <button
+              key={index}
+              onClick={() => handleSuggestionClick(suggestion)}
+              className="w-full px-4 py-2 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      )}
 
+      {/* Loading indicator */}
+      {isSearching && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 rounded-lg">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-jewgo-primary"></div>
+        </div>
+      )}
     </div>
   );
 } 
