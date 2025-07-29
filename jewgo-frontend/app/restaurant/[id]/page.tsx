@@ -495,7 +495,9 @@ const RestaurantDetailPage: React.FC = () => {
         {/* Action Buttons Card */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">Get in Touch</h2>
-          <div className="flex space-x-4 max-w-md mx-auto">
+          
+          {/* Primary Action Buttons */}
+          <div className="flex space-x-4 max-w-md mx-auto mb-4">
             {restaurant.website ? (
               <a 
                 href={restaurant.website}
@@ -542,6 +544,56 @@ const RestaurantDetailPage: React.FC = () => {
                 <span>Call</span>
               </button>
             )}
+          </div>
+
+          {/* Secondary Action Buttons */}
+          <div className="flex space-x-4 max-w-md mx-auto">
+            <button 
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({
+                    title: restaurant.name,
+                    text: `Check out ${restaurant.name} - ${restaurant.kosher_category || 'Kosher'} restaurant`,
+                    url: window.location.href
+                  });
+                } else {
+                  // Fallback: copy to clipboard
+                  navigator.clipboard.writeText(window.location.href);
+                  alert('Link copied to clipboard!');
+                }
+              }}
+              className="flex-1 border-2 border-blue-600 text-blue-600 py-3 rounded-full font-medium flex items-center justify-center space-x-2 hover:bg-blue-600 hover:text-white transition-all duration-200"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+              </svg>
+              <span>Share</span>
+            </button>
+
+            <button 
+              onClick={() => {
+                // Toggle favorite status
+                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                const isFavorite = favorites.includes(restaurant.id);
+                
+                if (isFavorite) {
+                  const newFavorites = favorites.filter((id: number) => id !== restaurant.id);
+                  localStorage.setItem('favorites', JSON.stringify(newFavorites));
+                } else {
+                  favorites.push(restaurant.id);
+                  localStorage.setItem('favorites', JSON.stringify(favorites));
+                }
+                
+                // Force re-render
+                window.location.reload();
+              }}
+              className="flex-1 border-2 border-red-600 text-red-600 py-3 rounded-full font-medium flex items-center justify-center space-x-2 hover:bg-red-600 hover:text-white transition-all duration-200"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+              </svg>
+              <span>Favorite</span>
+            </button>
           </div>
         </div>
 
@@ -596,6 +648,53 @@ const RestaurantDetailPage: React.FC = () => {
               <span>Call</span>
             </a>
           )}
+
+          <button 
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: restaurant.name,
+                  text: `Check out ${restaurant.name} - ${restaurant.kosher_category || 'Kosher'} restaurant`,
+                  url: window.location.href
+                });
+              } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(window.location.href);
+                alert('Link copied to clipboard!');
+              }
+            }}
+            className="flex-1 bg-blue-600 text-white py-3 rounded-full font-medium text-sm flex items-center justify-center space-x-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+            </svg>
+            <span>Share</span>
+          </button>
+
+          <button 
+            onClick={() => {
+              // Toggle favorite status
+              const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+              const isFavorite = favorites.includes(restaurant.id);
+              
+              if (isFavorite) {
+                const newFavorites = favorites.filter((id: number) => id !== restaurant.id);
+                localStorage.setItem('favorites', JSON.stringify(newFavorites));
+              } else {
+                favorites.push(restaurant.id);
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+              }
+              
+              // Force re-render
+              window.location.reload();
+            }}
+            className="flex-1 bg-red-600 text-white py-3 rounded-full font-medium text-sm flex items-center justify-center space-x-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
+            <span>❤️</span>
+          </button>
         </div>
       </div>
 
