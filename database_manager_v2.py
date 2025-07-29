@@ -116,14 +116,33 @@ class EnhancedDatabaseManager:
                     connect_args={"check_same_thread": False}
                 )
             else:
-                # PostgreSQL configuration
-                self.engine = create_engine(
-                    self.database_url,
-                    echo=False,  # Set to True for SQL debugging
-                    pool_size=10,
-                    max_overflow=20,
-                    pool_pre_ping=True
-                )
+                # PostgreSQL configuration with enhanced error handling
+                try:
+                    self.engine = create_engine(
+                        self.database_url,
+                        echo=False,  # Set to True for SQL debugging
+                        pool_size=10,
+                        max_overflow=20,
+                        pool_pre_ping=True,
+                        pool_recycle=3600,  # Recycle connections every hour
+                        connect_args={
+                            "connect_timeout": 10,
+                            "application_name": "jewgo_app"
+                        }
+                    )
+                except Exception as pg_error:
+                    logger.error("PostgreSQL connection failed, trying with minimal config", 
+                               error=str(pg_error), database_url=self.database_url)
+                    # Fallback to minimal configuration
+                    self.engine = create_engine(
+                        self.database_url,
+                        echo=False,
+                        pool_pre_ping=True
+                    )
+            
+            # Test the connection
+            with self.engine.connect() as conn:
+                conn.execute("SELECT 1")
             
             # Create tables if they don't exist
             Base.metadata.create_all(self.engine)
