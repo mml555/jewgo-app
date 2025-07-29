@@ -54,7 +54,7 @@ def index():
     return jsonify({
         'message': 'JewGo Restaurant API Server',
         'status': 'running',
-        'version': '1.0.0',
+        'version': '1.0.1',
         'endpoints': {
             'restaurants': '/api/restaurants',
             'statistics': '/api/statistics',
