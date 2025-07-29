@@ -60,7 +60,14 @@ def index():
             'statistics': '/api/statistics',
             'categories': '/api/categories',
             'states': '/api/states',
-            'health': '/health'
+            'health': '/health',
+            'admin': {
+                'add_restaurant': '/api/admin/restaurants',
+                'bulk_import': '/api/admin/restaurants/bulk',
+                'update_restaurant': '/api/admin/restaurants/<business_id>',
+                'add_special': '/api/admin/restaurants/<business_id>/specials',
+                'get_specials': '/api/admin/specials'
+            }
         }
     })
 
@@ -320,6 +327,56 @@ def api_get_all_specials():
         })
     except Exception as e:
         logger.error(f"API error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/admin/restaurants/bulk', methods=['POST'])
+def api_bulk_import_restaurants():
+    """API endpoint for bulk importing restaurants."""
+    try:
+        data = request.get_json()
+        
+        if not data or 'restaurants' not in data:
+            return jsonify({'success': False, 'error': 'Missing restaurants data'}), 400
+        
+        restaurants = data['restaurants']
+        if not isinstance(restaurants, list):
+            return jsonify({'success': False, 'error': 'Restaurants must be a list'}), 400
+        
+        success_count = 0
+        error_count = 0
+        errors = []
+        
+        for i, restaurant_data in enumerate(restaurants):
+            try:
+                # Validate required fields
+                required_fields = ['business_id', 'name', 'address']
+                for field in required_fields:
+                    if not restaurant_data.get(field):
+                        errors.append(f"Restaurant {i}: Missing required field '{field}'")
+                        error_count += 1
+                        continue
+                
+                # Add restaurant
+                if g.db_manager.add_restaurant(restaurant_data):
+                    success_count += 1
+                else:
+                    errors.append(f"Restaurant {i}: Failed to add to database")
+                    error_count += 1
+                    
+            except Exception as e:
+                errors.append(f"Restaurant {i}: {str(e)}")
+                error_count += 1
+        
+        return jsonify({
+            'success': True,
+            'message': f'Bulk import completed: {success_count} successful, {error_count} failed',
+            'success_count': success_count,
+            'error_count': error_count,
+            'errors': errors[:10]  # Limit error messages to first 10
+        })
+        
+    except Exception as e:
+        logger.error(f"Bulk import API error: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/export')
