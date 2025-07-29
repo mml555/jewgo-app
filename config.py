@@ -27,7 +27,7 @@ class Config:
     
     # API Configuration
     API_TITLE = "JewGo Restaurant API"
-    API_VERSION = "1.0.0"
+    API_VERSION = "1.0.2"
     API_DESCRIPTION = "REST API for kosher restaurant discovery"
     
     # Security Configuration
