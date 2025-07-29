@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import UnifiedSearchBar from '@/components/UnifiedSearchBar';
@@ -63,7 +63,7 @@ export default function LiveMapPage() {
 
   useEffect(() => {
     if (userLocation) {
-      fetchAllRestaurants();
+      fetchRestaurants();
     }
   }, [userLocation]);
 
@@ -73,19 +73,24 @@ export default function LiveMapPage() {
     updateDisplayedRestaurants();
   }, [allRestaurants, searchQuery, activeFilters, userLocation]);
 
-  const fetchAllRestaurants = async () => {
+  const fetchRestaurants = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
+      
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://jewgo.onrender.com/api/restaurants'
+        : 'http://127.0.0.1:8081/api/restaurants';
       
       if (userLocation) {
         // If there's a search query, fetch all restaurants to ensure we can find the specific restaurant
         // Otherwise, fetch restaurants within 50 miles of user location
-        const apiUrl = searchQuery.trim() 
-          ? '/api/restaurants?limit=1000'
-          : `/api/restaurants?limit=200&lat=${userLocation.latitude}&lng=${userLocation.longitude}&radius=50`;
+        const url = searchQuery.trim() 
+          ? `${apiUrl}?limit=1000`
+          : `${apiUrl}?limit=200&lat=${userLocation.latitude}&lng=${userLocation.longitude}&radius=50`;
         
-        console.log('Live map fetching from:', apiUrl);
-        const response = await fetch(apiUrl);
+        console.log('Live map fetching from:', url);
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error('Failed to fetch restaurants');
         }
@@ -99,7 +104,7 @@ export default function LiveMapPage() {
           throw new Error(data.error || 'Failed to fetch restaurants');
         }
       } else {
-        const response = await fetch('/api/restaurants?limit=1000');
+        const response = await fetch(`${apiUrl}?limit=1000`);
         if (!response.ok) {
           throw new Error('Failed to fetch restaurants');
         }
@@ -118,7 +123,7 @@ export default function LiveMapPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userLocation, searchQuery]);
 
   const getUserLocation = () => {
     if (!navigator.geolocation) {

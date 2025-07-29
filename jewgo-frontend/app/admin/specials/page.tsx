@@ -14,35 +14,44 @@ export default function SpecialsManagementPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   useEffect(() => {
-    fetchAllSpecials();
+    fetchSpecials();
   }, []);
 
-  const fetchAllSpecials = async () => {
+  const fetchSpecials = async () => {
     try {
       setLoading(true);
-      // This would need to be implemented in the backend
-      const response = await fetch('/api/admin/specials');
-      if (response.ok) {
-        const data = await response.json();
-        setSpecials(data.specials || []);
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://jewgo.onrender.com/api/admin/specials'
+        : 'http://127.0.0.1:8081/api/admin/specials';
+      
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error('Failed to fetch specials');
       }
+      const data = await response.json();
+      setSpecials(data.specials || []);
     } catch (error) {
       console.error('Error fetching specials:', error);
+      setError('Failed to load specials');
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePaymentUpdate = async (specialId: number, isPaid: boolean) => {
+  const handlePayment = async (specialId: number) => {
     try {
-              const response = await fetch(`/api/admin/specials/${specialId}/payment`, {
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://jewgo.onrender.com/api/admin/specials'
+        : 'http://127.0.0.1:8081/api/admin/specials';
+      
+      const response = await fetch(`${apiUrl}/${specialId}/payment`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          is_paid: isPaid,
-          payment_status: isPaid ? 'paid' : 'unpaid'
+          is_paid: !selectedSpecial.is_paid,
+          payment_status: !selectedSpecial.is_paid ? 'paid' : 'unpaid'
         }),
       });
 
@@ -50,7 +59,7 @@ export default function SpecialsManagementPage() {
         // Update local state
         setSpecials(prev => prev.map(special => 
           special.id === specialId 
-            ? { ...special, is_paid: isPaid, payment_status: isPaid ? 'paid' : 'unpaid' }
+            ? { ...special, is_paid: !selectedSpecial.is_paid, payment_status: !selectedSpecial.is_paid ? 'paid' : 'unpaid' }
             : special
         ));
         setShowPaymentModal(false);
@@ -208,7 +217,7 @@ export default function SpecialsManagementPage() {
               </div>
               <div className="flex justify-center space-x-4">
                 <button
-                  onClick={() => handlePaymentUpdate(selectedSpecial.id, !selectedSpecial.is_paid)}
+                  onClick={() => handlePayment(selectedSpecial.id)}
                   className={`px-4 py-2 rounded-md text-sm font-medium ${
                     selectedSpecial.is_paid
                       ? 'bg-red-600 text-white hover:bg-red-700'

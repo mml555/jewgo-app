@@ -107,12 +107,13 @@ export default function HomePage() {
   const fetchAllRestaurants = async () => {
     try {
       setLoading(true);
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Fetching restaurants from API...');
-      }
+      setApiError(null);
       
-      // Call the real API
-      const response = await fetch('/api/restaurants?limit=1000', {
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://jewgo.onrender.com/api/restaurants'
+        : 'http://127.0.0.1:8081/api/restaurants';
+      
+      const response = await fetch(`${apiUrl}?limit=1000`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

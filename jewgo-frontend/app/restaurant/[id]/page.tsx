@@ -8,6 +8,17 @@ import Logo from '@/components/Logo';
 import Reviews from '@/components/Reviews';
 import { formatWeeklyHoursArray, getHoursStatus } from '@/utils/hours';
 
+// Generate static params for common restaurant IDs
+export async function generateStaticParams() {
+  // Generate static pages for restaurant IDs 1-50
+  // This ensures the build succeeds and creates static pages for common restaurant IDs
+  const restaurantIds = Array.from({ length: 50 }, (_, i) => i + 1);
+  
+  return restaurantIds.map((id) => ({
+    id: id.toString(),
+  }));
+}
+
 const RestaurantDetailPage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
@@ -21,7 +32,11 @@ const RestaurantDetailPage: React.FC = () => {
   useEffect(() => {
     const fetchRestaurant = async () => {
       try {
-        const response = await fetch(`/api/restaurants/${params.id}`, {
+        const apiUrl = process.env.NODE_ENV === 'production' 
+          ? 'https://jewgo.onrender.com/api/restaurants'
+          : 'http://127.0.0.1:8081/api/restaurants';
+        
+        const response = await fetch(`${apiUrl}/${params.id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
