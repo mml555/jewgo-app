@@ -78,7 +78,7 @@ export default function LiveMapPage() {
       setError(null);
       
       const apiUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://jewgo.onrender.com/api/restaurants'
+        ? 'http://localhost:8081/api/restaurants'
         : 'http://127.0.0.1:8081/api/restaurants';
       
       if (userLocation) {
