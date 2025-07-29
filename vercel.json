@@ -1,4 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "cd jewgo-frontend && npm install && npm run build"
+  "rootDirectory": "jewgo-frontend",
+  "buildCommand": "npm run build"
 } 
