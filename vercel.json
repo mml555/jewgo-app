@@ -5,11 +5,7 @@
   "outputDirectory": "jewgo-frontend/.next",
   "installCommand": "cd jewgo-frontend && npm install",
 
-  "functions": {
-    "app/**/*.tsx": {
-      "maxDuration": 30
-    }
-  },
+
   "regions": ["iad1"],
   "headers": [
     {
