@@ -165,8 +165,17 @@ export default function HomePage() {
               />
               <ActionButtons 
                 isOnMapPage={false}
+                onShowFilters={() => {}}
+                onShowMap={() => window.location.href = '/live-map'}
+                onAddEatery={() => window.location.href = '/add-eatery'}
                 onFilterChange={handleFilterChange}
                 onToggleFilter={handleToggleFilter}
+                onDistanceChange={handleDistanceChange}
+                onClearAll={handleClearAll}
+                activeFilters={activeFilters}
+                userLocation={userLocation ? { lat: userLocation.latitude, lng: userLocation.longitude } : null}
+                locationLoading={locationLoading}
+                hasActiveFilters={Object.values(activeFilters || {}).some(filter => filter !== undefined && filter !== false)}
               />
             </div>
 
