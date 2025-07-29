@@ -1,0 +1,17 @@
+{
+  "/_not-found": "app/_not-found.js",
+  "/add-eatery/page": "app/add-eatery/page.js",
+  "/admin/specials/page": "app/admin/specials/page.js",
+  "/live-map/page": "app/live-map/page.js",
+  "/favorites/page": "app/favorites/page.js",
+  "/advanced-filters/page": "app/advanced-filters/page.js",
+  "/location-test/page": "app/location-test/page.js",
+  "/notifications/page": "app/notifications/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/page": "app/page.js",
+  "/search-test/page": "app/search-test/page.js",
+  "/simple-map/page": "app/simple-map/page.js",
+  "/specials/page": "app/specials/page.js",
+  "/test/page": "app/test/page.js",
+  "/restaurant/[id]/page": "app/restaurant/[id]/page.js"
+}
