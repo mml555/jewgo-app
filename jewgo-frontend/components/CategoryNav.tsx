@@ -4,12 +4,18 @@ interface CategoryNavProps {
   selectedFilters: {
     agency?: string;
     dietary?: string;
+    openNow?: boolean;
+    category?: string;
+    nearMe?: boolean;
+    distanceRadius?: number;
   };
-  onFilterChange: (filterType: 'agency' | 'dietary', value: string) => void;
+  onFilterChange: (key: string, value: any) => void;
+  onToggleFilter?: (filterType: 'openNow' | 'nearMe', value: boolean) => void;
+  onDistanceChange?: (distance: number) => void;
   onClearAll: () => void;
 }
 
-export default function CategoryNav({ selectedFilters, onFilterChange, onClearAll }: CategoryNavProps) {
+export default function CategoryNav({ selectedFilters, onFilterChange, onToggleFilter, onDistanceChange, onClearAll }: CategoryNavProps) {
   const agencyFilters = [
     { value: 'all', label: 'All Agencies', icon: '🏢' },
     { value: 'ORB', label: 'ORB', icon: '✓', tooltip: 'Orthodox Union Rabbinical Board' },
@@ -25,9 +31,17 @@ export default function CategoryNav({ selectedFilters, onFilterChange, onClearAl
     { value: 'pareve', label: 'Pareve', icon: '🥬' }
   ];
 
-  const hasActiveFilters = selectedFilters.agency || selectedFilters.dietary;
+  const categoryFilters = [
+    { value: 'all', label: 'All Categories', icon: '🏪' },
+    { value: 'restaurant', label: 'Restaurants', icon: '🍽️' },
+    { value: 'bakery', label: 'Bakeries', icon: '🥖' },
+    { value: 'grocery', label: 'Grocery', icon: '🛒' },
+    { value: 'catering', label: 'Catering', icon: '🎉' }
+  ];
 
-  const handleFilterClick = (filterType: 'agency' | 'dietary', value: string) => {
+  const hasActiveFilters = selectedFilters.agency || selectedFilters.dietary || selectedFilters.category || selectedFilters.openNow || selectedFilters.distanceRadius;
+
+  const handleFilterClick = (filterType: 'agency' | 'dietary' | 'category', value: string) => {
     const currentValue = selectedFilters[filterType];
     
     // If clicking the same filter that's already selected, remove it (set to 'all')
@@ -39,7 +53,7 @@ export default function CategoryNav({ selectedFilters, onFilterChange, onClearAl
     }
   };
 
-  const isFilterActive = (filterType: 'agency' | 'dietary', value: string) => {
+  const isFilterActive = (filterType: 'agency' | 'dietary' | 'category', value: string) => {
     return selectedFilters[filterType] === value;
   };
 
@@ -109,6 +123,29 @@ export default function CategoryNav({ selectedFilters, onFilterChange, onClearAl
           </div>
         </div>
 
+        {/* Category Filters */}
+        <div>
+          <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
+            <svg className="w-4 h-4 mr-2 text-jewgo-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            Categories
+            <span className="text-xs text-gray-400 ml-2">(click to toggle)</span>
+          </h4>
+          <div className="grid grid-cols-2 gap-2">
+            {categoryFilters.map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => handleFilterClick('category', filter.value)}
+                className={`filter-button w-full ${isFilterActive('category', filter.value) ? 'active' : ''}`}
+              >
+                <span className="text-sm">{filter.icon}</span>
+                <span className="text-xs sm:text-sm">{filter.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Active Filters Summary */}
         {hasActiveFilters && (
           <div className="pt-4 border-t border-gray-100">
@@ -131,6 +168,45 @@ export default function CategoryNav({ selectedFilters, onFilterChange, onClearAl
                   {dietaryFilters.find(f => f.value === selectedFilters.dietary)?.label}
                   <button
                     onClick={() => onFilterChange('dietary', 'all')}
+                    className="ml-2 hover:bg-jewgo-primary/20 rounded-full p-0.5"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </span>
+              )}
+              {selectedFilters.category && selectedFilters.category !== 'all' && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-jewgo-primary/10 text-jewgo-primary">
+                  {categoryFilters.find(f => f.value === selectedFilters.category)?.label}
+                  <button
+                    onClick={() => onFilterChange('category', 'all')}
+                    className="ml-2 hover:bg-jewgo-primary/20 rounded-full p-0.5"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </span>
+              )}
+              {selectedFilters.openNow && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-jewgo-primary/10 text-jewgo-primary">
+                  Open Now
+                  <button
+                    onClick={() => onToggleFilter?.('openNow', false)}
+                    className="ml-2 hover:bg-jewgo-primary/20 rounded-full p-0.5"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </span>
+              )}
+              {selectedFilters.distanceRadius && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-jewgo-primary/10 text-jewgo-primary">
+                  {selectedFilters.distanceRadius} miles
+                  <button
+                    onClick={() => onDistanceChange?.(0)}
                     className="ml-2 hover:bg-jewgo-primary/20 rounded-full p-0.5"
                   >
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import CategoryNav from '@/components/CategoryNav';
 import BottomNavigation from '@/components/BottomNavigation';
 import { getFavorites, removeFromFavorites, FavoriteRestaurant } from '@/utils/favorites';
 import { formatDistance } from '@/utils/distance';
@@ -10,7 +11,16 @@ import { formatDistance } from '@/utils/distance';
 export default function FavoritesPage() {
   const router = useRouter();
   const [favorites, setFavorites] = useState<FavoriteRestaurant[]>([]);
+  const [filteredFavorites, setFilteredFavorites] = useState<FavoriteRestaurant[]>([]);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [activeFilters, setActiveFilters] = useState<{
+    agency?: string;
+    dietary?: string;
+    openNow?: boolean;
+    category?: string;
+    nearMe?: boolean;
+    distanceRadius?: number;
+  }>({});
 
   // Load favorites on component mount
   useEffect(() => {
@@ -32,11 +42,64 @@ export default function FavoritesPage() {
     }
   }, []);
 
+  // Apply filters when favorites or filters change
+  useEffect(() => {
+    let filtered = [...favorites];
+
+    // Apply agency filter
+    if (activeFilters.agency && activeFilters.agency !== 'all') {
+      filtered = filtered.filter(favorite => 
+        favorite.certifying_agency?.toLowerCase() === activeFilters.agency?.toLowerCase()
+      );
+    }
+
+    // Apply dietary filter
+    if (activeFilters.dietary && activeFilters.dietary !== 'all') {
+      filtered = filtered.filter(favorite => 
+        favorite.kosher_category?.toLowerCase() === activeFilters.dietary?.toLowerCase()
+      );
+    }
+
+    // Apply category filter
+    if (activeFilters.category && activeFilters.category !== 'all') {
+      filtered = filtered.filter(favorite => 
+        favorite.listing_type?.toLowerCase() === activeFilters.category?.toLowerCase()
+      );
+    }
+
+    setFilteredFavorites(filtered);
+  }, [favorites, activeFilters]);
+
   const removeFavorite = (id: number) => {
     const success = removeFromFavorites(id);
     if (success) {
       setFavorites(getFavorites()); // Refresh the list
     }
+  };
+
+  const handleFilterChange = (key: string, value: any) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [key]: value === 'all' ? undefined : value
+    }));
+  };
+
+  const handleToggleFilter = (key: string, value: boolean) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const handleDistanceChange = (distance: number) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      distanceRadius: distance
+    }));
+  };
+
+  const handleClearAll = () => {
+    setActiveFilters({});
   };
 
   const handleViewDetails = (restaurant: FavoriteRestaurant) => {
@@ -68,8 +131,19 @@ export default function FavoritesPage() {
             <p className="text-gray-600">Your saved kosher establishments</p>
           </div>
 
+          {/* Category Navigation */}
+          <div className="mb-6">
+            <CategoryNav
+              selectedFilters={activeFilters}
+              onFilterChange={handleFilterChange}
+              onToggleFilter={handleToggleFilter}
+              onDistanceChange={handleDistanceChange}
+              onClearAll={handleClearAll}
+            />
+          </div>
+
           {/* Favorites List */}
-          {favorites.length === 0 ? (
+          {filteredFavorites.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">💔</div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">No Favorites Yet</h3>
@@ -80,7 +154,7 @@ export default function FavoritesPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {favorites.map((favorite) => {
+              {filteredFavorites.map((favorite) => {
                 // Calculate distance if user location is available
                 let distanceText = '';
                 if (userLocation && favorite.latitude && favorite.longitude) {

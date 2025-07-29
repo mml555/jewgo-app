@@ -7,7 +7,9 @@ import LogoIcon from './LogoIcon';
 import SpecialsCard from './SpecialsCard';
 import { getRestaurantDistance, formatDistance } from '@/utils/distance';
 import { getHoursStatus } from '@/utils/hours';
+import { isFavorite, addToFavorites, removeFromFavorites } from '@/utils/favorites';
 import { useState, useEffect } from 'react';
+import SharePopup from './SharePopup';
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -20,6 +22,8 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
   const router = useRouter();
   const [imageError, setImageError] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [showSharePopup, setShowSharePopup] = useState(false);
 
   // Helper functions - defined before use
   const getCategoryEmoji = (name: string, category?: string) => {
@@ -48,13 +52,25 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
   };
 
   const getHeroImage = (restaurant: Restaurant) => {
-    // Check if image_url is a Google Places photo URL that might fail
+    // Check if image_url is a Google Places photo URL
     const isGooglePlacesUrl = restaurant.image_url?.includes('maps.googleapis.com/maps/api/place/photo');
     
-    // If it's a Google Places URL, skip it and use fallbacks to avoid 403 errors
     if (isGooglePlacesUrl) {
-      // Skip Google Places URLs and use fallbacks instead
-      console.log('Skipping Google Places photo URL to avoid 403 errors');
+      // Replace the API key in the Google Places photo URL with our configured key
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+      if (apiKey && apiKey !== 'YOUR_API_KEY_HERE') {
+        // Extract the photo reference and other parameters
+        const url = new URL(restaurant.image_url!);
+        const photoReference = url.searchParams.get('photo_reference');
+        const maxWidth = url.searchParams.get('maxwidth') || '400';
+        
+        if (photoReference) {
+          // Construct a new URL with our API key
+          return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${apiKey}`;
+        }
+      }
+      // If we can't construct a proper URL, fall back to category images
+      console.log('Using fallback image for Google Places photo');
     } else if (restaurant.image_url) {
       // Use non-Google Places image URLs
       return restaurant.image_url;
@@ -86,6 +102,29 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
   
   // Get category emoji for fallback display
   const categoryEmoji = getCategoryEmoji(restaurant.name, restaurant.kosher_category);
+
+  // Check if restaurant is favorited on mount
+  useEffect(() => {
+    setIsFavorited(isFavorite(restaurant.id));
+  }, [restaurant.id]);
+
+  // Handle favorite toggle
+  const handleFavoriteToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isFavorited) {
+      removeFromFavorites(restaurant.id);
+      setIsFavorited(false);
+    } else {
+      addToFavorites(restaurant);
+      setIsFavorited(true);
+    }
+  };
+
+  // Handle share button click
+  const handleShareClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowSharePopup(true);
+  };
 
   const getAgencyBadgeClass = (agency: string) => {
     switch (agency?.toUpperCase()) {
@@ -189,8 +228,39 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
             </div>
           )}
           
-          {/* Overlay with badges */}
+          {/* Overlay with badges and action buttons */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+
+            {/* Action Buttons - Top-right corner */}
+            <div className="absolute top-2 right-2 z-30 flex gap-2">
+              {/* Share Button */}
+              <button
+                onClick={handleShareClick}
+                className="p-2 rounded-full shadow-lg backdrop-blur-sm bg-white/90 text-gray-700 hover:bg-white hover:scale-110 transition-all duration-200"
+                title="Share restaurant"
+                aria-label="Share restaurant"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                </svg>
+              </button>
+
+              {/* Favorite Button */}
+              <button
+                onClick={handleFavoriteToggle}
+                className={`p-2 rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 ${
+                  isFavorited 
+                    ? 'bg-pink-500 text-white hover:bg-pink-600' 
+                    : 'bg-white/90 text-pink-500 border-2 border-white hover:bg-pink-500 hover:text-white hover:scale-110'
+                }`}
+                title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+                aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+              >
+                <svg className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </button>
+            </div>
 
             {/* Certification Badge - Bottom-left corner */}
             {restaurant.certifying_agency && restaurant.certifying_agency !== 'Unknown' && (
@@ -403,6 +473,13 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
           </div>
         </div>
       </div>
+
+      {/* Share Popup */}
+      <SharePopup
+        restaurant={restaurant}
+        isOpen={showSharePopup}
+        onClose={() => setShowSharePopup(false)}
+      />
     </div>
   );
 } 

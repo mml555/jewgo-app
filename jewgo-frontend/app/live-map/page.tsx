@@ -3,17 +3,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
-import UnifiedSearchBar from '@/components/UnifiedSearchBar';
-import CategoryNav from '@/components/CategoryNav';
+import SearchBar from '@/components/SearchBar';
+import ActionButtons from '@/components/ActionButtons';
 import InteractiveRestaurantMap from '@/components/InteractiveRestaurantMap';
 import BottomNavigation from '@/components/BottomNavigation';
 import { Restaurant } from '@/types/restaurant';
-
-interface UserLocation {
-  latitude: number;
-  longitude: number;
-  accuracy?: number;
-}
 
 export default function LiveMapPage() {
   const searchParams = useSearchParams();
@@ -23,12 +17,16 @@ export default function LiveMapPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
-  const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
+  const [userLocation, setUserLocation] = useState<{latitude: number, longitude: number, accuracy?: number} | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [activeFilters, setActiveFilters] = useState<{
     agency?: string;
     dietary?: string;
+    openNow?: boolean;
+    category?: string;
+    nearMe?: boolean;
+    distanceRadius?: number;
   }>({});
   const [mapCenter, setMapCenter] = useState<{lat: number, lng: number} | null>(null);
 
@@ -137,7 +135,7 @@ export default function LiveMapPage() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const location: UserLocation = {
+        const location = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
@@ -245,6 +243,40 @@ export default function LiveMapPage() {
       });
     }
 
+    // Apply category filter
+    if (activeFilters.category && activeFilters.category !== 'all') {
+      filteredRestaurants = filteredRestaurants.filter(restaurant => {
+        const listingType = restaurant.listing_type?.toLowerCase() || '';
+        return listingType === activeFilters.category?.toLowerCase();
+      });
+    }
+
+    // Apply distance radius filter
+    if (activeFilters.distanceRadius && userLocation) {
+      filteredRestaurants = filteredRestaurants.filter(restaurant => {
+        const distance = calculateDistance(
+          userLocation.latitude,
+          userLocation.longitude,
+          parseFloat(String(restaurant.latitude) || '0'),
+          parseFloat(String(restaurant.longitude) || '0')
+        );
+        return distance <= activeFilters.distanceRadius!;
+      });
+    }
+
+    // Apply "Open Now" filter
+    if (activeFilters.openNow) {
+      const now = new Date();
+      const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+      const currentTime = now.getHours() * 100 + now.getMinutes(); // Convert to HHMM format
+      
+      filteredRestaurants = filteredRestaurants.filter(restaurant => {
+        // This is a simplified check - you might want to implement more sophisticated hours checking
+        // For now, we'll assume restaurants are open if they have hours data
+        return restaurant.hours_of_operation && restaurant.hours_of_operation.trim() !== '';
+      });
+    }
+
     // Sort by distance if user location is available
     if (userLocation) {
       filteredRestaurants.sort((a, b) => {
@@ -272,19 +304,24 @@ export default function LiveMapPage() {
     setSearchQuery(query);
   };
 
-  const handleLocationSearch = (location: UserLocation, address: string) => {
-    setUserLocation(location);
-    setSearchQuery(address);
-  };
-
-  const handleUseCurrentLocation = () => {
-    getUserLocation();
-  };
-
-  const handleFilterChange = (filterType: 'agency' | 'dietary', value: string) => {
+  const handleFilterChange = (key: string, value: any) => {
     setActiveFilters(prev => ({
       ...prev,
-      [filterType]: value === 'all' ? undefined : value
+      [key]: value === 'all' ? undefined : value
+    }));
+  };
+
+  const handleToggleFilter = (key: string, value: boolean) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const handleDistanceChange = (distance: number) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      distanceRadius: distance
     }));
   };
 
@@ -302,6 +339,17 @@ export default function LiveMapPage() {
     return displayedRestaurants.length;
   };
 
+  const hasActiveFilters = () => {
+    return !!(
+      activeFilters.agency ||
+      activeFilters.dietary ||
+      activeFilters.category ||
+      activeFilters.openNow ||
+      activeFilters.distanceRadius ||
+      searchQuery.trim()
+    );
+  };
+
   const getFilterDescription = () => {
     const filters = [];
     if (activeFilters.agency) {
@@ -309,6 +357,15 @@ export default function LiveMapPage() {
     }
     if (activeFilters.dietary) {
       filters.push(activeFilters.dietary);
+    }
+    if (activeFilters.category) {
+      filters.push(activeFilters.category);
+    }
+    if (activeFilters.openNow) {
+      filters.push('Open Now');
+    }
+    if (activeFilters.distanceRadius) {
+      filters.push(`${activeFilters.distanceRadius} miles`);
     }
     if (searchQuery.trim()) {
       filters.push(`"${searchQuery}"`);
@@ -323,14 +380,9 @@ export default function LiveMapPage() {
       {/* Header */}
       <Header />
       
-      {/* Unified Search Bar */}
+      {/* Search Bar */}
       <div className="px-4 py-4">
-        <UnifiedSearchBar 
-          onRestaurantSearch={handleRestaurantSearch}
-          onLocationSearch={handleLocationSearch}
-          onUseCurrentLocation={handleUseCurrentLocation}
-          restaurants={allRestaurants}
-        />
+        <SearchBar onSearch={handleRestaurantSearch} />
       </div>
 
       {/* Location Status */}
@@ -361,14 +413,25 @@ export default function LiveMapPage() {
         )}
       </div>
 
-      {/* Category Navigation */}
-      <div className="px-4 mb-4">
-        <CategoryNav 
-          selectedFilters={activeFilters}
-          onFilterChange={handleFilterChange}
-          onClearAll={handleClearAll}
-        />
-      </div>
+      {/* Action Buttons with Advanced Filters */}
+      <ActionButtons
+        onShowFilters={() => {}} // This will be handled by the modal in ActionButtons
+        onShowMap={() => {
+          window.location.href = '/'; // Navigate to explore page (list view)
+        }}
+        onAddEatery={() => {
+          window.location.href = '/add-eatery';
+        }}
+        activeFilters={activeFilters}
+        onFilterChange={handleFilterChange}
+        onToggleFilter={handleToggleFilter}
+        onDistanceChange={handleDistanceChange}
+        onClearAll={handleClearAll}
+        userLocation={userLocation ? { lat: userLocation.latitude, lng: userLocation.longitude } : null}
+        locationLoading={locationLoading}
+        hasActiveFilters={hasActiveFilters()}
+        isOnMapPage={true}
+      />
 
       {/* Results Summary */}
       {!loading && (

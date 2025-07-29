@@ -141,13 +141,29 @@ const RestaurantDetailPage: React.FC = () => {
   };
 
   const getHeroImage = (restaurant: Restaurant) => {
-    // Check if image_url is a Google Places photo URL that might fail
+    // Check if image_url is a Google Places photo URL
     const isGooglePlacesUrl = restaurant.image_url?.includes('maps.googleapis.com/maps/api/place/photo');
     
-    // If it's a Google Places URL, skip it and use fallbacks to avoid 403 errors
     if (isGooglePlacesUrl) {
-      // Skip Google Places URLs and use fallbacks instead
-      console.log('Skipping Google Places photo URL to avoid 403 errors');
+      // Replace the API key in the Google Places photo URL with our configured key
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+      if (apiKey && apiKey !== 'YOUR_API_KEY_HERE') {
+        try {
+          // Extract the photo reference and other parameters
+          const url = new URL(restaurant.image_url!);
+          const photoReference = url.searchParams.get('photo_reference');
+          const maxWidth = url.searchParams.get('maxwidth') || '800';
+          
+          if (photoReference) {
+            // Construct a new URL with our API key
+            return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${apiKey}`;
+          }
+        } catch (error) {
+          console.error('Error parsing Google Places URL:', error);
+        }
+      }
+      // If we can't construct a proper URL, fall back to category images
+      console.log('Using fallback image for Google Places photo');
     } else if (restaurant.image_url && !imageError) {
       // Use non-Google Places image URLs
       return restaurant.image_url;

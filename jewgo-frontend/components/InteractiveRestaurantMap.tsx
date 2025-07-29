@@ -485,11 +485,28 @@ export default function InteractiveRestaurantMap({
 
   }, [restaurantsWithCoords, selectedRestaurantId, mapLoaded, userLocation]);
 
-  // Helper function to get safe image URLs (avoid Google Places photo URLs)
+  // Helper function to get safe image URLs (handle Google Places photo URLs properly)
   const getSafeImageUrl = (restaurant: Restaurant) => {
     const isGooglePlacesUrl = restaurant.image_url?.includes('maps.googleapis.com/maps/api/place/photo');
     if (isGooglePlacesUrl) {
-      return null; // Skip Google Places URLs to avoid 403 errors
+      // Replace the API key in the Google Places photo URL with our configured key
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+      if (apiKey && apiKey !== 'YOUR_API_KEY_HERE') {
+        try {
+          // Extract the photo reference and other parameters
+          const url = new URL(restaurant.image_url!);
+          const photoReference = url.searchParams.get('photo_reference');
+          const maxWidth = url.searchParams.get('maxwidth') || '400';
+          
+          if (photoReference) {
+            // Construct a new URL with our API key
+            return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${apiKey}`;
+          }
+        } catch (error) {
+          console.error('Error parsing Google Places URL:', error);
+        }
+      }
+      return null; // Fall back to no image if we can't construct a proper URL
     }
     return restaurant.image_url;
   };

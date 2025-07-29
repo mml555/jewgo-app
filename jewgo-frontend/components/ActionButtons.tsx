@@ -51,6 +51,7 @@ interface ActionButtonsProps {
   userLocation?: { lat: number; lng: number } | null;
   locationLoading?: boolean;
   hasActiveFilters?: boolean;
+  isOnMapPage?: boolean;
 }
 
 export default function ActionButtons({
@@ -64,7 +65,8 @@ export default function ActionButtons({
   onClearAll,
   userLocation,
   locationLoading,
-  hasActiveFilters
+  hasActiveFilters,
+  isOnMapPage = false
 }: ActionButtonsProps) {
   const [showFilters, setShowFilters] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
@@ -135,11 +137,22 @@ export default function ActionButtons({
             onClick={onShowMap}
             className="flex items-center justify-center gap-2 bg-transparent text-black border border-black px-6 py-3 rounded-full text-sm font-medium shadow-sm hover:bg-green-100 hover:border-green-400 transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-300/20 flex-1"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span>Map</span>
+            {isOnMapPage ? (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                <span>View List</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Map</span>
+              </>
+            )}
           </button>
 
           <button

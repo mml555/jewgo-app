@@ -2,9 +2,18 @@
 
 import { useState } from 'react';
 import Header from '@/components/Header';
+import CategoryNav from '@/components/CategoryNav';
 import BottomNavigation from '@/components/BottomNavigation';
 
 export default function ProfilePage() {
+  const [activeFilters, setActiveFilters] = useState<{
+    agency?: string;
+    dietary?: string;
+    openNow?: boolean;
+    category?: string;
+    nearMe?: boolean;
+    distanceRadius?: number;
+  }>({});
   const [userProfile, setUserProfile] = useState({
     name: 'Sarah Cohen',
     email: 'sarah.cohen@email.com',
@@ -40,6 +49,31 @@ export default function ProfilePage() {
     }));
   };
 
+  const handleFilterChange = (key: string, value: any) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [key]: value === 'all' ? undefined : value
+    }));
+  };
+
+  const handleToggleFilter = (key: string, value: boolean) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const handleDistanceChange = (distance: number) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      distanceRadius: distance
+    }));
+  };
+
+  const handleClearAll = () => {
+    setActiveFilters({});
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -53,6 +87,17 @@ export default function ProfilePage() {
             <div className="text-4xl mb-4">👤</div>
             <h1 className="text-2xl font-bold text-gray-800 mb-2">My Profile</h1>
             <p className="text-gray-600">Manage your account and preferences</p>
+          </div>
+
+          {/* Category Navigation */}
+          <div className="mb-6">
+            <CategoryNav
+              selectedFilters={activeFilters}
+              onFilterChange={handleFilterChange}
+              onToggleFilter={handleToggleFilter}
+              onDistanceChange={handleDistanceChange}
+              onClearAll={handleClearAll}
+            />
           </div>
 
           {/* Profile Tabs */}
