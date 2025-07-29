@@ -137,13 +137,16 @@ const RestaurantDetailPage: React.FC = () => {
   };
 
   const getHeroImage = (restaurant: Restaurant) => {
-    // Priority: Google Places image > backup image > category-specific fallback
-    if (restaurant.image_url && !imageError) {
-      return restaurant.image_url;
-    }
+    // Check if image_url is a Google Places photo URL that might fail
+    const isGooglePlacesUrl = restaurant.image_url?.includes('maps.googleapis.com/maps/api/place/photo');
     
-    if (restaurant.image_path && !imageError) {
-      return restaurant.image_path;
+    // If it's a Google Places URL, skip it and use fallbacks to avoid 403 errors
+    if (isGooglePlacesUrl) {
+      // Skip Google Places URLs and use fallbacks instead
+      console.log('Skipping Google Places photo URL to avoid 403 errors');
+    } else if (restaurant.image_url && !imageError) {
+      // Use non-Google Places image URLs
+      return restaurant.image_url;
     }
     
     // Category-specific Unsplash fallbacks with reliable URLs
@@ -161,7 +164,8 @@ const RestaurantDetailPage: React.FC = () => {
   const getGoogleMapsEmbedUrl = (restaurant: Restaurant) => {
     const address = formatCompleteAddress(restaurant);
     const encodedAddress = encodeURIComponent(address);
-    return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodedAddress}`;
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    return `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodedAddress}`;
   };
 
   if (loading) {
@@ -614,7 +618,7 @@ const RestaurantDetailPage: React.FC = () => {
                 <button
                   onClick={() => {
                     // Redirect to Google Reviews
-                    const googleReviewUrl = `https://search.google.com/local/writereview?placeid=${restaurant.google_place_id || ''}&name=${encodeURIComponent(restaurant.name)}`;
+                    const googleReviewUrl = `https://search.google.com/local/writereview?name=${encodeURIComponent(restaurant.name)}&address=${encodeURIComponent(restaurant.address)}`;
                     window.open(googleReviewUrl, '_blank', 'noopener,noreferrer');
                     setShowWriteReviewModal(false);
                   }}
@@ -625,7 +629,7 @@ const RestaurantDetailPage: React.FC = () => {
                 <button
                   onClick={() => {
                     // Redirect to Yelp Reviews
-                    const yelpReviewUrl = `https://www.yelp.com/writeareview/biz/${restaurant.yelp_id || ''}`;
+                    const yelpReviewUrl = `https://www.yelp.com/search?find_desc=${encodeURIComponent(restaurant.name)}&find_loc=${encodeURIComponent(restaurant.address)}`;
                     window.open(yelpReviewUrl, '_blank', 'noopener,noreferrer');
                     setShowWriteReviewModal(false);
                   }}

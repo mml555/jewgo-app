@@ -48,13 +48,16 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
   };
 
   const getHeroImage = (restaurant: Restaurant) => {
-    // Priority: Google Places image > backup image > category-specific fallback
-    if (restaurant.image_url) {
-      return restaurant.image_url;
-    }
+    // Check if image_url is a Google Places photo URL that might fail
+    const isGooglePlacesUrl = restaurant.image_url?.includes('maps.googleapis.com/maps/api/place/photo');
     
-    if (restaurant.image_path) {
-      return restaurant.image_path;
+    // If it's a Google Places URL, skip it and use fallbacks to avoid 403 errors
+    if (isGooglePlacesUrl) {
+      // Skip Google Places URLs and use fallbacks instead
+      console.log('Skipping Google Places photo URL to avoid 403 errors');
+    } else if (restaurant.image_url) {
+      // Use non-Google Places image URLs
+      return restaurant.image_url;
     }
     
     // Category-specific Unsplash fallbacks with reliable URLs
@@ -80,6 +83,9 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
   // Calculate distance if location is available
   const distance = userLocation ? getRestaurantDistance(restaurant, userLocation) : null;
   const formattedDistance = distance ? formatDistance(distance) : null;
+  
+  // Get category emoji for fallback display
+  const categoryEmoji = getCategoryEmoji(restaurant.name, restaurant.kosher_category);
 
   const getAgencyBadgeClass = (agency: string) => {
     switch (agency?.toUpperCase()) {
@@ -129,8 +135,6 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
   // Get hours status using the utility function
   const hoursStatus = getHoursStatus(restaurant.hours_open || restaurant.hours_of_operation);
 
-  // Get category emoji for fallback image
-  const categoryEmoji = getCategoryEmoji(restaurant.name, restaurant.kosher_category);
 
   const getCertificationWebsite = (agency: string) => {
     switch (agency?.toUpperCase()) {
@@ -173,8 +177,8 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               onError={() => setImageError(true)}
               unoptimized
-              priority={index < 4}
-              loading={index < 4 ? "eager" : "lazy"}
+              priority={index !== undefined && index < 4}
+              loading={index !== undefined && index < 4 ? "eager" : "lazy"}
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
               quality={85}

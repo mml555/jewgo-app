@@ -245,14 +245,14 @@ export default function LiveMapPage() {
         const distanceA = calculateDistance(
           userLocation.latitude,
           userLocation.longitude,
-          parseFloat(a.latitude || '0'),
-          parseFloat(a.longitude || '0')
+          parseFloat(String(a.latitude) || '0'),
+          parseFloat(String(a.longitude) || '0')
         );
         const distanceB = calculateDistance(
           userLocation.latitude,
           userLocation.longitude,
-          parseFloat(b.latitude || '0'),
-          parseFloat(b.longitude || '0')
+          parseFloat(String(b.latitude) || '0'),
+          parseFloat(String(b.longitude) || '0')
         );
         return distanceA - distanceB;
       });

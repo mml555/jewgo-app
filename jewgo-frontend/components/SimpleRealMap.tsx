@@ -55,11 +55,11 @@ export default function SimpleRealMap({ restaurants, onRestaurantSelect }: Simpl
   // Create Google Maps URL with markers
   const createMapUrl = () => {
     if (restaurants.length === 0) {
-      return `https://www.google.com/maps/embed/v1/view?key=your_google_maps_api_key_here&center=${mapCenter.lat},${mapCenter.lng}&zoom=12`;
+      return `https://www.google.com/maps/embed/v1/view?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&center=${mapCenter.lat},${mapCenter.lng}&zoom=12`;
     }
 
     const markers = restaurants.map(r => `${r.latitude},${r.longitude}`).join('|');
-    return `https://www.google.com/maps/embed/v1/view?key=your_google_maps_api_key_here&center=${mapCenter.lat},${mapCenter.lng}&zoom=11&maptype=roadmap`;
+    return `https://www.google.com/maps/embed/v1/view?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&center=${mapCenter.lat},${mapCenter.lng}&zoom=11&maptype=roadmap`;
   };
 
   return (

@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   trailingSlash: true,
   images: {
     unoptimized: true,
@@ -32,7 +31,7 @@ const nextConfig = {
       {
         source: '/api/:path*',
         destination: process.env.NODE_ENV === 'production' 
-          ? 'https://your-backend-url.com/api/:path*'  // Replace with your backend URL
+          ? 'https://jewgo.onrender.com/api/:path*'  // Replace with your backend URL
           : 'http://127.0.0.1:8081/api/:path*',
       },
     ];

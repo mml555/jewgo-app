@@ -135,7 +135,7 @@ export default function HomePage() {
       }
     } catch (error) {
       console.error('Error fetching restaurants:', error);
-      setApiError(error.message || 'Unknown error');
+      setApiError(error instanceof Error ? error.message : 'Unknown error');
     } finally {
       setLoading(false);
       if (process.env.NODE_ENV === 'development') {
@@ -166,7 +166,6 @@ export default function HomePage() {
         const searchableFields = [
           restaurant.name,
           restaurant.short_description,
-          restaurant.full_description,
           restaurant.address,
           restaurant.city,
           restaurant.state,
@@ -310,25 +309,35 @@ export default function HomePage() {
     setCurrentPage(1);
   };
 
-  const handleFilterChange = (filterType: 'agency' | 'dietary' | 'category', value: string) => {
+  const handleFilterChange = (key: string, value: any) => {
     if (process.env.NODE_ENV === 'development') {
       console.log('=== handleFilterChange called - setting currentPage to 1 ===');
     }
-    setActiveFilters(prev => ({
-      ...prev,
-      [filterType]: value === 'all' ? undefined : value
-    }));
+    
+    // Handle different filter types
+    if (key === 'agency' || key === 'dietary' || key === 'category') {
+      setActiveFilters(prev => ({
+        ...prev,
+        [key]: value === 'all' ? undefined : value
+      }));
+    }
+    
     setCurrentPage(1);
   };
 
-  const handleToggleFilter = (filterType: 'openNow' | 'nearMe', value: boolean) => {
+  const handleToggleFilter = (key: string, value: boolean) => {
     if (process.env.NODE_ENV === 'development') {
       console.log('=== handleToggleFilter called - setting currentPage to 1 ===');
     }
-    setActiveFilters(prev => ({
-      ...prev,
-      [filterType]: value
-    }));
+    
+    // Handle different filter types
+    if (key === 'openNow' || key === 'nearMe') {
+      setActiveFilters(prev => ({
+        ...prev,
+        [key]: value
+      }));
+    }
+    
     setCurrentPage(1);
   };
 
@@ -388,7 +397,6 @@ export default function HomePage() {
         const searchableFields = [
           restaurant.name,
           restaurant.short_description,
-          restaurant.full_description,
           restaurant.address,
           restaurant.city,
           restaurant.state,
@@ -547,7 +555,7 @@ export default function HomePage() {
             onToggleFilter={handleToggleFilter}
             onDistanceChange={handleDistanceChange}
             onClearAll={handleClearAll}
-            userLocation={userLocation}
+            userLocation={userLocation ? { lat: userLocation.latitude, lng: userLocation.longitude } : null}
             locationLoading={locationLoading}
             hasActiveFilters={Object.values(activeFilters || {}).some(filter => filter !== undefined && filter !== false)}
           />

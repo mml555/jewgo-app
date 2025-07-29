@@ -1,39 +1,14 @@
-# 🍽️ JewGo - Kosher Restaurant Discovery App
+# JewGo - Kosher Restaurant Discovery App
 
-A modern, mobile-first web application for discovering kosher restaurants, bakeries, and grocery stores in your area.
-
-**🚀 Latest Update: Configured for Cloudflare Pages deployment with fixed dependencies (2025-07-29)**
-
-## 🌟 Features
-
-- **Restaurant Discovery**: Find kosher restaurants, bakeries, and grocery stores
-- **Advanced Filtering**: Filter by certifying agency, dietary preferences, and distance
-- **Interactive Maps**: Live map view with restaurant locations
-- **Mobile-First Design**: Optimized for mobile devices with responsive design
-- **Real-time Search**: Search restaurants by name, location, and keywords
-- **Restaurant Details**: Comprehensive restaurant information including hours, reviews, and contact details
-- **Favorites System**: Save and manage your favorite restaurants
-- **Location Services**: GPS-based distance calculations and directions
-
-## 🏗️ Tech Stack
-
-### Frontend
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type-safe JavaScript
-- **Tailwind CSS** - Utility-first CSS framework
-- **Google Maps API** - Interactive maps and location services
-
-### Backend
-- **Python Flask** - RESTful API server
-- **SQLite** - Lightweight database
-- **Google Places API** - Restaurant data and reviews
+A modern web application for discovering kosher restaurants and eateries with advanced filtering, mapping, and community features.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+ 
 - Python 3.8+
-- Git
+- Google Maps API key
+- Google Places API key
 
 ### Installation
 
@@ -45,144 +20,128 @@ A modern, mobile-first web application for discovering kosher restaurants, baker
 
 2. **Install dependencies**
    ```bash
+   # Frontend dependencies
    npm install
-   ```
-
-3. **Setup Backend**
-   ```bash
-   # Create virtual environment
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
    
-   # Install dependencies
+   # Backend dependencies  
    pip install -r requirements.txt
    ```
 
-4. **Environment Variables**
+3. **Set up environment variables**
+   ```bash
+   # Copy environment templates
+   cp .env.example .env.local
+   cp .env.example .env
    
-   Create `.env.local` file:
-   ```env
-   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
-   NEXT_PUBLIC_BACKEND_URL=http://localhost:8081
+   # Edit with your API keys
+   nano .env.local
+   nano .env
    ```
 
-5. **Run Development Servers**
-   
-   **Backend (Terminal 1):**
+4. **Start development servers**
    ```bash
+   # Frontend (Next.js)
+   npm run dev
+   
+   # Backend (Flask) - in another terminal
    python app.py
    ```
-   
-   **Frontend (Terminal 2):**
-   ```bash
-   npm run dev
-   ```
 
-6. **Access the Application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8081
+## 🌟 Features
 
-## 📱 Features Overview
+- **Restaurant Discovery**: Search and filter kosher restaurants
+- **Interactive Maps**: Google Maps integration with restaurant locations
+- **Advanced Filtering**: Filter by agency, dietary restrictions, categories
+- **Community Features**: Add new restaurants, reviews, and specials
+- **Mobile Responsive**: Optimized for all device sizes
+- **Real-time Data**: Live updates from Google Places API
 
-### 🗺️ Interactive Map
-- Real-time restaurant locations
-- Distance-based filtering
-- Click-to-navigate functionality
-- Mobile-optimized map interface
+## 🛠 Tech Stack
 
-### 🔍 Advanced Search & Filters
-- Text-based search
-- Certifying agency filters (ORB, KM, KDM, Diamond K)
-- Dietary preference filters (Meat, Dairy, Pareve)
-- Distance-based filtering
-- "Open Now" filter
+### Frontend
+- **Next.js 15.3.3** - React framework
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **Google Maps API** - Interactive maps
+- **React Leaflet** - Alternative mapping
 
-### 🏪 Restaurant Details
-- Comprehensive restaurant information
-- Hours of operation
-- Contact information
-- Google reviews integration
-- Cost information
-- Kosher certification details
+### Backend  
+- **Flask** - Python web framework
+- **SQLite** - Database
+- **Google Places API** - Restaurant data
+- **CORS** - Cross-origin requests
 
-### 📱 Mobile Experience
-- Responsive design
-- Touch-friendly interface
-- Sticky action bars
-- Optimized for mobile browsing
-
-## 🏗️ Project Structure
+## 📁 Project Structure
 
 ```
 jewgo/
-├── app/                    # Next.js App Router pages
-├── components/             # React components
-├── types/                  # TypeScript definitions
-├── utils/                  # Utility functions
-├── public/                 # Static assets
-├── app.py                  # Flask backend server
-├── database_manager.py     # Database operations
-├── requirements.txt        # Python dependencies
-└── README.md              # This file
+├── app/                    # Next.js app directory
+│   ├── page.tsx           # Main explore page
+│   ├── live-map/          # Interactive map view
+│   ├── restaurant/[id]/   # Restaurant detail pages
+│   └── ...                # Other pages
+├── components/            # React components
+├── app.py                # Flask backend server
+├── database_manager.py   # Database operations
+├── requirements.txt      # Python dependencies
+└── package.json         # Node.js dependencies
 ```
 
 ## 🚀 Deployment
 
-### Cloudflare Pages Deployment
+### Frontend (Cloudflare Pages)
+1. Connect GitHub repository to Cloudflare Pages
+2. Set build command: `npm run build`
+3. Set build output directory: `out`
+4. Add environment variables:
+   - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
+   - `NEXT_PUBLIC_BACKEND_URL`
+   - `NODE_ENV=production`
 
-This app is configured for Cloudflare Pages deployment:
+### Backend (Render/Railway/Heroku)
+1. Deploy to your preferred platform
+2. Add environment variables:
+   - `FLASK_SECRET_KEY`
+   - `GOOGLE_PLACES_API_KEY`
+   - `GOOGLE_KNOWLEDGE_GRAPH_API_KEY`
 
-1. **Automatic Deployment**: Connected to GitHub repository
-2. **Build Command**: `npm run build`
-3. **Build Output Directory**: `out`
-4. **Environment Variables**: Set in Cloudflare Pages dashboard
+## 🔧 Environment Variables
 
-### Backend Deployment
+### Frontend (.env.local)
+```env
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+NEXT_PUBLIC_BACKEND_URL=https://your-backend-url.com
+```
 
-The backend can be deployed to:
-- **Railway** - Easy Python deployment
-- **Render** - Free tier available
-- **Heroku** - Traditional choice
-- **DigitalOcean App Platform** - Scalable solution
+### Backend (.env)
+```env
+FLASK_SECRET_KEY=your_flask_secret_key
+GOOGLE_PLACES_API_KEY=your_google_places_api_key
+GOOGLE_KNOWLEDGE_GRAPH_API_KEY=your_google_knowledge_graph_api_key
+DATABASE_URL=sqlite:///restaurants.db
+```
 
-## 🔧 Configuration
+## 📝 API Endpoints
 
-### Google Maps API Setup
-
-1. Create a Google Cloud Project
-2. Enable Maps JavaScript API and Places API
-3. Create API keys with appropriate restrictions
-4. Add keys to environment variables
-
-### Database Setup
-
-The app uses SQLite for simplicity. For production:
-- Consider PostgreSQL or MySQL
-- Set up proper database migrations
-- Configure connection pooling
+### Backend API (Flask)
+- `GET /api/restaurants` - Search restaurants
+- `GET /api/restaurants/{id}` - Get restaurant details
+- `GET /api/categories` - Get restaurant categories
+- `GET /api/states` - Get available states
+- `GET /health` - Health check
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Google Maps API for location services
-- Unsplash for restaurant images
-- The kosher community for feedback and support
-
-## 📞 Support
-
-For support, email support@jewgo.com or create an issue in this repository.
+This project is licensed under the MIT License.
 
 ---
 
-**Made with ❤️ for the kosher community** 
+**Last Updated:** 2025-07-29 01:49 UTC - Force Cloudflare Pages to pick up latest commit 

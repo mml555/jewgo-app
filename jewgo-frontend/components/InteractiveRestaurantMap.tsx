@@ -95,7 +95,7 @@ export default function InteractiveRestaurantMap({
       }
 
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=your_google_maps_api_key_here&libraries=places,geometry&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places,geometry&loading=async`;
       script.async = true;
       script.defer = true;
       
@@ -485,9 +485,18 @@ export default function InteractiveRestaurantMap({
 
   }, [restaurantsWithCoords, selectedRestaurantId, mapLoaded, userLocation]);
 
-
+  // Helper function to get safe image URLs (avoid Google Places photo URLs)
+  const getSafeImageUrl = (restaurant: Restaurant) => {
+    const isGooglePlacesUrl = restaurant.image_url?.includes('maps.googleapis.com/maps/api/place/photo');
+    if (isGooglePlacesUrl) {
+      return null; // Skip Google Places URLs to avoid 403 errors
+    }
+    return restaurant.image_url;
+  };
 
   const createInfoWindowContent = (restaurant: Restaurant, distanceFromUser?: number | null) => {
+    const safeImageUrl = getSafeImageUrl(restaurant);
+    
     return `
       <div class="p-3 max-w-xs relative">
         <button onclick="this.parentElement.parentElement.parentElement.close()" 
@@ -495,8 +504,8 @@ export default function InteractiveRestaurantMap({
           ×
         </button>
         <div class="flex items-start space-x-3">
-          ${restaurant.image_url ? `
-            <img src="${restaurant.image_url}" alt="${restaurant.name}" 
+          ${safeImageUrl ? `
+            <img src="${safeImageUrl}" alt="${restaurant.name}" 
                  class="w-16 h-12 object-cover rounded-lg flex-shrink-0"
                  loading="lazy" />
           ` : `
@@ -508,7 +517,7 @@ export default function InteractiveRestaurantMap({
             <h3 class="font-semibold text-gray-900 text-sm leading-tight mb-1">${restaurant.name}</h3>
             <p class="text-gray-600 text-xs mb-1">${restaurant.address}</p>
             ${distanceFromUser !== null && distanceFromUser !== undefined ? `
-              <p class="text-blue-600 text-xs font-medium mb-1">�� ${distanceFromUser.toFixed(1)} miles away</p>
+              <p class="text-blue-600 text-xs font-medium mb-1">📍 ${distanceFromUser.toFixed(1)} miles away</p>
             ` : ''}
             ${restaurant.certifying_agency ? `
               <span class="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full mb-1">
