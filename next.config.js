@@ -38,10 +38,16 @@ const nextConfig = {
     return config;
   },
   
-  // Enable webpack build worker for faster builds
+  // Disable experimental features that might cause build issues
   experimental: {
-    webpackBuildWorker: true,
+    // Remove webpackBuildWorker to avoid build issues
   },
+  
+  // Ensure proper output configuration for Vercel
+  output: 'standalone',
+  
+  // Disable static optimization for dynamic routes
+  staticPageGenerationTimeout: 120,
 };
 
 module.exports = nextConfig; 
