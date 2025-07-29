@@ -20,6 +20,7 @@ export default function LiveMapPage() {
   const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
   const [displayedRestaurants, setDisplayedRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
