@@ -1,5 +1,9 @@
 {
   "version": 2,
-  "rootDirectory": "jewgo-frontend",
-  "buildCommand": "npm run build"
+  "builds": [
+    {
+      "src": "jewgo-frontend/package.json",
+      "use": "@vercel/next"
+    }
+  ]
 } 
