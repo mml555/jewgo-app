@@ -107,13 +107,23 @@ class EnhancedDatabaseManager:
     def connect(self) -> bool:
         """Connect to the database and create tables if they don't exist."""
         try:
-            self.engine = create_engine(
-                self.database_url,
-                echo=False,  # Set to True for SQL debugging
-                pool_size=10,
-                max_overflow=20,
-                pool_pre_ping=True
-            )
+            # Configure engine based on database type
+            if 'sqlite' in self.database_url.lower():
+                # SQLite configuration (no pool parameters)
+                self.engine = create_engine(
+                    self.database_url,
+                    echo=False,  # Set to True for SQL debugging
+                    connect_args={"check_same_thread": False}
+                )
+            else:
+                # PostgreSQL configuration
+                self.engine = create_engine(
+                    self.database_url,
+                    echo=False,  # Set to True for SQL debugging
+                    pool_size=10,
+                    max_overflow=20,
+                    pool_pre_ping=True
+                )
             
             # Create tables if they don't exist
             Base.metadata.create_all(self.engine)
