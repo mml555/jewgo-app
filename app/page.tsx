@@ -42,12 +42,18 @@ export default function HomePage() {
   useEffect(() => {
     console.log('useEffect called - fetching restaurants');
     fetchAllRestaurants();
-    requestUserLocation();
+    // Don't request location automatically - wait for user interaction
   }, []);
 
   const requestUserLocation = () => {
     if (!navigator.geolocation) {
       console.log('Geolocation is not supported by this browser');
+      return;
+    }
+
+    // Only request location if not already obtained
+    if (userLocation) {
+      console.log('Location already available:', userLocation);
       return;
     }
 
@@ -84,6 +90,12 @@ export default function HomePage() {
         maximumAge: 300000,
       }
     );
+  };
+
+  // Function to request location on user interaction
+  const handleLocationRequest = () => {
+    console.log('User requested location access');
+    requestUserLocation();
   };
 
   const fetchAllRestaurants = async () => {
@@ -123,6 +135,11 @@ export default function HomePage() {
   const handleFilterChange = (key: string, value: any) => {
     setActiveFilters(prev => ({ ...prev, [key]: value }));
     setCurrentPage(1);
+    
+    // Request location when user enables location-based features
+    if (key === 'nearMe' && value === true) {
+      handleLocationRequest();
+    }
   };
 
   const handleToggleFilter = (key: string, value: boolean) => {
