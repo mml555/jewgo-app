@@ -1,438 +1,441 @@
 #!/usr/bin/env python3
 """
-Restaurant Database Web Application
-Flask-based web server for hosting the restaurant database with modern UI.
+Production-Ready Restaurant Database Web Application
+Enhanced Flask-based web server with PostgreSQL support, security features, and monitoring.
 """
 
-from flask import Flask, request, jsonify, g
-from flask_cors import CORS
-from database_manager import DatabaseManager
-import json
 import os
+import json
 from datetime import datetime
 import logging
+from flask import Flask, request, jsonify, g
+from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from database_manager_v2 import EnhancedDatabaseManager
+from config import get_config
+import structlog
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Configure structured logging
+structlog.configure(
+    processors=[
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.processors.JSONRenderer()
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)
 
-app = Flask(__name__)
-app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production')
-CORS(app)  # Enable CORS for API endpoints
+logger = structlog.get_logger()
 
-# Initialize database manager per request
-def get_db_manager():
-    """Get a fresh database manager instance for each request."""
-    db_manager = DatabaseManager()
-    if not db_manager.connect():
-        raise Exception("Failed to connect to database")
-    return db_manager
-
-@app.before_request
-def before_request():
-    """Ensure database connection before each request."""
-    try:
-        # Store db manager in Flask's g object for this request
-        g.db_manager = get_db_manager()
-    except Exception as e:
-        logger.error(f"Database connection error: {e}")
-        return jsonify({'error': 'Database connection failed'}), 500
-
-@app.teardown_appcontext
-def teardown_db(exception):
-    """Close database connection after each request."""
-    if hasattr(g, 'db_manager') and g.db_manager:
+def create_app(config_name=None):
+    """Application factory pattern for Flask app creation."""
+    app = Flask(__name__)
+    
+    # Load configuration
+    config = get_config()
+    app.config.from_object(config)
+    
+    # Initialize CORS with production-ready settings
+    CORS(app, 
+         origins=app.config['CORS_ORIGINS'],
+         methods=app.config['CORS_METHODS'],
+         allow_headers=app.config['CORS_ALLOW_HEADERS'],
+         supports_credentials=True)
+    
+    # Initialize rate limiter
+    limiter = Limiter(
+        app=app,
+        key_func=get_remote_address,
+        default_limits=app.config['RATELIMIT_DEFAULT'],
+        storage_uri=app.config['RATELIMIT_STORAGE_URL']
+    )
+    
+    # Initialize database manager
+    def get_db_manager():
+        """Get a fresh database manager instance for each request."""
+        db_manager = EnhancedDatabaseManager()
+        if not db_manager.connect():
+            raise Exception("Failed to connect to database")
+        return db_manager
+    
+    @app.before_request
+    def before_request():
+        """Ensure database connection before each request."""
         try:
-            g.db_manager.disconnect()
+            g.db_manager = get_db_manager()
+            logger.info("Request started", 
+                       method=request.method, 
+                       path=request.path, 
+                       remote_addr=request.remote_addr)
         except Exception as e:
-            logger.error(f"Error disconnecting database: {e}")
-        g.db_manager = None
-
-@app.route('/')
-def index():
-    """API server root - redirect to API documentation or return status."""
-    return jsonify({
-        'message': 'JewGo Restaurant API Server',
-        'status': 'running',
-        'version': '1.0.1',
-        'endpoints': {
-            'restaurants': '/api/restaurants',
-            'statistics': '/api/statistics',
-            'categories': '/api/categories',
-            'states': '/api/states',
-            'health': '/health',
-            'admin': {
-                'add_restaurant': '/api/admin/restaurants',
-                'bulk_import': '/api/admin/restaurants/bulk',
-                'update_restaurant': '/api/admin/restaurants/<business_id>',
-                'add_special': '/api/admin/restaurants/<business_id>/specials',
-                'get_specials': '/api/admin/specials'
-            }
-        }
-    })
-
-@app.route('/api/restaurants')
-def api_restaurants():
-    """API endpoint for restaurant search."""
-    try:
-        query = request.args.get('query', '')
-        category = request.args.get('category', '')
-        state = request.args.get('state', '')
-        limit = int(request.args.get('limit', 50))
-        offset = int(request.args.get('offset', 0))
-        
-        # Location-based filtering
-        lat = request.args.get('lat')
-        lng = request.args.get('lng')
-        radius = float(request.args.get('radius', 50))  # Default 50 miles
-        
-        if lat and lng:
-            # Use location-based search
-            restaurants = g.db_manager.search_restaurants_near_location(
-                lat=float(lat),
-                lng=float(lng),
-                radius=radius,
-                query=query,
-                category=category,
-                limit=limit,
-                offset=offset
-            )
-        else:
-            # Use regular search
-            restaurants = g.db_manager.search_restaurants(
-                query=query,
-                category=category,
-                state=state,
-                limit=limit,
-                offset=offset
-            )
-        
-        return jsonify({
-            'success': True,
-            'restaurants': restaurants,
-            'count': len(restaurants)
-        })
-    except Exception as e:
-        logger.error(f"API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/restaurants/<business_id>')
-def api_restaurant_detail(business_id):
-    """API endpoint for single restaurant details."""
-    try:
-        # Try to get restaurant by business_id first
-        restaurant = g.db_manager.get_restaurant(business_id)
-        
-        # If not found, try to get by numeric id
-        if not restaurant:
+            logger.error("Database connection error", error=str(e))
+            return jsonify({'error': 'Database connection failed'}), 500
+    
+    @app.teardown_appcontext
+    def teardown_db(exception):
+        """Close database connection after each request."""
+        if hasattr(g, 'db_manager') and g.db_manager:
             try:
-                numeric_id = int(business_id)
-                # Get restaurant by numeric id
-                restaurant = g.db_manager.get_restaurant_by_id(numeric_id)
-            except (ValueError, TypeError):
-                pass
-        
-        if restaurant:
-            # Get reviews, tags, and specials
-            reviews = g.db_manager.get_reviews(restaurant['id'])
-            tags = g.db_manager.get_restaurant_tags(restaurant['id'])
-            specials = g.db_manager.get_restaurant_specials(restaurant['id'], paid_only=True)
-            
-            restaurant['reviews'] = reviews
-            restaurant['tags'] = tags
-            restaurant['specials'] = specials
-            
-            return jsonify({
-                'success': True,
-                'restaurant': restaurant
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'error': 'Restaurant not found'
-            }), 404
-    except Exception as e:
-        logger.error(f"API error: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-@app.route('/api/statistics')
-def api_statistics():
-    """API endpoint for database statistics."""
-    try:
-        stats = g.db_manager.get_statistics()
-        return jsonify({
-            'success': True,
-            'statistics': stats
-        })
-    except Exception as e:
-        logger.error(f"API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/categories')
-def api_categories():
-    """API endpoint for available categories."""
-    try:
-        stats = g.db_manager.get_statistics()
-        categories = stats.get('category_breakdown', {})
-        return jsonify({
-            'success': True,
-            'categories': categories
-        })
-    except Exception as e:
-        logger.error(f"API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/states')
-def api_states():
-    """API endpoint for available states."""
-    try:
-        stats = g.db_manager.get_statistics()
-        states = stats.get('top_states', {})
-        return jsonify({
-            'success': True,
-            'states': states
-        })
-    except Exception as e:
-        logger.error(f"API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-# Removed template routes - using Next.js frontend instead
-# @app.route('/restaurant/<business_id>')
-# @app.route('/admin')
-
-@app.route('/api/admin/restaurants', methods=['POST'])
-def api_add_restaurant():
-    """API endpoint for adding new restaurants."""
-    try:
-        data = request.get_json()
-        
-        required_fields = ['business_id', 'name', 'address']
-        for field in required_fields:
-            if not data.get(field):
-                return jsonify({'success': False, 'error': f'Missing required field: {field}'}), 400
-        
-        if g.db_manager.add_restaurant(data):
-            return jsonify({'success': True, 'message': 'Restaurant added successfully'})
-        else:
-            return jsonify({'success': False, 'error': 'Failed to add restaurant'}), 500
-    except Exception as e:
-        logger.error(f"API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/admin/restaurants/<business_id>', methods=['PUT'])
-def api_update_restaurant(business_id):
-    """API endpoint for updating restaurants."""
-    try:
-        data = request.get_json()
-        
-        if g.db_manager.update_restaurant(business_id, data):
-            return jsonify({'success': True, 'message': 'Restaurant updated successfully'})
-        else:
-            return jsonify({'success': False, 'error': 'Failed to update restaurant'}), 500
-    except Exception as e:
-        logger.error(f"API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/restaurants/<business_id>/specials')
-def api_restaurant_specials(business_id):
-    """API endpoint for getting restaurant specials."""
-    try:
-        # Get restaurant first
-        restaurant = g.db_manager.get_restaurant(business_id)
-        if not restaurant:
-            try:
-                numeric_id = int(business_id)
-                restaurant = g.db_manager.get_restaurant_by_id(numeric_id)
-            except (ValueError, TypeError):
-                pass
-        
-        if not restaurant:
-            return jsonify({'success': False, 'error': 'Restaurant not found'}), 404
-        
-        # Get specials (paid only by default)
-        paid_only = request.args.get('paid_only', 'true').lower() == 'true'
-        specials = g.db_manager.get_restaurant_specials(restaurant['id'], paid_only=paid_only)
-        
-        return jsonify({
-            'success': True,
-            'specials': specials,
-            'restaurant_id': restaurant['id']
-        })
-    except Exception as e:
-        logger.error(f"API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/admin/restaurants/<business_id>/specials', methods=['POST'])
-def api_add_restaurant_special(business_id):
-    """API endpoint for adding restaurant specials."""
-    try:
-        # Get restaurant first
-        restaurant = g.db_manager.get_restaurant(business_id)
-        if not restaurant:
-            try:
-                numeric_id = int(business_id)
-                restaurant = g.db_manager.get_restaurant_by_id(numeric_id)
-            except (ValueError, TypeError):
-                pass
-        
-        if not restaurant:
-            return jsonify({'success': False, 'error': 'Restaurant not found'}), 404
-        
-        data = request.get_json()
-        data['restaurant_id'] = restaurant['id']
-        
-        if g.db_manager.add_restaurant_special(data):
-            return jsonify({'success': True, 'message': 'Special added successfully'})
-        else:
-            return jsonify({'success': False, 'error': 'Failed to add special'}), 500
-    except Exception as e:
-        logger.error(f"API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/admin/specials/<int:special_id>/payment', methods=['PUT'])
-def api_update_special_payment(special_id):
-    """API endpoint for updating special payment status."""
-    try:
-        data = request.get_json()
-        is_paid = data.get('is_paid', False)
-        payment_status = data.get('payment_status', 'paid')
-        
-        if g.db_manager.update_special_payment_status(special_id, is_paid, payment_status):
-            return jsonify({'success': True, 'message': 'Payment status updated successfully'})
-        else:
-            return jsonify({'success': False, 'error': 'Failed to update payment status'}), 500
-    except Exception as e:
-        logger.error(f"API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/admin/specials')
-def api_get_all_specials():
-    """API endpoint for getting all specials (admin only)."""
-    try:
-        # Get all specials (both paid and unpaid)
-        all_specials = []
-        
-        # Get all restaurants and their specials
-        restaurants = g.db_manager.search_restaurants(limit=1000)
-        for restaurant in restaurants:
-            specials = g.db_manager.get_restaurant_specials(restaurant['id'], paid_only=False)
-            all_specials.extend(specials)
-        
-        return jsonify({
-            'success': True,
-            'specials': all_specials
-        })
-    except Exception as e:
-        logger.error(f"API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/admin/restaurants/bulk', methods=['POST'])
-def api_bulk_import_restaurants():
-    """API endpoint for bulk importing restaurants."""
-    try:
-        data = request.get_json()
-        
-        if not data or 'restaurants' not in data:
-            return jsonify({'success': False, 'error': 'Missing restaurants data'}), 400
-        
-        restaurants = data['restaurants']
-        if not isinstance(restaurants, list):
-            return jsonify({'success': False, 'error': 'Restaurants must be a list'}), 400
-        
-        success_count = 0
-        error_count = 0
-        errors = []
-        
-        for i, restaurant_data in enumerate(restaurants):
-            try:
-                # Validate required fields
-                required_fields = ['business_id', 'name', 'address']
-                for field in required_fields:
-                    if not restaurant_data.get(field):
-                        errors.append(f"Restaurant {i}: Missing required field '{field}'")
-                        error_count += 1
-                        continue
-                
-                # Add restaurant
-                if g.db_manager.add_restaurant(restaurant_data):
-                    success_count += 1
-                else:
-                    errors.append(f"Restaurant {i}: Failed to add to database")
-                    error_count += 1
-                    
+                g.db_manager.disconnect()
             except Exception as e:
-                errors.append(f"Restaurant {i}: {str(e)}")
-                error_count += 1
-        
+                logger.error("Error disconnecting database", error=str(e))
+            g.db_manager = None
+    
+    @app.route('/')
+    @limiter.limit("100 per minute")
+    def index():
+        """API server root with enhanced information."""
         return jsonify({
-            'success': True,
-            'message': f'Bulk import completed: {success_count} successful, {error_count} failed',
-            'success_count': success_count,
-            'error_count': error_count,
-            'errors': errors[:10]  # Limit error messages to first 10
+            'message': 'JewGo Restaurant API Server',
+            'status': 'running',
+            'version': app.config['API_VERSION'],
+            'environment': os.environ.get('FLASK_ENV', 'development'),
+            'database': 'PostgreSQL' if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI'] else 'SQLite',
+            'endpoints': {
+                'restaurants': '/api/restaurants',
+                'statistics': '/api/statistics',
+                'categories': '/api/categories',
+                'states': '/api/states',
+                'health': '/health',
+                'admin': {
+                    'add_restaurant': '/api/admin/restaurants',
+                    'bulk_import': '/api/admin/restaurants/bulk',
+                    'update_restaurant': '/api/admin/restaurants/<business_id>',
+                    'add_special': '/api/admin/restaurants/<business_id>/specials',
+                    'get_specials': '/api/admin/specials'
+                }
+            },
+            'documentation': 'https://jewgo.com/api/docs',
+            'timestamp': datetime.utcnow().isoformat()
         })
-        
-    except Exception as e:
-        logger.error(f"Bulk import API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/restaurants')
+    @limiter.limit("200 per minute")
+    def api_restaurants():
+        """Enhanced API endpoint for restaurant search with better error handling."""
+        try:
+            # Parse query parameters with validation
+            query = request.args.get('query', '').strip()
+            category = request.args.get('category', '').strip()
+            state = request.args.get('state', '').strip()
+            
+            try:
+                limit = min(int(request.args.get('limit', 50)), 100)  # Max 100 results
+                offset = max(int(request.args.get('offset', 0)), 0)
+            except ValueError:
+                return jsonify({'error': 'Invalid limit or offset parameter'}), 400
+            
+            # Location-based filtering
+            lat = request.args.get('lat')
+            lng = request.args.get('lng')
+            radius = request.args.get('radius', 50)
+            
+            if lat and lng:
+                try:
+                    lat = float(lat)
+                    lng = float(lng)
+                    radius = min(float(radius), 100)  # Max 100 mile radius
+                    
+                    # Validate coordinates
+                    if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
+                        return jsonify({'error': 'Invalid coordinates'}), 400
+                        
+                    restaurants = g.db_manager.search_restaurants_near_location(
+                        lat=lat, lng=lng, radius=radius,
+                        query=query, category=category,
+                        limit=limit, offset=offset
+                    )
+                except ValueError:
+                    return jsonify({'error': 'Invalid location parameters'}), 400
+            else:
+                restaurants = g.db_manager.search_restaurants(
+                    query=query, category=category, state=state,
+                    limit=limit, offset=offset
+                )
+            
+            # Add metadata to response
+            response = {
+                'success': True,
+                'data': restaurants,
+                'metadata': {
+                    'total_results': len(restaurants),
+                    'limit': limit,
+                    'offset': offset,
+                    'query': query,
+                    'category': category,
+                    'state': state,
+                    'location_based': bool(lat and lng),
+                    'timestamp': datetime.utcnow().isoformat()
+                }
+            }
+            
+            logger.info("Restaurant search completed", 
+                       query=query, 
+                       category=category, 
+                       results_count=len(restaurants))
+            
+            return jsonify(response)
+            
+        except Exception as e:
+            logger.error("Error in restaurant search", error=str(e))
+            return jsonify({'error': 'Internal server error'}), 500
+    
+    @app.route('/api/restaurants/<business_id>')
+    @limiter.limit("100 per minute")
+    def api_restaurant_detail(business_id):
+        """Get detailed information about a specific restaurant."""
+        try:
+            restaurant = g.db_manager.get_restaurant(business_id)
+            
+            if not restaurant:
+                return jsonify({'error': 'Restaurant not found'}), 404
+            
+            response = {
+                'success': True,
+                'data': restaurant,
+                'metadata': {
+                    'business_id': business_id,
+                    'timestamp': datetime.utcnow().isoformat()
+                }
+            }
+            
+            logger.info("Restaurant detail retrieved", business_id=business_id)
+            return jsonify(response)
+            
+        except Exception as e:
+            logger.error("Error getting restaurant detail", error=str(e), business_id=business_id)
+            return jsonify({'error': 'Internal server error'}), 500
+    
+    @app.route('/api/statistics')
+    @limiter.limit("50 per minute")
+    def api_statistics():
+        """Get comprehensive database statistics."""
+        try:
+            stats = g.db_manager.get_statistics()
+            
+            response = {
+                'success': True,
+                'data': stats,
+                'metadata': {
+                    'timestamp': datetime.utcnow().isoformat()
+                }
+            }
+            
+            logger.info("Statistics retrieved", total_restaurants=stats.get('total_restaurants', 0))
+            return jsonify(response)
+            
+        except Exception as e:
+            logger.error("Error getting statistics", error=str(e))
+            return jsonify({'error': 'Internal server error'}), 500
+    
+    @app.route('/api/categories')
+    @limiter.limit("100 per minute")
+    def api_categories():
+        """Get available restaurant categories."""
+        try:
+            categories = [
+                {'id': 'restaurant', 'name': 'Restaurants', 'icon': '🍽️'},
+                {'id': 'bakery', 'name': 'Bakeries', 'icon': '🥖'},
+                {'id': 'grocery', 'name': 'Grocery Stores', 'icon': '🛒'},
+                {'id': 'catering', 'name': 'Catering', 'icon': '🎉'},
+                {'id': 'deli', 'name': 'Delis', 'icon': '🥪'},
+                {'id': 'ice_cream', 'name': 'Ice Cream', 'icon': '🍦'},
+                {'id': 'pizza', 'name': 'Pizza', 'icon': '🍕'},
+                {'id': 'coffee', 'name': 'Coffee Shops', 'icon': '☕'}
+            ]
+            
+            response = {
+                'success': True,
+                'data': categories,
+                'metadata': {
+                    'total_categories': len(categories),
+                    'timestamp': datetime.utcnow().isoformat()
+                }
+            }
+            
+            return jsonify(response)
+            
+        except Exception as e:
+            logger.error("Error getting categories", error=str(e))
+            return jsonify({'error': 'Internal server error'}), 500
+    
+    @app.route('/api/states')
+    @limiter.limit("100 per minute")
+    def api_states():
+        """Get available states with restaurant counts."""
+        try:
+            stats = g.db_manager.get_statistics()
+            states_data = stats.get('states', {})
+            
+            # Convert to list format
+            states = [
+                {'code': state, 'name': state, 'count': count}
+                for state, count in states_data.items()
+            ]
+            
+            # Sort by count descending
+            states.sort(key=lambda x: x['count'], reverse=True)
+            
+            response = {
+                'success': True,
+                'data': states,
+                'metadata': {
+                    'total_states': len(states),
+                    'timestamp': datetime.utcnow().isoformat()
+                }
+            }
+            
+            return jsonify(response)
+            
+        except Exception as e:
+            logger.error("Error getting states", error=str(e))
+            return jsonify({'error': 'Internal server error'}), 500
+    
+    # Admin endpoints for restaurant management
+    @app.route('/api/admin/restaurants', methods=['POST'])
+    @limiter.limit("50 per minute")
+    def admin_add_restaurant():
+        """Add a new restaurant via admin API."""
+        try:
+            data = request.get_json()
+            if not data:
+                return jsonify({'error': 'No data provided', 'success': False}), 400
+            
+            # Validate required fields
+            required_fields = ['business_id', 'name']
+            for field in required_fields:
+                if not data.get(field):
+                    return jsonify({'error': f'Missing required field: {field}', 'success': False}), 400
+            
+            # Add restaurant
+            success = g.db_manager.add_restaurant(data)
+            if success:
+                return jsonify({'success': True, 'message': 'Restaurant added successfully'})
+            else:
+                return jsonify({'error': 'Failed to add restaurant', 'success': False}), 500
+                
+        except Exception as e:
+            logger.error("Error adding restaurant", error=str(e))
+            return jsonify({'error': 'Internal server error', 'success': False}), 500
 
-@app.route('/api/export')
-def api_export():
-    """API endpoint for exporting data."""
-    try:
-        category = request.args.get('category', '')
-        state = request.args.get('state', '')
-        query = request.args.get('query', '')
-        
-        filters = {}
-        if category:
-            filters['category'] = category
-        if state:
-            filters['state'] = state
-        if query:
-            filters['query'] = query
-        
-        filename = f"export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        
-        if g.db_manager.export_to_json(filename, filters):
+    @app.route('/api/admin/restaurants/bulk', methods=['POST'])
+    @limiter.limit("10 per minute")
+    def admin_bulk_import():
+        """Bulk import restaurants via admin API."""
+        try:
+            data = request.get_json()
+            if not data or 'restaurants' not in data:
+                return jsonify({'error': 'No restaurants data provided', 'success': False}), 400
+            
+            restaurants = data['restaurants']
+            if not isinstance(restaurants, list):
+                return jsonify({'error': 'Restaurants must be a list', 'success': False}), 400
+            
+            success_count = 0
+            error_count = 0
+            errors = []
+            
+            for i, restaurant in enumerate(restaurants):
+                try:
+                    if g.db_manager.add_restaurant(restaurant):
+                        success_count += 1
+                    else:
+                        error_count += 1
+                        errors.append(f"Restaurant {i}: Failed to add to database")
+                except Exception as e:
+                    error_count += 1
+                    errors.append(f"Restaurant {i}: {str(e)}")
+                
+                # Limit error messages to first 10
+                if len(errors) >= 10:
+                    break
+            
             return jsonify({
                 'success': True,
-                'filename': filename,
-                'message': 'Export completed successfully'
+                'message': f'Bulk import completed: {success_count} successful, {error_count} failed',
+                'success_count': success_count,
+                'error_count': error_count,
+                'errors': errors
             })
-        else:
-            return jsonify({'success': False, 'error': 'Export failed'}), 500
-    except Exception as e:
-        logger.error(f"API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+            
+        except Exception as e:
+            logger.error("Error in bulk import", error=str(e))
+            return jsonify({'error': 'Internal server error', 'success': False}), 500
 
-@app.route('/health')
-def health_check():
-    """Health check endpoint for monitoring."""
-    try:
-        # Test database connection
-        stats = g.db_manager.get_statistics()
-        return jsonify({
-            'status': 'healthy',
-            'database': 'connected',
-            'restaurants': stats.get('total_restaurants', 0)
-        })
-    except Exception as e:
-        return jsonify({'status': 'unhealthy', 'error': str(e)}), 500
+    @app.route('/health')
+    @limiter.limit("200 per minute")
+    def health_check():
+        """Enhanced health check endpoint."""
+        try:
+            # Test database connection
+            db_healthy = g.db_manager is not None
+            
+            health_status = {
+                'status': 'healthy' if db_healthy else 'unhealthy',
+                'timestamp': datetime.utcnow().isoformat(),
+                'version': app.config['API_VERSION'],
+                'environment': os.environ.get('FLASK_ENV', 'development'),
+                'database': {
+                    'status': 'connected' if db_healthy else 'disconnected',
+                    'type': 'PostgreSQL' if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI'] else 'SQLite'
+                },
+                'uptime': 'running',  # In production, add actual uptime calculation
+                'memory_usage': 'normal'  # In production, add actual memory monitoring
+            }
+            
+            status_code = 200 if db_healthy else 503
+            return jsonify(health_status), status_code
+            
+        except Exception as e:
+            logger.error("Health check failed", error=str(e))
+            return jsonify({
+                'status': 'unhealthy',
+                'error': str(e),
+                'timestamp': datetime.utcnow().isoformat()
+            }), 503
+    
+    # Error handlers
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({'error': 'Endpoint not found'}), 404
+    
+    @app.errorhandler(429)
+    def rate_limit_exceeded(error):
+        return jsonify({'error': 'Rate limit exceeded'}), 429
+    
+    @app.errorhandler(500)
+    def internal_error(error):
+        logger.error("Internal server error", error=str(error))
+        return jsonify({'error': 'Internal server error'}), 500
+    
+    return app
+
+# Create the application instance
+app = create_app()
 
 if __name__ == '__main__':
-    # Get configuration from environment
-    host = os.environ.get('HOST', '0.0.0.0')
+    # Production server configuration
     port = int(os.environ.get('PORT', 8081))
-    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
+    debug = os.environ.get('FLASK_ENV') == 'development'
     
-    print(f"🚀 Starting Restaurant Database Web Server")
-    print(f"📍 Host: {host}")
-    print(f"🔌 Port: {port}")
-    print(f"🐛 Debug: {debug}")
-    print(f"🌐 Access: http://{host}:{port}")
+    logger.info("Starting JewGo API server", 
+               port=port, 
+               debug=debug, 
+               environment=os.environ.get('FLASK_ENV', 'development'))
     
-    app.run(host=host, port=port, debug=debug) 
+    # Use Gunicorn in production, Flask dev server in development
+    if debug:
+        app.run(host='0.0.0.0', port=port, debug=True)
+    else:
+        # For production, use: gunicorn app_production:app
+        app.run(host='0.0.0.0', port=port, debug=False) 
