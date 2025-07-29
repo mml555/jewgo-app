@@ -5,7 +5,11 @@
   "scripts": {
     "build": "cd jewgo-frontend && npm install && npm run build",
     "dev": "cd jewgo-frontend && npm run dev",
-    "start": "cd jewgo-frontend && npm run start"
+    "start": "cd jewgo-frontend && npm run start",
+    "postinstall": "cd jewgo-frontend && npm install"
   },
-  "private": true
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  }
 } 
