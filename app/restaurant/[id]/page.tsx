@@ -22,7 +22,7 @@ const RestaurantDetailPage: React.FC = () => {
     const fetchRestaurant = async () => {
       try {
         const apiUrl = process.env.NODE_ENV === 'production' 
-          ? 'https://82c398518aec.ngrok-free.app/api/restaurants'
+          ? 'https://jewgo.onrender.com/api/restaurants'
           : 'http://127.0.0.1:8081/api/restaurants';
         
         const response = await fetch(`${apiUrl}/${params.id}`, {
