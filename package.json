@@ -1,0 +1,11 @@
+{
+  "name": "jewgo-app",
+  "version": "1.0.0",
+  "description": "JewGo Restaurant Finder App",
+  "scripts": {
+    "build": "cd jewgo-frontend && npm install && npm run build",
+    "dev": "cd jewgo-frontend && npm run dev",
+    "start": "cd jewgo-frontend && npm run start"
+  },
+  "private": true
+} 
