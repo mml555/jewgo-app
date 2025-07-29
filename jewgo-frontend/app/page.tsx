@@ -157,7 +157,7 @@ export default function HomePage() {
             <div className="px-4 py-4 space-y-4">
               <SearchBar onSearch={handleSearch} />
               <CategoryNav 
-                activeFilters={activeFilters}
+                selectedFilters={activeFilters}
                 onFilterChange={handleFilterChange}
                 onToggleFilter={handleToggleFilter}
                 onDistanceChange={handleDistanceChange}
