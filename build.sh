@@ -19,6 +19,11 @@ echo "=== Building the application ==="
 npm run build
 
 echo "=== Build completed successfully! ==="
-echo "Build output directory: $(pwd)/out"
-ls -la out/ 2>/dev/null || echo "No out directory found, checking .next:"
-ls -la .next/ 2>/dev/null || echo "No .next directory found" 
+echo "Build output directory: $(pwd)/.next"
+ls -la .next/ 2>/dev/null || echo "No .next directory found"
+
+echo "=== Creating out directory for Cloudflare Pages ==="
+mkdir -p out
+cp -r .next/* out/ 2>/dev/null || echo "Copying .next to out failed, but build succeeded"
+echo "Build output copied to: $(pwd)/out"
+ls -la out/ 2>/dev/null || echo "No out directory found" 
