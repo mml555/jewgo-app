@@ -4,8 +4,8 @@ const nextConfig = {
   // Using server-side rendering for better performance and SEO
   // Vercel automatically handles SSR/SSG optimization
   
-  // Ensure trailing slashes for consistency
-  trailingSlash: true,
+  // Remove trailing slash requirement to avoid routing issues
+  trailingSlash: false,
   
   // Image optimization configuration for Vercel
   images: {
