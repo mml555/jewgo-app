@@ -23,20 +23,37 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [placeSuggestions, setPlaceSuggestions] = useState<PlaceSuggestion[]>([]);
   const [isLoadingPlaces, setIsLoadingPlaces] = useState(false);
+  const [placesApiError, setPlacesApiError] = useState<string | null>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
   const placesTimeoutRef = useRef<NodeJS.Timeout>();
   const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
-  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
+  const autocompleteServiceRef = useRef<any>(null);
+  const placesServiceRef = useRef<any>(null);
 
   // Initialize Google Places services
   useEffect(() => {
     const initializeGooglePlaces = () => {
       if (window.google && window.google.maps && window.google.maps.places) {
-        autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService();
-        // Create a dummy div for PlacesService (required by Google Maps API)
-        const dummyDiv = document.createElement('div');
-        placesServiceRef.current = new window.google.maps.places.PlacesService(dummyDiv);
+        try {
+          // Try to use the newer AutocompleteSuggestion if available
+          if (window.google.maps.places.AutocompleteSuggestion) {
+            autocompleteServiceRef.current = new window.google.maps.places.AutocompleteSuggestion();
+          } else if (window.google.maps.places.AutocompleteService) {
+            // Fallback to AutocompleteService (deprecated but still works)
+            autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService();
+          } else {
+            console.warn('Google Places API not available');
+            setPlacesApiError('Places API not available');
+            return;
+          }
+          
+          // Create a dummy div for PlacesService (required by Google Maps API)
+          const dummyDiv = document.createElement('div');
+          placesServiceRef.current = new window.google.maps.places.PlacesService(dummyDiv);
+        } catch (error) {
+          console.error('Error initializing Google Places:', error);
+          setPlacesApiError('Failed to initialize Places API');
+        }
       }
     };
 
@@ -53,7 +70,12 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
       }, 100);
 
       // Cleanup interval after 10 seconds
-      setTimeout(() => clearInterval(checkGoogleMaps), 10000);
+      setTimeout(() => {
+        clearInterval(checkGoogleMaps);
+        if (!autocompleteServiceRef.current) {
+          setPlacesApiError('Google Maps failed to load');
+        }
+      }, 10000);
     }
   }, []);
 
@@ -80,8 +102,9 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
       clearTimeout(placesTimeoutRef.current);
     }
 
-    if (query.length > 2 && autocompleteServiceRef.current) {
+    if (query.length > 2 && autocompleteServiceRef.current && !placesApiError) {
       setIsLoadingPlaces(true);
+      setPlaceSuggestions([]);
       placesTimeoutRef.current = setTimeout(() => {
         fetchPlaceSuggestions(query);
       }, 500);
@@ -95,30 +118,51 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
         clearTimeout(placesTimeoutRef.current);
       }
     };
-  }, [query]);
+  }, [query, placesApiError]);
 
   const fetchPlaceSuggestions = async (searchQuery: string) => {
     if (!autocompleteServiceRef.current) return;
 
     try {
-      const request: google.maps.places.AutocompletionRequest = {
-        input: searchQuery,
-        types: ['establishment', 'geocode', 'address'],
-        componentRestrictions: { country: 'us' }, // Restrict to US for better kosher results
-      };
+      // Check if we're using the newer API
+      if (autocompleteServiceRef.current.getPlacePredictions) {
+        // Use the newer AutocompleteSuggestion API
+        const request = {
+          input: searchQuery,
+          types: ['establishment', 'geocode', 'address'],
+          componentRestrictions: { country: 'us' },
+        };
 
-      autocompleteServiceRef.current.getPlacePredictions(request, (predictions, status) => {
+        const response = await autocompleteServiceRef.current.getPlacePredictions(request);
         setIsLoadingPlaces(false);
-        if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-          setPlaceSuggestions(predictions);
+        
+        if (response && response.predictions) {
+          setPlaceSuggestions(response.predictions);
         } else {
           setPlaceSuggestions([]);
         }
-      });
+      } else {
+        // Fallback to older API
+        const request: any = {
+          input: searchQuery,
+          types: ['establishment', 'geocode', 'address'],
+          componentRestrictions: { country: 'us' },
+        };
+
+        autocompleteServiceRef.current.getPlacePredictions(request, (predictions: any, status: any) => {
+          setIsLoadingPlaces(false);
+          if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
+            setPlaceSuggestions(predictions);
+          } else {
+            setPlaceSuggestions([]);
+          }
+        });
+      }
     } catch (error) {
       console.error('Error fetching place suggestions:', error);
       setIsLoadingPlaces(false);
       setPlaceSuggestions([]);
+      setPlacesApiError('Failed to fetch suggestions');
     }
   };
 
@@ -126,6 +170,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
     setQuery('');
     onSearch('');
     setPlaceSuggestions([]);
+    setPlacesApiError(null);
     inputRef.current?.focus();
   };
 
@@ -150,6 +195,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
     const value = e.target.value;
     setQuery(value);
     setShowSuggestions(value.length > 0);
+    setPlacesApiError(null); // Clear error when user types
   };
 
   const handleFocus = () => {
@@ -291,6 +337,18 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
               </div>
             )}
 
+            {/* Places API Error */}
+            {placesApiError && (
+              <div className="px-3 py-2 text-sm text-red-500 bg-red-50 rounded-lg mb-2">
+                <div className="flex items-center">
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  {placesApiError}
+                </div>
+              </div>
+            )}
+
             {/* Loading indicator for places */}
             {isLoadingPlaces && (
               <div className="px-3 py-2 text-sm text-gray-500 flex items-center">
@@ -325,14 +383,14 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
             )}
 
             {/* No results */}
-            {!hasPlaceSuggestions && !hasSearchSuggestions && !isLoadingPlaces && query.length > 0 && (
+            {!hasPlaceSuggestions && !hasSearchSuggestions && !isLoadingPlaces && !placesApiError && query.length > 0 && (
               <div className="px-3 py-2 text-sm text-gray-500">
                 No suggestions found for "{query}"
               </div>
             )}
 
             {/* Popular searches when no query */}
-            {!query && !hasPlaceSuggestions && !hasSearchSuggestions && (
+            {!query && !hasPlaceSuggestions && !hasSearchSuggestions && !placesApiError && (
               <div className="space-y-1">
                 <div className="text-xs text-gray-500 px-3 py-1">Popular searches</div>
                 {searchSuggestions.slice(0, 5).map((suggestion, index) => (

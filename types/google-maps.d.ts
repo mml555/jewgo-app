@@ -425,6 +425,11 @@ declare namespace google.maps {
       getPlacePredictions(request: AutocompletionRequest, callback: (predictions: AutocompletePrediction[] | null, status: PlacesServiceStatus) => void): void;
     }
 
+    class AutocompleteSuggestion {
+      constructor();
+      getPlacePredictions(request: AutocompletionRequest): Promise<{ predictions: AutocompletePrediction[] }>;
+    }
+
     class PlacesService {
       constructor(attrContainer: HTMLDivElement | Map);
       getDetails(request: PlaceDetailsRequest, callback: (result: PlaceResult | null, status: PlacesServiceStatus) => void): void;
