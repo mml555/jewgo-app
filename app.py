@@ -155,6 +155,18 @@ def create_app(config_name=None):
          methods=app.config['CORS_METHODS'],
          allow_headers=app.config['CORS_ALLOW_HEADERS'],
          supports_credentials=True)
+
+    # Add additional CORS headers for all responses
+    @app.after_request
+    def after_request(response):
+        """Add CORS headers to all responses."""
+        origin = request.headers.get('Origin')
+        if origin and origin in app.config['CORS_ORIGINS']:
+            response.headers['Access-Control-Allow-Origin'] = origin
+        response.headers['Access-Control-Allow-Methods'] = ', '.join(app.config['CORS_METHODS'])
+        response.headers['Access-Control-Allow-Headers'] = ', '.join(app.config['CORS_ALLOW_HEADERS'])
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        return response
     
     # Initialize rate limiter
     limiter = Limiter(
