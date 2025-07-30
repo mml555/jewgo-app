@@ -132,7 +132,8 @@ def fix_database_schema():
             # Google Reviews columns
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS google_rating FLOAT",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS google_review_count INTEGER",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS google_reviews TEXT"
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS google_reviews TEXT",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS kosher_type VARCHAR(100)"
         ]
         
         # Execute each ALTER statement

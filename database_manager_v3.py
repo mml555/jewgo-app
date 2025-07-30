@@ -72,6 +72,7 @@ class Restaurant(Base):
     is_mehadrin = Column(Boolean, default=False)
     is_hechsher = Column(Boolean, default=False)
     hechsher_details = Column(String(500))
+    kosher_type = Column(String(100))  # dairy, meat, pareve
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -401,6 +402,7 @@ class EnhancedDatabaseManager:
             'is_bishul_yisroel': restaurant.is_bishul_yisroel,
             'is_mehadrin': restaurant.is_mehadrin,
             'is_hechsher': restaurant.is_hechsher,
+            'kosher_type': restaurant.kosher_type,
             'created_at': restaurant.created_at.isoformat() if restaurant.created_at else None,
             'updated_at': restaurant.updated_at.isoformat() if restaurant.updated_at else None
         }
