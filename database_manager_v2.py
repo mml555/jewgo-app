@@ -96,6 +96,9 @@ class EnhancedDatabaseManager:
     def __init__(self, database_url: str = None):
         """Initialize database manager with connection string."""
         self.database_url = database_url or os.environ.get('DATABASE_URL', 'sqlite:///restaurants.db')
+        # Convert PostgreSQL URLs to use psycopg3 driver
+        if self.database_url and 'postgresql://' in self.database_url and 'postgresql+psycopg://' not in self.database_url:
+            self.database_url = self.database_url.replace('postgresql://', 'postgresql+psycopg://')
         self.engine = None
         self.SessionLocal = None
         self.session = None
