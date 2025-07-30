@@ -48,7 +48,7 @@ export default function RootLayout({
               {children}
             </div>
             <ToastContainer />
-            <EnvDebug />
+            {process.env.NODE_ENV === 'development' && <EnvDebug />}
           </AuthProvider>
         </ErrorBoundary>
       </body>

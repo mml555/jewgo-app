@@ -1,5 +1,5 @@
 {
-  "/_not-found": "app/_not-found.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/add-eatery/page": "app/add-eatery/page.js",
   "/admin/specials/page": "app/admin/specials/page.js",
   "/advanced-filters/page": "app/advanced-filters/page.js",
@@ -16,7 +16,7 @@
   "/profile/privacy/page": "app/profile/privacy/page.js",
   "/search-test/page": "app/search-test/page.js",
   "/simple-map/page": "app/simple-map/page.js",
-  "/specials/page": "app/specials/page.js",
   "/test/page": "app/test/page.js",
+  "/specials/page": "app/specials/page.js",
   "/restaurant/[id]/page": "app/restaurant/[id]/page.js"
 }

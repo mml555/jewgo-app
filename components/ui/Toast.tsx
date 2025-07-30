@@ -108,6 +108,11 @@ function Toast({ id, type, message, duration = 5000, onRemove }: ToastProps) {
 // Toast Container
 export function ToastContainer() {
   const [toasts, setToasts] = useState<Array<{ id: string; type: ToastType; message: string; duration?: number }>>([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const removeToast = (id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
@@ -120,11 +125,18 @@ export function ToastContainer() {
 
   // Make showToast available globally
   useEffect(() => {
-    (window as any).showToast = showToast;
-    return () => {
-      delete (window as any).showToast;
-    };
-  }, []);
+    if (mounted) {
+      (window as any).showToast = showToast;
+      return () => {
+        delete (window as any).showToast;
+      };
+    }
+  }, [mounted]);
+
+  // Don't render until mounted to prevent hydration issues
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div className="fixed top-4 right-4 z-50 space-y-2">

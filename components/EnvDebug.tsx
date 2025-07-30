@@ -29,7 +29,7 @@ export default function EnvDebug() {
   }
 
   // Only show in development
-  if (process.env.NODE_ENV !== 'development') {
+  if (envVars.NODE_ENV !== 'development') {
     return null;
   }
 
