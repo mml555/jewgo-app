@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
+import NavTabs from '@/components/NavTabs';
 
 export default function ProfilePage() {
   const [activeFilters, setActiveFilters] = useState<{
@@ -30,6 +31,7 @@ export default function ProfilePage() {
   });
 
   const [activeTab, setActiveTab] = useState('profile');
+  const [profileTab, setProfileTab] = useState('profile');
 
   const updateProfile = (field: string, value: any) => {
     setUserProfile(prev => ({
@@ -73,10 +75,17 @@ export default function ProfilePage() {
     setActiveFilters({});
   };
 
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <Header />
+
+      {/* Navigation Tabs */}
+      <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
       
       {/* Content */}
       <div className="px-4 py-6 pb-24">
@@ -101,9 +110,9 @@ export default function ProfilePage() {
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => setProfileTab(tab.id)}
                   className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    activeTab === tab.id
+                    profileTab === tab.id
                       ? 'bg-jewgo-primary text-white'
                       : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
@@ -117,7 +126,7 @@ export default function ProfilePage() {
 
           {/* Tab Content */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            {activeTab === 'profile' && (
+            {profileTab === 'profile' && (
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Personal Information</h3>
                 

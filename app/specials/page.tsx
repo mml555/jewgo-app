@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
+import NavTabs from '@/components/NavTabs';
 
 export default function SpecialsPage() {
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState('specials');
+  const [categoryTab, setCategoryTab] = useState('all');
   const [activeFilters, setActiveFilters] = useState<{
     agency?: string;
     dietary?: string;
@@ -88,9 +90,9 @@ export default function SpecialsPage() {
     { id: 'catering', name: 'Catering', count: specials.filter(s => s.category === 'catering').length }
   ];
 
-  const filteredSpecials = activeTab === 'all' 
+  const filteredSpecials = categoryTab === 'all' 
     ? specials 
-    : specials.filter(special => special.category === activeTab);
+    : specials.filter(special => special.category === categoryTab);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -125,10 +127,17 @@ export default function SpecialsPage() {
     setActiveFilters({});
   };
 
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <Header />
+
+      {/* Navigation Tabs */}
+      <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
       
       {/* Content */}
       <div className="px-4 py-6 pb-24">
@@ -148,9 +157,9 @@ export default function SpecialsPage() {
               {categories.map((category) => (
                 <button
                   key={category.id}
-                  onClick={() => setActiveTab(category.id)}
+                  onClick={() => setCategoryTab(category.id)}
                   className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    activeTab === category.id
+                    categoryTab === category.id
                       ? 'bg-jewgo-primary text-white'
                       : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}

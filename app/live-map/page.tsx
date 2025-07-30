@@ -7,6 +7,7 @@ import SearchBar from '@/components/SearchBar';
 import ActionButtons from '@/components/ActionButtons';
 import InteractiveRestaurantMap from '@/components/InteractiveRestaurantMap';
 import BottomNavigation from '@/components/BottomNavigation';
+import NavTabs from '@/components/NavTabs';
 import { Restaurant } from '@/types/restaurant';
 
 export default function LiveMapPage() {
@@ -29,6 +30,7 @@ export default function LiveMapPage() {
     distanceRadius?: number;
   }>({});
   const [mapCenter, setMapCenter] = useState<{lat: number, lng: number} | null>(null);
+  const [activeTab, setActiveTab] = useState('eatery');
 
   // Handle URL parameters for centering map on specific location
   useEffect(() => {
@@ -351,6 +353,11 @@ export default function LiveMapPage() {
     );
   };
 
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setSearchQuery('');
+  };
+
   const getFilterDescription = () => {
     const filters = [];
     if (activeFilters.agency) {
@@ -380,6 +387,9 @@ export default function LiveMapPage() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <Header />
+
+      {/* Navigation Tabs */}
+      <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
       
       {/* Search Bar */}
       <div className="px-4 py-4">

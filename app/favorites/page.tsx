@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
+import NavTabs from '@/components/NavTabs';
 import { getFavorites, removeFromFavorites, FavoriteRestaurant } from '@/utils/favorites';
 import { formatDistance } from '@/utils/distance';
 
@@ -20,6 +21,7 @@ export default function FavoritesPage() {
     nearMe?: boolean;
     distanceRadius?: number;
   }>({});
+  const [activeTab, setActiveTab] = useState('eatery');
 
   // Load favorites on component mount
   useEffect(() => {
@@ -101,6 +103,10 @@ export default function FavoritesPage() {
     setActiveFilters({});
   };
 
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
+
   const handleViewDetails = (restaurant: FavoriteRestaurant) => {
     router.push(`/restaurant/${restaurant.id}`);
   };
@@ -119,6 +125,9 @@ export default function FavoritesPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <Header />
+
+      {/* Navigation Tabs */}
+      <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
       
       {/* Content */}
       <div className="px-4 py-6 pb-24">
