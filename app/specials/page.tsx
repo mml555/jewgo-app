@@ -143,7 +143,7 @@ export default function SpecialsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-neutral-50">
       {/* Header */}
       <Header />
 
@@ -161,8 +161,8 @@ export default function SpecialsPage() {
           {/* Page Header */}
           <div className="text-center mb-8">
             <div className="text-4xl mb-4">🎉</div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">Kosher Specials</h1>
-            <p className="text-gray-600">Exclusive deals and promotions from kosher establishments</p>
+            <h1 className="text-2xl font-bold text-neutral-800 mb-2">Kosher Specials</h1>
+            <p className="text-neutral-600">Exclusive deals and promotions from kosher establishments</p>
           </div>
 
 
@@ -176,8 +176,8 @@ export default function SpecialsPage() {
                   onClick={() => setCategoryTab(category.id)}
                   className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     categoryTab === category.id
-                      ? 'bg-jewgo-primary text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                      ? 'bg-gradient-jewgo text-white'
+                      : 'bg-white text-neutral-700 hover:bg-neutral-50'
                   }`}
                 >
                   {category.name} ({category.count})
@@ -190,15 +190,15 @@ export default function SpecialsPage() {
           {filteredSpecials.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">😔</div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">No Specials Available</h3>
-              <p className="text-gray-600">Check back later for new deals and promotions!</p>
+              <h3 className="text-xl font-semibold text-neutral-800 mb-2">No Specials Available</h3>
+              <p className="text-neutral-600">Check back later for new deals and promotions!</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredSpecials.map((special) => (
                 <div key={special.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                   {/* Special Image */}
-                  <div className="h-48 bg-gradient-to-br from-jewgo-primary/20 to-jewgo-primary/40 relative">
+                  <div className="h-48 bg-gradient-to-br from-jewgo-400/20 to-jewgo-400/40 relative">
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="text-6xl">🍽️</span>
                     </div>
@@ -213,15 +213,15 @@ export default function SpecialsPage() {
                   {/* Special Content */}
                   <div className="p-4">
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-gray-800 text-lg">{special.title}</h3>
+                      <h3 className="font-semibold text-neutral-800 text-lg">{special.title}</h3>
                     </div>
                     
-                    <p className="text-gray-600 text-sm mb-2">{special.restaurant}</p>
-                    <p className="text-gray-700 mb-3">{special.description}</p>
+                    <p className="text-neutral-600 text-sm mb-2">{special.restaurant}</p>
+                    <p className="text-neutral-700 mb-3">{special.description}</p>
                     
                     {/* Valid Until */}
                     <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-1 text-sm text-gray-500">
+                      <div className="flex items-center space-x-1 text-sm text-neutral-500">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -231,10 +231,10 @@ export default function SpecialsPage() {
 
                     {/* Action Buttons */}
                     <div className="flex space-x-2">
-                      <button className="flex-1 bg-jewgo-primary text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-jewgo-primary-dark transition-colors">
+                      <button className="flex-1 bg-gradient-jewgo text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-jewgo-600 transition-colors">
                         Claim Deal
                       </button>
-                      <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                      <button className="flex-1 bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-neutral-200 transition-colors">
                         View Restaurant
                       </button>
                     </div>
@@ -247,17 +247,17 @@ export default function SpecialsPage() {
           {/* Newsletter Signup */}
           <div className="mt-8 bg-white rounded-lg shadow-md p-6">
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Get Special Deals First!</h3>
-              <p className="text-gray-600 mb-4">Subscribe to receive exclusive kosher specials and promotions</p>
+              <h3 className="text-lg font-semibold text-neutral-800 mb-2">Get Special Deals First!</h3>
+              <p className="text-neutral-600 mb-4">Subscribe to receive exclusive kosher specials and promotions</p>
               <div className="flex max-w-md mx-auto space-x-2">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
-                />
-                <button className="bg-jewgo-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-jewgo-primary-dark transition-colors">
-                  Subscribe
-                </button>
+                                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="flex-1 px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-jewgo-400 focus:border-transparent"
+                  />
+                  <button className="bg-gradient-jewgo text-white px-4 py-2 rounded-lg font-medium hover:bg-jewgo-600 transition-colors">
+                    Subscribe
+                  </button>
               </div>
             </div>
           </div>

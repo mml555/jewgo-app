@@ -223,16 +223,16 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
   };
 
   const searchSuggestions = [
-    { label: 'ORB Certified', value: 'ORB', icon: '✓', color: 'bg-blue-500' },
-    { label: 'KM Certified', value: 'KM', icon: '🥛', color: 'bg-green-500' },
-    { label: 'KDM Certified', value: 'KDM', icon: '🍽️', color: 'bg-yellow-500' },
-    { label: 'Diamond K', value: 'Diamond K', icon: '💎', color: 'bg-purple-500' },
-    { label: 'Meat Restaurants', value: 'meat', icon: '🥩', color: 'bg-red-500' },
-    { label: 'Dairy Restaurants', value: 'dairy', icon: '🥛', color: 'bg-blue-500' },
-    { label: 'Pareve Restaurants', value: 'pareve', icon: '🥬', color: 'bg-green-500' },
-    { label: 'Miami Beach', value: 'Miami Beach', icon: '🏖️', color: 'bg-blue-500' },
-    { label: 'Hollywood FL', value: 'Hollywood', icon: '🎬', color: 'bg-orange-500' },
-    { label: 'Boca Raton', value: 'Boca', icon: '🌴', color: 'bg-green-500' }
+    { label: 'ORB Certified', value: 'ORB', icon: '✓', color: 'bg-agency-orb' },
+    { label: 'KM Certified', value: 'KM', icon: '🥛', color: 'bg-agency-km' },
+    { label: 'KDM Certified', value: 'KDM', icon: '🍽️', color: 'bg-agency-kdm' },
+    { label: 'Diamond K', value: 'Diamond K', icon: '💎', color: 'bg-agency-diamond-k' },
+    { label: 'Meat Restaurants', value: 'meat', icon: '🥩', color: 'bg-kosher-meat' },
+    { label: 'Dairy Restaurants', value: 'dairy', icon: '🥛', color: 'bg-kosher-dairy' },
+    { label: 'Pareve Restaurants', value: 'pareve', icon: '🥬', color: 'bg-kosher-pareve' },
+    { label: 'Miami Beach', value: 'Miami Beach', icon: '🏖️', color: 'bg-accent-blue' },
+    { label: 'Hollywood FL', value: 'Hollywood', icon: '🎬', color: 'bg-accent-orange' },
+    { label: 'Boca Raton', value: 'Boca', icon: '🌴', color: 'bg-accent-green' }
   ];
 
   const filteredSuggestions = searchSuggestions.filter(suggestion =>
@@ -250,7 +250,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
         <div className="relative">
           {/* Search Icon */}
           <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-            <svg className={`h-5 w-5 transition-colors duration-200 ${isFocused ? 'text-jewgo-primary' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className={`h-5 w-5 transition-colors duration-200 ${isFocused ? 'text-jewgo-400' : 'text-neutral-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
           </div>
@@ -265,7 +265,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
             onFocus={handleFocus}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            className="w-full pl-12 pr-12 py-2.5 sm:py-3 rounded-xl bg-white border border-gray-200 focus:border-jewgo-primary focus:ring-jewgo-primary/20 focus:outline-none transition-all duration-200 shadow-soft text-base"
+            className="w-full pl-12 pr-12 py-2.5 sm:py-3 rounded-xl bg-white border border-neutral-300 focus:border-jewgo-400 focus:ring-jewgo-400/20 focus:outline-none transition-all duration-200 shadow-soft text-base"
             autoComplete="off"
           />
 
@@ -275,7 +275,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
               <button
                 type="button"
                 onClick={handleClear}
-                className="p-1 text-gray-400 hover:text-jewgo-primary transition-colors duration-200"
+                className="p-1 text-neutral-400 hover:text-jewgo-400 transition-colors duration-200"
                 title="Clear search"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,10 +289,10 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
 
       {/* Enhanced Search Suggestions with Google Places */}
       {showSuggestionsPanel && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-strong z-50 animate-fade-in-up max-h-80 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-200 rounded-xl shadow-strong z-50 animate-fade-in-up max-h-80 overflow-y-auto">
           <div className="p-2">
             {query.length > 0 && (
-              <div className="text-xs text-gray-500 px-3 py-1 border-b border-gray-100 mb-2">
+              <div className="text-xs text-neutral-500 px-3 py-1 border-b border-neutral-100 mb-2">
                 Search suggestions for "{query}"
               </div>
             )}
@@ -300,7 +300,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
             {/* Google Places Suggestions */}
             {hasPlaceSuggestions && (
               <div className="mb-3">
-                <div className="text-xs text-gray-500 px-3 py-1 mb-2 flex items-center">
+                <div className="text-xs text-neutral-500 px-3 py-1 mb-2 flex items-center">
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -312,13 +312,13 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
                     <button
                       key={place.place_id}
                       onClick={() => handlePlaceSuggestionClick(place)}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200 flex items-center space-x-3"
+                      className="w-full text-left px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50 rounded-lg transition-colors duration-200 flex items-center space-x-3"
                     >
-                      <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
+                      <span className="w-2 h-2 bg-accent-blue rounded-full flex-shrink-0"></span>
                       <span className="text-sm">📍</span>
                       <div className="flex-1">
                         <div className="font-medium">{place.structured_formatting.main_text}</div>
-                        <div className="text-xs text-gray-500">{place.structured_formatting.secondary_text}</div>
+                        <div className="text-xs text-neutral-500">{place.structured_formatting.secondary_text}</div>
                       </div>
                     </button>
                   ))}
@@ -328,7 +328,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
 
             {/* Places API Error */}
             {placesApiError && (
-              <div className="px-3 py-2 text-sm text-red-500 bg-red-50 rounded-lg mb-2">
+              <div className="px-3 py-2 text-sm text-status-error bg-status-error-light rounded-lg mb-2">
                 <div className="flex items-center">
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -340,8 +340,8 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
 
             {/* Loading indicator for places */}
             {isLoadingPlaces && (
-              <div className="px-3 py-2 text-sm text-gray-500 flex items-center">
-                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-jewgo-primary mr-2"></div>
+              <div className="px-3 py-2 text-sm text-neutral-500 flex items-center">
+                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-jewgo-400 mr-2"></div>
                 Searching locations...
               </div>
             )}
@@ -349,7 +349,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
             {/* Search Suggestions */}
             {hasSearchSuggestions && (
               <div>
-                <div className="text-xs text-gray-500 px-3 py-1 mb-2 flex items-center">
+                <div className="text-xs text-neutral-500 px-3 py-1 mb-2 flex items-center">
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                   </svg>
@@ -360,7 +360,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
                     <button
                       key={index}
                       onClick={() => handleSuggestionClick(suggestion.value)}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200 flex items-center space-x-3"
+                      className="w-full text-left px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50 rounded-lg transition-colors duration-200 flex items-center space-x-3"
                     >
                       <span className={`w-2 h-2 ${suggestion.color} rounded-full flex-shrink-0`}></span>
                       <span className="text-sm">{suggestion.icon}</span>
@@ -373,7 +373,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
 
             {/* No results */}
             {!hasPlaceSuggestions && !hasSearchSuggestions && !isLoadingPlaces && !placesApiError && query.length > 0 && (
-              <div className="px-3 py-2 text-sm text-gray-500">
+              <div className="px-3 py-2 text-sm text-neutral-500">
                 No suggestions found for "{query}"
               </div>
             )}
@@ -381,12 +381,12 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
             {/* Popular searches when no query */}
             {!query && !hasPlaceSuggestions && !hasSearchSuggestions && !placesApiError && (
               <div className="space-y-1">
-                <div className="text-xs text-gray-500 px-3 py-1">Popular searches</div>
+                <div className="text-xs text-neutral-500 px-3 py-1">Popular searches</div>
                 {searchSuggestions.slice(0, 5).map((suggestion, index) => (
                   <button
                     key={index}
                     onClick={() => handleSuggestionClick(suggestion.value)}
-                    className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200 flex items-center space-x-3"
+                    className="w-full text-left px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50 rounded-lg transition-colors duration-200 flex items-center space-x-3"
                   >
                     <span className={`w-2 h-2 ${suggestion.color} rounded-full flex-shrink-0`}></span>
                     <span className="text-sm">{suggestion.icon}</span>

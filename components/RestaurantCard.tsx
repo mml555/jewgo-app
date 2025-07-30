@@ -129,28 +129,28 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
   const getAgencyBadgeClass = (agency: string) => {
     switch (agency?.toUpperCase()) {
       case 'ORB':
-        return 'border-blue-500 text-white hover:bg-blue-500 hover:text-white border-white';
+        return 'border-agency-orb text-white hover:bg-agency-orb hover:text-white border-white';
       case 'KM':
-        return 'border-green-500 text-green-500 hover:bg-green-500 hover:text-white';
+        return 'border-agency-km text-agency-km hover:bg-agency-km hover:text-white';
       case 'KDM':
-        return 'border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-white';
+        return 'border-agency-kdm text-agency-kdm hover:bg-agency-kdm hover:text-white';
       case 'DIAMOND K':
-        return 'border-purple-300 text-purple-300 hover:bg-purple-300 hover:text-white';
+        return 'border-agency-diamond-k text-agency-diamond-k hover:bg-agency-diamond-k hover:text-white';
       default:
-        return 'border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white';
+        return 'border-kosher-unknown text-kosher-unknown hover:bg-kosher-unknown hover:text-white';
     }
   };
 
   const getKosherBadgeClass = (category: string) => {
     switch (category?.toLowerCase()) {
       case 'meat':
-        return 'bg-red-500 text-white';
+        return 'bg-kosher-meat text-white';
       case 'dairy':
-        return 'bg-blue-500 text-white';
+        return 'bg-kosher-dairy text-white';
       case 'pareve':
-        return 'bg-orange-500 text-white';
+        return 'bg-kosher-pareve text-white';
       default:
-        return 'bg-gray-500 text-white';
+        return 'bg-kosher-unknown text-white';
     }
   };
 
@@ -204,7 +204,7 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
 
   return (
     <div className="relative">
-      <div className="bg-white rounded-xl shadow-soft border border-gray-200 overflow-hidden hover:shadow-medium hover:scale-[1.02] transition-all duration-300 group h-[520px] flex flex-col">
+      <div className="bg-white rounded-xl shadow-soft border border-neutral-200 overflow-hidden hover:shadow-medium hover:scale-[1.02] transition-all duration-300 group h-[520px] flex flex-col">
         {/* Image Section */}
         <div className="relative h-52 w-full overflow-hidden flex-shrink-0">
           {!imageError ? (
@@ -223,7 +223,7 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
               quality={85}
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+            <div className="w-full h-full bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center">
               <span className="text-5xl" aria-label={`${restaurant.name} food category`}>{categoryEmoji}</span>
             </div>
           )}
@@ -236,7 +236,7 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
               {/* Share Button */}
               <button
                 onClick={handleShareClick}
-                className="p-2 rounded-full shadow-lg backdrop-blur-sm bg-white/90 text-gray-700 hover:bg-white hover:scale-110 transition-all duration-200"
+                className="p-2 rounded-full shadow-lg backdrop-blur-sm bg-white/90 text-neutral-700 hover:bg-white hover:scale-110 transition-all duration-200"
                 title="Share restaurant"
                 aria-label="Share restaurant"
               >

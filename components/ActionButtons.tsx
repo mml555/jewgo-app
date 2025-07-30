@@ -131,11 +131,11 @@ export default function ActionButtons({
   return (
     <>
       {/* Action Buttons Bar */}
-      <div className="px-4 mb-6">
-        <div className="flex space-x-3 bg-white rounded-full shadow-lg border border-gray-200 p-1">
+      <div className="px-3 sm:px-4 mb-4 sm:mb-6">
+        <div className="flex space-x-2 sm:space-x-3 bg-white rounded-full shadow-lg border border-gray-200 p-1">
           <button
             onClick={onShowMap}
-            className="flex items-center justify-center gap-2 bg-transparent text-black border border-black px-6 py-3 rounded-full text-sm font-medium shadow-sm hover:bg-green-100 hover:border-green-400 transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-300/20 flex-1"
+            className="flex items-center justify-center gap-1 sm:gap-2 bg-transparent text-black border border-black px-3 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium shadow-sm hover:bg-green-100 hover:border-green-400 transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-300/20 flex-1"
           >
             {isOnMapPage ? (
               <>
@@ -155,10 +155,10 @@ export default function ActionButtons({
             )}
           </button>
 
-          <button
-            onClick={onAddEatery}
-            className="flex items-center justify-center gap-2 bg-transparent text-black border border-black px-6 py-3 rounded-full text-sm font-medium shadow-sm hover:bg-green-100 hover:border-green-400 transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-300/20 flex-1"
-          >
+                      <button
+              onClick={onAddEatery}
+              className="flex items-center justify-center gap-1 sm:gap-2 bg-transparent text-black border border-black px-3 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium shadow-sm hover:bg-green-100 hover:border-green-400 transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-300/20 flex-1"
+            >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
@@ -167,7 +167,7 @@ export default function ActionButtons({
 
           <button
             onClick={() => setShowFilters(true)}
-            className="flex items-center justify-center gap-2 bg-transparent text-black border border-black px-6 py-3 rounded-full text-sm font-medium shadow-sm hover:bg-green-100 hover:border-green-400 transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-300/20 relative flex-1"
+            className="flex items-center justify-center gap-1 sm:gap-2 bg-transparent text-black border border-black px-3 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium shadow-sm hover:bg-green-100 hover:border-green-400 transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-300/20 relative flex-1"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -182,28 +182,28 @@ export default function ActionButtons({
 
       {/* Filters Modal */}
       {showFilters && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-[2rem] w-full max-w-md max-h-[90vh] flex flex-col shadow-2xl">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-1 sm:p-2 md:p-4">
+          <div className="bg-white rounded-[1.5rem] sm:rounded-[2rem] w-full max-w-md max-h-[98vh] sm:max-h-[95vh] md:max-h-[90vh] flex flex-col shadow-2xl">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900">Advanced Filters</h2>
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Advanced Filters</h2>
               <button
                 onClick={() => setShowFilters(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto max-h-[calc(90vh-200px)]">
-              <div className="px-6 py-4 space-y-6">
+            <div className="flex-1 overflow-y-auto max-h-[calc(98vh-200px)] sm:max-h-[calc(95vh-200px)] md:max-h-[calc(90vh-200px)]">
+              <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 space-y-3 sm:space-y-4 md:space-y-6">
                 {/* Quick Filters Section */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     Quick Filters
@@ -213,19 +213,19 @@ export default function ActionButtons({
                       onClick={() => onToggleFilter?.('openNow', !activeFilters?.openNow)}
                       disabled={locationLoading}
                       className={cn(
-                        "w-full flex justify-between items-center py-3 px-4 rounded-full transition-all duration-200",
+                        "w-full flex justify-between items-center py-2.5 sm:py-3 px-3 sm:px-4 rounded-full transition-all duration-200",
                         "hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-green-500/20",
                         activeFilters?.openNow
                           ? "bg-black text-green-300 border-2 border-green-300"
                           : "bg-gray-100 text-gray-700 border-2 border-gray-200 hover:bg-gray-200"
                       )}
                     >
-                      <span className="flex items-center">
-                        <span className="w-2 h-2 rounded-full bg-green-500 mr-3"></span>
+                      <span className="flex items-center text-sm sm:text-base">
+                        <span className="w-2 h-2 rounded-full bg-green-500 mr-2 sm:mr-3"></span>
                         Open Now
                       </span>
                       <div className={cn(
-                        "w-5 h-5 border-2 rounded-full transition-colors",
+                        "w-4 h-4 sm:w-5 sm:h-5 border-2 rounded-full transition-colors",
                         activeFilters?.openNow
                           ? "border-green-300 bg-green-300"
                           : "border-gray-400"
@@ -236,8 +236,8 @@ export default function ActionButtons({
 
                 {/* Distance Section */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
@@ -248,7 +248,7 @@ export default function ActionButtons({
                     disabled={!userLocation || locationLoading}
                     title={!userLocation ? 'Enable location to use this sort option' : ''}
                     className={cn(
-                      "w-full flex justify-between items-center py-3 px-4 rounded-full transition-all duration-200",
+                      "w-full flex justify-between items-center py-2.5 sm:py-3 px-3 sm:px-4 rounded-full transition-all duration-200",
                       "hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-green-500/20",
                       !userLocation || locationLoading ? "opacity-50 cursor-not-allowed" : "",
                       expandedSections.distance
@@ -258,7 +258,7 @@ export default function ActionButtons({
                         : "bg-gray-100 text-gray-700 border-2 border-gray-200 hover:bg-gray-200"
                     )}
                   >
-                    <span className="flex items-center">
+                    <span className="flex items-center text-sm sm:text-base">
                       <span>{getDistanceLabel()}</span>
                       {activeFilters?.distanceRadius && (
                         <span className="ml-2 bg-green-300 text-black text-xs font-bold px-2 py-1 rounded-full">
@@ -268,7 +268,7 @@ export default function ActionButtons({
                     </span>
                     <svg 
                       className={cn(
-                        "w-5 h-5 transition-transform duration-200",
+                        "w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200",
                         expandedSections.distance ? "rotate-180" : ""
                       )} 
                       fill="none" 
@@ -280,7 +280,7 @@ export default function ActionButtons({
                   </button>
                   
                   {expandedSections.distance && (
-                    <div className="mt-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                    <div className="mt-3 sm:mt-4 space-y-3 sm:space-y-4 animate-in slide-in-from-top-2 duration-200">
                       {/* Distance Slider */}
                       <div className="px-2">
                         <div className="flex justify-between items-center mb-3">
@@ -310,13 +310,13 @@ export default function ActionButtons({
                       </div>
 
                       {/* Quick Distance Buttons */}
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                         {[5, 10, 15, 20, 25, 30].map((distance) => (
                           <button
                             key={distance}
                             onClick={() => handleDistanceSelect(distance)}
                             className={cn(
-                              "py-2 px-3 rounded-full border-2 transition-colors text-sm font-medium",
+                              "py-1.5 sm:py-2 px-2 sm:px-3 rounded-full border-2 transition-colors text-xs sm:text-sm font-medium",
                               activeFilters?.distanceRadius === distance
                                 ? "border-green-300 bg-black text-green-300"
                                 : "border-gray-300 text-gray-700 hover:border-green-300 hover:bg-black hover:text-green-300"
@@ -337,13 +337,13 @@ export default function ActionButtons({
                             placeholder="Custom miles"
                             value={customDistance}
                             onChange={(e) => setCustomDistance(e.target.value)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20"
+                            className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20"
                             onKeyPress={(e) => e.key === 'Enter' && handleCustomDistanceSubmit()}
                           />
                           <button
                             onClick={handleCustomDistanceSubmit}
                             disabled={!customDistance || parseFloat(customDistance) <= 0 || parseFloat(customDistance) > 100}
-                            className="px-3 py-2 bg-black text-green-300 text-sm rounded-full hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-green-300"
+                            className="px-2 sm:px-3 py-1.5 sm:py-2 bg-black text-green-300 text-xs sm:text-sm rounded-full hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-green-300"
                           >
                             Set
                           </button>
@@ -356,8 +356,8 @@ export default function ActionButtons({
 
                 {/* Certifying Agencies Section */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Certifying Agencies
@@ -365,7 +365,7 @@ export default function ActionButtons({
                   <button
                     onClick={() => toggleSection('agencies')}
                     className={cn(
-                      "w-full flex justify-between items-center py-3 px-4 rounded-full transition-all duration-200",
+                      "w-full flex justify-between items-center py-2.5 sm:py-3 px-3 sm:px-4 rounded-full transition-all duration-200",
                       "hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-green-500/20",
                       expandedSections.agencies
                         ? "bg-black text-green-300 border-2 border-green-300"
@@ -374,7 +374,7 @@ export default function ActionButtons({
                         : "bg-gray-100 text-gray-700 border-2 border-gray-200 hover:bg-gray-200"
                     )}
                   >
-                    <span className="flex items-center">
+                    <span className="flex items-center text-sm sm:text-base">
                       <span>{getSelectedLabel('agencies')}</span>
                       {getSelectedCount('agencies') > 0 && (
                         <span className="ml-2 bg-green-300 text-black text-xs font-bold px-2 py-1 rounded-full">
@@ -384,7 +384,7 @@ export default function ActionButtons({
                     </span>
                     <svg 
                       className={cn(
-                        "w-5 h-5 transition-transform duration-200",
+                        "w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200",
                         expandedSections.agencies ? "rotate-180" : ""
                       )} 
                       fill="none" 
@@ -396,105 +396,105 @@ export default function ActionButtons({
                   </button>
                   
                   {expandedSections.agencies && (
-                    <div className="mt-3 space-y-2 animate-in slide-in-from-top-2 duration-200">
-                      <button
-                        onClick={() => onFilterChange?.('agency', 'all')}
-                        className={cn(
-                          "w-full flex justify-between items-center py-2 px-4 rounded-full transition-all duration-200",
-                          "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500/20",
-                          !activeFilters?.agency
-                            ? "bg-black text-green-300 border border-green-300"
-                            : "text-gray-700 border border-gray-200"
-                        )}
-                      >
-                        <span>All Agencies</span>
-                        <div className={cn(
-                          "w-4 h-4 border-2 rounded-full transition-colors",
-                          !activeFilters?.agency
-                            ? "border-green-300 bg-green-300"
-                            : "border-gray-300"
-                        )} />
-                      </button>
+                    <div className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2 animate-in slide-in-from-top-2 duration-200">
+                                              <button
+                          onClick={() => onFilterChange?.('agency', 'all')}
+                          className={cn(
+                            "w-full flex justify-between items-center py-1.5 sm:py-2 px-3 sm:px-4 rounded-full transition-all duration-200",
+                            "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500/20",
+                            !activeFilters?.agency
+                              ? "bg-black text-green-300 border border-green-300"
+                              : "text-gray-700 border border-gray-200"
+                          )}
+                        >
+                          <span className="text-sm sm:text-base">All Agencies</span>
+                          <div className={cn(
+                            "w-3 h-3 sm:w-4 sm:h-4 border-2 rounded-full transition-colors",
+                            !activeFilters?.agency
+                              ? "border-green-300 bg-green-300"
+                              : "border-gray-300"
+                          )} />
+                        </button>
                       
-                      <button
-                        onClick={() => onFilterChange?.('agency', 'ORB')}
-                        className={cn(
-                          "w-full flex justify-between items-center py-2 px-4 rounded-full transition-all duration-200",
-                          "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500/20",
-                          activeFilters?.agency === 'ORB'
-                            ? "bg-black text-green-300 border border-green-300"
-                            : "text-gray-700 border border-gray-200"
-                        )}
-                        title="Orthodox Union Rabbinical Board"
-                      >
-                        <span>ORB</span>
-                        <div className={cn(
-                          "w-4 h-4 border-2 rounded-full transition-colors",
-                          activeFilters?.agency === 'ORB'
-                            ? "border-green-300 bg-green-300"
-                            : "border-gray-300"
-                        )} />
-                      </button>
+                                              <button
+                          onClick={() => onFilterChange?.('agency', 'ORB')}
+                          className={cn(
+                            "w-full flex justify-between items-center py-1.5 sm:py-2 px-3 sm:px-4 rounded-full transition-all duration-200",
+                            "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500/20",
+                            activeFilters?.agency === 'ORB'
+                              ? "bg-black text-green-300 border border-green-300"
+                              : "text-gray-700 border border-gray-200"
+                          )}
+                          title="Orthodox Union Rabbinical Board"
+                        >
+                          <span className="text-sm sm:text-base">ORB</span>
+                          <div className={cn(
+                            "w-3 h-3 sm:w-4 sm:h-4 border-2 rounded-full transition-colors",
+                            activeFilters?.agency === 'ORB'
+                              ? "border-green-300 bg-green-300"
+                              : "border-gray-300"
+                          )} />
+                        </button>
                       
-                      <button
-                        onClick={() => onFilterChange?.('agency', 'KM')}
-                        className={cn(
-                          "w-full flex justify-between items-center py-2 px-4 rounded-full transition-all duration-200",
-                          "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500/20",
-                          activeFilters?.agency === 'KM'
-                            ? "bg-black text-green-300 border border-green-300"
-                            : "text-gray-700 border border-gray-200"
-                        )}
-                        title="Cholov Yisroel only"
-                      >
-                        <span>KM</span>
-                        <div className={cn(
-                          "w-4 h-4 border-2 rounded-full transition-colors",
-                          activeFilters?.agency === 'KM'
-                            ? "border-green-300 bg-green-300"
-                            : "border-gray-300"
-                        )} />
-                      </button>
+                                              <button
+                          onClick={() => onFilterChange?.('agency', 'KM')}
+                          className={cn(
+                            "w-full flex justify-between items-center py-1.5 sm:py-2 px-3 sm:px-4 rounded-full transition-all duration-200",
+                            "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500/20",
+                            activeFilters?.agency === 'KM'
+                              ? "bg-black text-green-300 border border-green-300"
+                              : "text-gray-700 border border-gray-200"
+                          )}
+                          title="Cholov Yisroel only"
+                        >
+                          <span className="text-sm sm:text-base">KM</span>
+                          <div className={cn(
+                            "w-3 h-3 sm:w-4 sm:h-4 border-2 rounded-full transition-colors",
+                            activeFilters?.agency === 'KM'
+                              ? "border-green-300 bg-green-300"
+                              : "border-gray-300"
+                          )} />
+                        </button>
                       
-                      <button
-                        onClick={() => onFilterChange?.('agency', 'KDM')}
-                        className={cn(
-                          "w-full flex justify-between items-center py-2 px-4 rounded-full transition-all duration-200",
-                          "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500/20",
-                          activeFilters?.agency === 'KDM'
-                            ? "bg-black text-green-300 border border-green-300"
-                            : "text-gray-700 border border-gray-200"
-                        )}
-                        title="Not exclusively Cholov Yisroel"
-                      >
-                        <span>KDM</span>
-                        <div className={cn(
-                          "w-4 h-4 border-2 rounded-full transition-colors",
-                          activeFilters?.agency === 'KDM'
-                            ? "border-green-300 bg-green-300"
-                            : "border-gray-300"
-                        )} />
-                      </button>
-                      
-                      <button
-                        onClick={() => onFilterChange?.('agency', 'Diamond K')}
-                        className={cn(
-                          "w-full flex justify-between items-center py-2 px-4 rounded-full transition-all duration-200",
-                          "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500/20",
-                          activeFilters?.agency === 'Diamond K'
-                            ? "bg-black text-green-300 border border-green-300"
-                            : "text-gray-700 border border-gray-200"
-                        )}
-                        title="ORB subsidiary, not Cholov Yisroel"
-                      >
-                        <span>Diamond K</span>
-                        <div className={cn(
-                          "w-4 h-4 border-2 rounded-full transition-colors",
-                          activeFilters?.agency === 'Diamond K'
-                            ? "border-green-300 bg-green-300"
-                            : "border-gray-300"
-                        )} />
-                      </button>
+                                              <button
+                          onClick={() => onFilterChange?.('agency', 'KDM')}
+                          className={cn(
+                            "w-full flex justify-between items-center py-1.5 sm:py-2 px-3 sm:px-4 rounded-full transition-all duration-200",
+                            "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500/20",
+                            activeFilters?.agency === 'KDM'
+                              ? "bg-black text-green-300 border border-green-300"
+                              : "text-gray-700 border border-gray-200"
+                          )}
+                          title="Not exclusively Cholov Yisroel"
+                        >
+                          <span className="text-sm sm:text-base">KDM</span>
+                          <div className={cn(
+                            "w-3 h-3 sm:w-4 sm:h-4 border-2 rounded-full transition-colors",
+                            activeFilters?.agency === 'KDM'
+                              ? "border-green-300 bg-green-300"
+                              : "border-gray-300"
+                          )} />
+                        </button>
+                        
+                        <button
+                          onClick={() => onFilterChange?.('agency', 'Diamond K')}
+                          className={cn(
+                            "w-full flex justify-between items-center py-1.5 sm:py-2 px-3 sm:px-4 rounded-full transition-all duration-200",
+                            "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500/20",
+                            activeFilters?.agency === 'Diamond K'
+                              ? "bg-black text-green-300 border border-green-300"
+                              : "text-gray-700 border border-gray-200"
+                          )}
+                          title="ORB subsidiary, not Cholov Yisroel"
+                        >
+                          <span className="text-sm sm:text-base">Diamond K</span>
+                          <div className={cn(
+                            "w-3 h-3 sm:w-4 sm:h-4 border-2 rounded-full transition-colors",
+                            activeFilters?.agency === 'Diamond K'
+                              ? "border-green-300 bg-green-300"
+                              : "border-gray-300"
+                          )} />
+                        </button>
                     </div>
                   )}
                 </div>
@@ -765,26 +765,26 @@ export default function ActionButtons({
             </div>
 
             {/* Sticky Footer with CTA */}
-            <div className="sticky bottom-0 bg-white rounded-b-[2rem] px-6 py-4 border-t border-gray-100">
+            <div className="sticky bottom-0 bg-white rounded-b-[1.5rem] sm:rounded-b-[2rem] px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 border-t border-gray-100">
               {hasActiveFilters && (
-                <div className="mb-3">
-                  <span className="text-sm text-gray-600">
+                <div className="mb-2 sm:mb-3">
+                  <span className="text-xs sm:text-sm text-gray-600">
                     {Object.values(activeFilters || {}).filter(f => f !== undefined && f !== false).length} active filter(s)
                   </span>
                 </div>
               )}
-              <div className="flex space-x-3">
+              <div className="flex space-x-2 sm:space-x-3">
                 {hasActiveFilters && onClearAll && (
                   <button
                     onClick={onClearAll}
-                    className="flex-1 border-2 border-black text-black hover:bg-black hover:text-white font-semibold py-4 rounded-full transition-colors touch-manipulation active:scale-95"
+                    className="flex-1 border-2 border-black text-black hover:bg-black hover:text-white font-semibold py-3 sm:py-4 rounded-full transition-colors touch-manipulation active:scale-95 text-sm sm:text-base"
                   >
                     Reset Filters
                   </button>
                 )}
                 <button
                   onClick={() => setShowFilters(false)}
-                  className="flex-1 bg-black text-green-300 hover:bg-gray-800 font-semibold py-4 rounded-full transition-colors touch-manipulation active:scale-95 border border-green-300"
+                  className="flex-1 bg-black text-green-300 hover:bg-gray-800 font-semibold py-3 sm:py-4 rounded-full transition-colors touch-manipulation active:scale-95 border border-green-300 text-sm sm:text-base"
                 >
                   Apply Filters
                 </button>
