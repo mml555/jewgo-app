@@ -249,7 +249,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
       <form onSubmit={(e) => e.preventDefault()}>
         <div className="relative">
           {/* Search Icon */}
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
             <svg className={`h-5 w-5 transition-colors duration-200 ${isFocused ? 'text-jewgo-primary' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
@@ -265,7 +265,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
             onFocus={handleFocus}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            className="w-full px-3 py-2.5 sm:px-4 sm:py-3 pl-12 pr-12 rounded-xl bg-white border border-gray-200 focus:border-jewgo-primary focus:ring-jewgo-primary/20 focus:outline-none transition-all duration-200 shadow-soft text-base"
+            className="w-full pl-12 pr-12 py-2.5 sm:py-3 rounded-xl bg-white border border-gray-200 focus:border-jewgo-primary focus:ring-jewgo-primary/20 focus:outline-none transition-all duration-200 shadow-soft text-base"
             autoComplete="off"
           />
 
