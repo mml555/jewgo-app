@@ -1,0 +1,97 @@
+{
+  "monitors": [
+    {
+      "name": "jewgo-api-health",
+      "display_name": "JewGo API Health Check",
+      "type": "http",
+      "url": "https://jewgo.onrender.com/health",
+      "interval": 300,
+      "timeout": 30,
+      "retries": 2,
+      "expected_status": 200,
+      "expected_response": {
+        "status": "healthy"
+      },
+      "notifications": {
+        "email": ["admin@jewgo.com", "alerts@jewgo.com"],
+        "slack": "#jewgo-alerts",
+        "webhook": "https://hooks.slack.com/services/YOUR_SLACK_WEBHOOK"
+      },
+      "tags": ["api", "health", "production"],
+      "group": "jewgo-api"
+    },
+    {
+      "name": "jewgo-api-ping",
+      "display_name": "JewGo API Ping",
+      "type": "http",
+      "url": "https://jewgo.onrender.com/ping",
+      "interval": 60,
+      "timeout": 10,
+      "retries": 1,
+      "expected_status": 200,
+      "expected_response": {
+        "pong": true
+      },
+      "notifications": {
+        "email": ["admin@jewgo.com"]
+      },
+      "tags": ["api", "ping", "production"],
+      "group": "jewgo-api"
+    },
+    {
+      "name": "jewgo-api-restaurants",
+      "display_name": "JewGo API Restaurants Endpoint",
+      "type": "http",
+      "url": "https://jewgo.onrender.com/api/restaurants?limit=1",
+      "interval": 300,
+      "timeout": 30,
+      "retries": 2,
+      "expected_status": 200,
+      "expected_response": {
+        "success": true
+      },
+      "notifications": {
+        "email": ["admin@jewgo.com", "alerts@jewgo.com"],
+        "slack": "#jewgo-alerts"
+      },
+      "tags": ["api", "restaurants", "production"],
+      "group": "jewgo-api"
+    },
+    {
+      "name": "jewgo-frontend",
+      "display_name": "JewGo Frontend",
+      "type": "http",
+      "url": "https://jewgo.com",
+      "interval": 300,
+      "timeout": 30,
+      "retries": 2,
+      "expected_status": 200,
+      "notifications": {
+        "email": ["admin@jewgo.com", "alerts@jewgo.com"],
+        "slack": "#jewgo-alerts"
+      },
+      "tags": ["frontend", "production"],
+      "group": "jewgo-frontend"
+    }
+  ],
+  "settings": {
+    "maintenance_windows": [
+      {
+        "name": "Weekly Maintenance",
+        "day": "sunday",
+        "start_time": "02:00",
+        "duration": 120
+      }
+    ],
+    "notification_settings": {
+      "down_alert": true,
+      "up_alert": true,
+      "retry_alert": false,
+      "grace_period": 300
+    },
+    "alert_thresholds": {
+      "response_time": 5000,
+      "error_rate": 0.05
+    }
+  }
+} 

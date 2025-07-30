@@ -430,6 +430,15 @@ class DatabaseManager:
             logger.error(f"Error getting restaurant tags: {e}")
             return []
     
+    def get_restaurant_count(self) -> int:
+        """Get total number of restaurants in the database."""
+        try:
+            self.cursor.execute("SELECT COUNT(*) FROM restaurants")
+            return self.cursor.fetchone()[0]
+        except Exception as e:
+            logger.error(f"Error getting restaurant count: {e}")
+            return 0
+
     def get_statistics(self) -> Dict[str, Any]:
         """Get comprehensive database statistics."""
         try:

@@ -1,0 +1,82 @@
+{
+  "monitors": [
+    {
+      "name": "JewGo API - Health Check",
+      "url": "https://jewgo.onrender.com/health",
+      "type": "http",
+      "interval": 300,
+      "timeout": 30,
+      "retries": 2,
+      "expected_status": 200,
+      "expected_response": {
+        "status": "healthy"
+      },
+      "alert_contacts": ["primary", "email"],
+      "tags": ["api", "health", "production"]
+    },
+    {
+      "name": "JewGo API - Ping",
+      "url": "https://jewgo.onrender.com/ping",
+      "type": "http",
+      "interval": 60,
+      "timeout": 10,
+      "retries": 1,
+      "expected_status": 200,
+      "expected_response": {
+        "pong": true
+      },
+      "alert_contacts": ["primary"],
+      "tags": ["api", "ping", "production"]
+    },
+    {
+      "name": "JewGo API - Restaurants Endpoint",
+      "url": "https://jewgo.onrender.com/api/restaurants?limit=1",
+      "type": "http",
+      "interval": 300,
+      "timeout": 30,
+      "retries": 2,
+      "expected_status": 200,
+      "expected_response": {
+        "success": true
+      },
+      "alert_contacts": ["primary", "email"],
+      "tags": ["api", "restaurants", "production"]
+    },
+    {
+      "name": "JewGo Frontend",
+      "url": "https://jewgo.com",
+      "type": "http",
+      "interval": 300,
+      "timeout": 30,
+      "retries": 2,
+      "expected_status": 200,
+      "alert_contacts": ["primary", "email"],
+      "tags": ["frontend", "production"]
+    }
+  ],
+  "alert_contacts": {
+    "primary": {
+      "type": "email",
+      "email": "admin@jewgo.com"
+    },
+    "email": {
+      "type": "email",
+      "email": "alerts@jewgo.com"
+    }
+  },
+  "settings": {
+    "maintenance_windows": [
+      {
+        "name": "Weekly Maintenance",
+        "day": "sunday",
+        "start_time": "02:00",
+        "duration": 120
+      }
+    ],
+    "notification_settings": {
+      "down_alert": true,
+      "up_alert": true,
+      "retry_alert": false
+    }
+  }
+} 

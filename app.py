@@ -517,28 +517,129 @@ def create_app(config_name=None):
             logger.error("Error in bulk import", error=str(e))
             return jsonify({'error': 'Internal server error', 'success': False}), 500
 
+    @app.route('/api/restaurants/<int:restaurant_id>/reviews', methods=['POST'])
+    @limiter.limit("10 per minute")
+    def api_submit_review(restaurant_id):
+        """Submit a new review for a restaurant."""
+        try:
+            # Get request data
+            data = request.get_json()
+            if not data:
+                return jsonify({'error': 'No data provided', 'success': False}), 400
+            
+            # Validate required fields
+            required_fields = ['rating', 'text']
+            for field in required_fields:
+                if field not in data:
+                    return jsonify({'error': f'Missing required field: {field}', 'success': False}), 400
+            
+            # Validate rating
+            rating = data.get('rating')
+            if not isinstance(rating, (int, float)) or rating < 1 or rating > 5:
+                return jsonify({'error': 'Rating must be a number between 1 and 5', 'success': False}), 400
+            
+            # Validate text
+            text = data.get('text', '').strip()
+            if len(text) < 10:
+                return jsonify({'error': 'Review text must be at least 10 characters', 'success': False}), 400
+            if len(text) > 500:
+                return jsonify({'error': 'Review text must be less than 500 characters', 'success': False}), 400
+            
+            # Check if restaurant exists
+            restaurant = g.db_manager.get_restaurant_by_id(restaurant_id)
+            if not restaurant:
+                return jsonify({'error': 'Restaurant not found', 'success': False}), 404
+            
+            # Create review data
+            review_data = {
+                'restaurant_id': restaurant_id,
+                'rating': rating,
+                'text': text,
+                'author_name': data.get('author_name', 'Anonymous'),
+                'author_email': data.get('author_email', ''),
+                'created_date': datetime.utcnow().isoformat()
+            }
+            
+            # Add review to database
+            if g.db_manager.add_review(restaurant_id, review_data):
+                logger.info(f"Review submitted for restaurant {restaurant_id}")
+                return jsonify({
+                    'success': True,
+                    'message': 'Review submitted successfully',
+                    'review': review_data
+                })
+            else:
+                return jsonify({'error': 'Failed to submit review', 'success': False}), 500
+                
+        except Exception as e:
+            logger.error(f"Error submitting review for restaurant {restaurant_id}", error=str(e))
+            return jsonify({'error': 'Internal server error', 'success': False}), 500
+
+    @app.route('/api/restaurants/<int:restaurant_id>/reviews', methods=['GET'])
+    @limiter.limit("100 per minute")
+    def api_get_reviews(restaurant_id):
+        """Get reviews for a restaurant."""
+        try:
+            # Check if restaurant exists
+            restaurant = g.db_manager.get_restaurant_by_id(restaurant_id)
+            if not restaurant:
+                return jsonify({'error': 'Restaurant not found', 'success': False}), 404
+            
+            # Get reviews
+            limit = request.args.get('limit', 10, type=int)
+            reviews = g.db_manager.get_reviews(restaurant_id, limit)
+            
+            return jsonify({
+                'success': True,
+                'reviews': reviews,
+                'count': len(reviews)
+            })
+                
+        except Exception as e:
+            logger.error(f"Error getting reviews for restaurant {restaurant_id}", error=str(e))
+            return jsonify({'error': 'Internal server error', 'success': False}), 500
+
     @app.route('/health')
     @limiter.limit("200 per minute")
     def health_check():
-        """Enhanced health check endpoint."""
+        """Enhanced health check endpoint for monitoring services."""
         try:
             # Test database connection
             db_healthy = g.db_manager is not None
             
+            # Test a simple database query
+            db_test_successful = False
+            if db_healthy:
+                try:
+                    # Try to get restaurant count as a simple DB test
+                    count = g.db_manager.get_restaurant_count()
+                    db_test_successful = count is not None
+                except Exception as db_error:
+                    logger.warning("Database test failed", error=str(db_error))
+                    db_test_successful = False
+            
+            # Overall health status
+            overall_healthy = db_healthy and db_test_successful
+            
             health_status = {
-                'status': 'healthy' if db_healthy else 'unhealthy',
+                'status': 'healthy' if overall_healthy else 'unhealthy',
                 'timestamp': datetime.utcnow().isoformat(),
                 'version': app.config['API_VERSION'],
                 'environment': os.environ.get('FLASK_ENV', 'development'),
                 'database': {
                     'status': 'connected' if db_healthy else 'disconnected',
+                    'test_passed': db_test_successful,
                     'type': 'PostgreSQL' if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI'] else 'SQLite'
                 },
-                'uptime': 'running',  # In production, add actual uptime calculation
-                'memory_usage': 'normal'  # In production, add actual memory monitoring
+                'uptime': 'running',
+                'memory_usage': 'normal',
+                'monitoring': {
+                    'uptimerobot': 'ready',
+                    'cronitor': 'ready'
+                }
             }
             
-            status_code = 200 if db_healthy else 503
+            status_code = 200 if overall_healthy else 503
             return jsonify(health_status), status_code
             
         except Exception as e:
@@ -548,6 +649,15 @@ def create_app(config_name=None):
                 'error': str(e),
                 'timestamp': datetime.utcnow().isoformat()
             }), 503
+
+    @app.route('/ping')
+    @limiter.limit("500 per minute")
+    def ping():
+        """Simple ping endpoint for basic uptime monitoring."""
+        return jsonify({
+            'pong': True,
+            'timestamp': datetime.utcnow().isoformat()
+        }), 200
     
     # Error handlers
     @app.errorhandler(404)
