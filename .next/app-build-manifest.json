@@ -23,19 +23,19 @@
       "static/chunks/main-app-fe7c3b874962b3de.js",
       "static/chunks/app/add-eatery/page-2219d8e97873a3e7.js"
     ],
-    "/advanced-filters/page": [
-      "static/chunks/webpack-06962e268a97de6f.js",
-      "static/chunks/fd9d1056-c5d579813bc2589a.js",
-      "static/chunks/938-8f99eaf504b350bd.js",
-      "static/chunks/main-app-fe7c3b874962b3de.js",
-      "static/chunks/app/advanced-filters/page-f2adfc1c8b625c4e.js"
-    ],
     "/admin/specials/page": [
       "static/chunks/webpack-06962e268a97de6f.js",
       "static/chunks/fd9d1056-c5d579813bc2589a.js",
       "static/chunks/938-8f99eaf504b350bd.js",
       "static/chunks/main-app-fe7c3b874962b3de.js",
       "static/chunks/app/admin/specials/page-3b8a5ef0db7ae64a.js"
+    ],
+    "/advanced-filters/page": [
+      "static/chunks/webpack-06962e268a97de6f.js",
+      "static/chunks/fd9d1056-c5d579813bc2589a.js",
+      "static/chunks/938-8f99eaf504b350bd.js",
+      "static/chunks/main-app-fe7c3b874962b3de.js",
+      "static/chunks/app/advanced-filters/page-f2adfc1c8b625c4e.js"
     ],
     "/auth/signin/page": [
       "static/chunks/webpack-06962e268a97de6f.js",
