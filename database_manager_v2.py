@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-Enhanced Database Manager with PostgreSQL Support
-Provides SQLAlchemy-based database operations with PostgreSQL support only.
+Enhanced Database Manager for JewGo App
+Handles PostgreSQL database operations with SQLAlchemy 1.4
 """
 
 import os
-import json
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Any
 import logging
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Boolean
-from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 import structlog
+from typing import Dict, Any, List, Optional
+from datetime import datetime
 
 # Configure structured logging
 structlog.configure(
@@ -35,100 +35,78 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
-# SQLAlchemy Base for SQLAlchemy 2.0
-class Base(DeclarativeBase):
-    pass
+# SQLAlchemy Base
+Base = declarative_base()
 
 class Restaurant(Base):
     """Restaurant model for SQLAlchemy."""
     __tablename__ = 'restaurants'
     
     id = Column(Integer, primary_key=True)
-    business_id = Column(String(255), unique=True, nullable=False)
     name = Column(String(255), nullable=False)
-    website_link = Column(String(500))
-    phone_number = Column(String(50))
     address = Column(String(500))
     city = Column(String(100))
     state = Column(String(50))
     zip_code = Column(String(20))
-    certificate_link = Column(String(500))
-    image_url = Column(String(1000))
-    certifying_agency = Column(String(100), default='ORB')
-    kosher_category = Column(String(50), default='unknown')
-    listing_type = Column(String(100), default='restaurant')
-    status = Column(String(50), default='active')
+    phone = Column(String(50))
+    website = Column(String(500))
+    description = Column(Text)
+    cuisine_type = Column(String(100))
+    price_range = Column(String(20))
     rating = Column(Float)
-    price_range = Column(String(50))
-    hours_of_operation = Column(Text)
-    short_description = Column(Text)
-    notes = Column(Text)
+    review_count = Column(Integer)
     latitude = Column(Float)
     longitude = Column(Float)
-    data_source = Column(String(100), default='manual')
-    external_id = Column(String(255))
-    created_date = Column(DateTime, default=datetime.utcnow)
-    updated_date = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-class RestaurantSpecial(Base):
-    """Restaurant specials model."""
-    __tablename__ = 'restaurant_specials'
-    
-    id = Column(Integer, primary_key=True)
-    restaurant_id = Column(Integer, nullable=False)
-    title = Column(String(255), nullable=False)
-    description = Column(Text)
-    discount_percent = Column(Float)
-    discount_amount = Column(Float)
-    start_date = Column(DateTime)
-    end_date = Column(DateTime)
-    is_paid = Column(Boolean, default=False)
-    payment_status = Column(String(50), default='pending')
-    special_type = Column(String(50), default='discount')
-    priority = Column(Integer, default=0)
-    is_active = Column(Boolean, default=True)
-    created_date = Column(DateTime, default=datetime.utcnow)
-    updated_date = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    hours = Column(Text)  # JSON string
+    images = Column(Text)  # JSON string
+    menu_items = Column(Text)  # JSON string
+    specials = Column(Text)  # JSON string
+    is_kosher = Column(Boolean, default=False)
+    is_vegetarian_friendly = Column(Boolean, default=False)
+    is_vegan_friendly = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class EnhancedDatabaseManager:
-    """Enhanced database manager with SQLAlchemy and PostgreSQL support."""
+    """Enhanced database manager with SQLAlchemy 1.4."""
     
     def __init__(self, database_url: str = None):
         """Initialize database manager with connection string."""
         self.database_url = database_url or os.environ.get('DATABASE_URL')
-
+        
         # Validate that DATABASE_URL is provided
         if not self.database_url:
             raise ValueError("DATABASE_URL environment variable is required")
-
+        
+        # Handle PostgreSQL URL format for SQLAlchemy 1.4
+        if self.database_url.startswith('postgres://'):
+            self.database_url = self.database_url.replace('postgres://', 'postgresql://', 1)
+        
+        logger.info("Database manager initialized", database_url=self.database_url[:50] + "...")
+        
         # Initialize SQLAlchemy components
         self.engine = None
         self.SessionLocal = None
         self.session = None
-
-        logger.info("Database manager initialized", database_url=self.database_url[:50] + "...")
-
+    
     def connect(self) -> bool:
         """Connect to the database and create tables if they don't exist."""
         try:
-            # Create the engine with standard SQLAlchemy 2.0 + psycopg3
-            # SQLAlchemy 2.0.43+ automatically detects psycopg3 when available
-            self.engine = create_engine(
-                self.database_url, 
-                echo=False
-            )
+            # Create the engine with standard SQLAlchemy 1.4 + psycopg2-binary
+            self.engine = create_engine(self.database_url, echo=False)
             
             # Test the connection
             with self.engine.connect() as conn:
-                conn.execute("SELECT 1")
-            
-            # Create tables if they don't exist
-            Base.metadata.create_all(self.engine)
+                result = conn.execute("SELECT 1")
+                logger.info("Database connection successful")
             
             # Create session factory
             self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
             
-            logger.info("Database connected successfully", database_url=self.database_url)
+            # Create tables if they don't exist
+            Base.metadata.create_all(bind=self.engine)
+            logger.info("Database tables created/verified")
+            
             return True
             
         except Exception as e:
@@ -138,408 +116,168 @@ class EnhancedDatabaseManager:
     def get_session(self) -> Session:
         """Get a database session."""
         if not self.SessionLocal:
-            raise Exception("Database not connected. Call connect() first.")
+            raise RuntimeError("Database not connected. Call connect() first.")
         return self.SessionLocal()
     
-    def disconnect(self):
-        """Disconnect from the database."""
-        if self.session:
-            self.session.close()
-        if self.engine:
-            self.engine.dispose()
-        logger.info("Database disconnected")
-    
     def add_restaurant(self, restaurant_data: Dict[str, Any]) -> bool:
-        """Add a new restaurant to the database with FPT feed validation."""
+        """Add a restaurant to the database."""
+        session = None
         try:
+            # Validate against FPT feed
+            validated_data = self._validate_against_fpt_feed(restaurant_data)
+            
+            # Create restaurant object
+            restaurant = Restaurant(**validated_data)
+            
+            # Get session and add restaurant
             session = self.get_session()
-            
-            # Check if restaurant already exists
-            existing = session.query(Restaurant).filter_by(business_id=restaurant_data.get('business_id')).first()
-            if existing:
-                logger.warning("Restaurant already exists", business_id=restaurant_data.get('business_id'))
-                session.close()
-                return False
-            
-            # Validate against FPT feed to avoid misassignments
-            validation_result = self._validate_against_fpt_feed(restaurant_data)
-            if not validation_result['valid']:
-                logger.error("FPT feed validation failed", 
-                           restaurant_name=restaurant_data.get('name'),
-                           errors=validation_result['errors'])
-                session.close()
-                return False
-            
-            # Create new restaurant
-            restaurant = Restaurant(
-                business_id=restaurant_data.get('business_id', ''),
-                name=restaurant_data.get('name', ''),
-                website_link=restaurant_data.get('website_link', ''),
-                phone_number=restaurant_data.get('phone_number', ''),
-                address=restaurant_data.get('address', ''),
-                city=restaurant_data.get('city', ''),
-                state=restaurant_data.get('state', ''),
-                zip_code=restaurant_data.get('zip_code', ''),
-                certificate_link=restaurant_data.get('certificate_link', ''),
-                image_url=restaurant_data.get('image_url', ''),
-                certifying_agency=restaurant_data.get('certifying_agency', 'ORB'),
-                kosher_category=restaurant_data.get('kosher_category', 'unknown'),
-                listing_type=restaurant_data.get('listing_type', 'restaurant'),
-                status=restaurant_data.get('status', 'active'),
-                rating=restaurant_data.get('rating'),
-                price_range=restaurant_data.get('price_range'),
-                hours_of_operation=restaurant_data.get('hours_of_operation'),
-                short_description=restaurant_data.get('short_description'),
-                notes=restaurant_data.get('notes'),
-                latitude=restaurant_data.get('latitude'),
-                longitude=restaurant_data.get('longitude'),
-                data_source=restaurant_data.get('data_source', 'manual'),
-                external_id=restaurant_data.get('external_id', '')
-            )
-            
             session.add(restaurant)
             session.commit()
             
-            logger.info("Restaurant added successfully with FPT validation", 
-                       name=restaurant_data.get('name'),
-                       validation_passed=True)
-            session.close()
+            logger.info("Restaurant added successfully", restaurant_id=restaurant.id, name=restaurant.name)
             return True
             
-        except SQLAlchemyError as e:
-            logger.error("Database error adding restaurant", error=str(e))
+        except Exception as e:
+            logger.error("Failed to add restaurant", error=str(e))
             if session:
                 session.rollback()
-                session.close()
             return False
+        finally:
+            if session:
+                session.close()
     
-    def _validate_against_fpt_feed(self, restaurant_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Validate restaurant data against FPT feed to avoid misassignments.
-        
-        Args:
-            restaurant_data: Restaurant data to validate
-            
-        Returns:
-            Dict with 'valid' boolean and 'errors' list
-        """
-        errors = []
-        
-        # Basic validation checks
-        if not restaurant_data.get('name'):
-            errors.append("Restaurant name is required")
-        
-        if not restaurant_data.get('business_id'):
-            errors.append("Business ID is required")
-        
-        # Validate certifying agency against FPT feed
-        certifying_agency = restaurant_data.get('certifying_agency', 'ORB')
-        valid_agencies = ['ORB', 'OU', 'KOF-K', 'Star-K', 'CRC', 'Vaad HaRabbonim']
-        if certifying_agency not in valid_agencies:
-            errors.append(f"Invalid certifying agency: {certifying_agency}")
-        
-        # Validate kosher category against FPT standards
-        kosher_category = restaurant_data.get('kosher_category', 'unknown')
-        valid_categories = ['meat', 'dairy', 'pareve', 'fish', 'unknown']
-        if kosher_category not in valid_categories:
-            errors.append(f"Invalid kosher category: {kosher_category}")
-        
-        # Validate listing type
-        listing_type = restaurant_data.get('listing_type', 'restaurant')
-        valid_types = ['restaurant', 'caterer', 'bakery', 'grocery', 'delivery']
-        if listing_type not in valid_types:
-            errors.append(f"Invalid listing type: {listing_type}")
-        
-        # Check for duplicate business IDs in FPT feed
-        # This would typically involve querying an external FPT feed API
-        # For now, we'll check against our own database
+    def get_restaurant(self, restaurant_id: int) -> Optional[Restaurant]:
+        """Get a restaurant by ID."""
+        session = None
         try:
             session = self.get_session()
-            existing = session.query(Restaurant).filter_by(business_id=restaurant_data.get('business_id')).first()
-            if existing:
-                errors.append(f"Business ID {restaurant_data.get('business_id')} already exists in FPT feed")
-            session.close()
+            restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
+            return restaurant
         except Exception as e:
-            logger.warning("Could not check FPT feed for duplicates", error=str(e))
-        
-        # Validate address format
-        address = restaurant_data.get('address', '')
-        if address and len(address.strip()) < 10:
-            errors.append("Address appears to be incomplete")
-        
-        # Validate phone number format
-        phone = restaurant_data.get('phone_number', '')
-        if phone and not self._is_valid_phone_format(phone):
-            errors.append("Invalid phone number format")
-        
-        # Validate website URL if provided
-        website = restaurant_data.get('website_link', '')
-        if website and not self._is_valid_url(website):
-            errors.append("Invalid website URL format")
-        
-        return {
-            'valid': len(errors) == 0,
-            'errors': errors
-        }
-    
-    def _is_valid_phone_format(self, phone: str) -> bool:
-        """Validate phone number format."""
-        import re
-        # Remove all non-digit characters
-        digits_only = re.sub(r'\D', '', phone)
-        # Check if it's a valid length (10-15 digits)
-        return 10 <= len(digits_only) <= 15
-    
-    def _is_valid_url(self, url: str) -> bool:
-        """Validate URL format."""
-        import re
-        url_pattern = re.compile(
-            r'^https?://'  # http:// or https://
-            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
-            r'localhost|'  # localhost...
-            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
-            r'(?::\d+)?'  # optional port
-            r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-        return bool(url_pattern.match(url))
-    
-    def search_restaurants(self, query: str = "", category: str = "", state: str = "", 
-                          limit: int = 50, offset: int = 0) -> List[Dict]:
-        """Search restaurants with filters."""
-        try:
-            session = self.get_session()
-            
-            # Build query
-            db_query = session.query(Restaurant).filter(Restaurant.status == 'active')
-            
-            if query:
-                db_query = db_query.filter(
-                    Restaurant.name.ilike(f'%{query}%') |
-                    Restaurant.address.ilike(f'%{query}%') |
-                    Restaurant.city.ilike(f'%{query}%')
-                )
-            
-            if category:
-                db_query = db_query.filter(Restaurant.listing_type.ilike(f'%{category}%'))
-            
-            if state:
-                db_query = db_query.filter(Restaurant.state.ilike(f'%{state}%'))
-            
-            # Apply pagination
-            restaurants = db_query.offset(offset).limit(limit).all()
-            
-            # Convert to dictionaries
-            result = []
-            for restaurant in restaurants:
-                result.append({
-                    'id': restaurant.id,
-                    'business_id': restaurant.business_id,
-                    'name': restaurant.name,
-                    'address': restaurant.address,
-                    'city': restaurant.city,
-                    'state': restaurant.state,
-                    'zip_code': restaurant.zip_code,
-                    'phone_number': restaurant.phone_number,
-                    'website': restaurant.website_link,
-                    'certifying_agency': restaurant.certifying_agency,
-                    'kosher_category': restaurant.kosher_category,
-                    'listing_type': restaurant.listing_type,
-                    'status': restaurant.status,
-                    'rating': restaurant.rating,
-                    'price_range': restaurant.price_range,
-                    'hours_of_operation': restaurant.hours_of_operation,
-                    'short_description': restaurant.short_description,
-                    'latitude': restaurant.latitude,
-                    'longitude': restaurant.longitude,
-                    'image_url': restaurant.image_url,
-                    'certificate_link': restaurant.certificate_link,
-                    'created_date': restaurant.created_date.isoformat() if restaurant.created_date else None,
-                    'updated_date': restaurant.updated_date.isoformat() if restaurant.updated_date else None
-                })
-            
-            session.close()
-            return result
-            
-        except SQLAlchemyError as e:
-            logger.error("Database error searching restaurants", error=str(e))
+            logger.error("Failed to get restaurant", error=str(e), restaurant_id=restaurant_id)
+            return None
+        finally:
             if session:
                 session.close()
-            return []
     
-    def search_restaurants_near_location(self, lat: float, lng: float, radius: float = 50,
-                                       query: str = "", category: str = "", 
-                                       limit: int = 50, offset: int = 0) -> List[Dict]:
-        """Search restaurants near a specific location."""
+    def get_all_restaurants(self) -> List[Restaurant]:
+        """Get all restaurants."""
+        session = None
         try:
             session = self.get_session()
-            
-            # Build base query
-            db_query = session.query(Restaurant).filter(Restaurant.status == 'active')
-            
-            # Add location filter (simplified distance calculation)
-            # In production, consider using PostGIS for more accurate distance calculations
-            db_query = db_query.filter(
-                Restaurant.latitude.isnot(None),
-                Restaurant.longitude.isnot(None)
-            )
-            
-            # Add other filters
-            if query:
-                db_query = db_query.filter(
-                    Restaurant.name.ilike(f'%{query}%') |
-                    Restaurant.address.ilike(f'%{query}%') |
-                    Restaurant.city.ilike(f'%{query}%')
-                )
-            
-            if category:
-                db_query = db_query.filter(Restaurant.listing_type.ilike(f'%{category}%'))
-            
-            # Get all restaurants and filter by distance in Python
-            # This is a simplified approach - consider PostGIS for production
-            restaurants = db_query.all()
-            
-            # Filter by distance
-            nearby_restaurants = []
-            for restaurant in restaurants:
-                if restaurant.latitude and restaurant.longitude:
-                    distance = self._calculate_distance(lat, lng, restaurant.latitude, restaurant.longitude)
-                    if distance <= radius:
-                        nearby_restaurants.append((restaurant, distance))
-            
-            # Sort by distance and apply pagination
-            nearby_restaurants.sort(key=lambda x: x[1])
-            paginated_restaurants = nearby_restaurants[offset:offset + limit]
-            
-            # Convert to result format
-            result = []
-            for restaurant, distance in paginated_restaurants:
-                result.append({
-                    'id': restaurant.id,
-                    'business_id': restaurant.business_id,
-                    'name': restaurant.name,
-                    'address': restaurant.address,
-                    'city': restaurant.city,
-                    'state': restaurant.state,
-                    'zip_code': restaurant.zip_code,
-                    'phone_number': restaurant.phone_number,
-                    'website': restaurant.website_link,
-                    'certifying_agency': restaurant.certifying_agency,
-                    'kosher_category': restaurant.kosher_category,
-                    'listing_type': restaurant.listing_type,
-                    'status': restaurant.status,
-                    'rating': restaurant.rating,
-                    'price_range': restaurant.price_range,
-                    'hours_of_operation': restaurant.hours_of_operation,
-                    'short_description': restaurant.short_description,
-                    'latitude': restaurant.latitude,
-                    'longitude': restaurant.longitude,
-                    'image_url': restaurant.image_url,
-                    'certificate_link': restaurant.certificate_link,
-                    'distance': round(distance, 2),
-                    'created_date': restaurant.created_date.isoformat() if restaurant.created_date else None,
-                    'updated_date': restaurant.updated_date.isoformat() if restaurant.updated_date else None
-                })
-            
-            session.close()
-            return result
-            
-        except SQLAlchemyError as e:
-            logger.error("Database error searching restaurants near location", error=str(e))
+            restaurants = session.query(Restaurant).all()
+            return restaurants
+        except Exception as e:
+            logger.error("Failed to get all restaurants", error=str(e))
+            return []
+        finally:
             if session:
                 session.close()
-            return []
     
-    def get_restaurant(self, business_id: str) -> Optional[Dict]:
-        """Get a specific restaurant by business ID."""
+    def search_restaurants(self, query: str) -> List[Restaurant]:
+        """Search restaurants by name or description."""
+        session = None
         try:
             session = self.get_session()
-            restaurant = session.query(Restaurant).filter_by(business_id=business_id).first()
+            restaurants = session.query(Restaurant).filter(
+                Restaurant.name.ilike(f'%{query}%') | 
+                Restaurant.description.ilike(f'%{query}%')
+            ).all()
+            return restaurants
+        except Exception as e:
+            logger.error("Failed to search restaurants", error=str(e), query=query)
+            return []
+        finally:
+            if session:
+                session.close()
+    
+    def update_restaurant(self, restaurant_id: int, update_data: Dict[str, Any]) -> bool:
+        """Update a restaurant."""
+        session = None
+        try:
+            session = self.get_session()
+            restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
             
             if not restaurant:
-                session.close()
-                return None
+                logger.warning("Restaurant not found for update", restaurant_id=restaurant_id)
+                return False
             
-            result = {
-                'id': restaurant.id,
-                'business_id': restaurant.business_id,
-                'name': restaurant.name,
-                'address': restaurant.address,
-                'city': restaurant.city,
-                'state': restaurant.state,
-                'zip_code': restaurant.zip_code,
-                'phone_number': restaurant.phone_number,
-                'website': restaurant.website_link,
-                'certifying_agency': restaurant.certifying_agency,
-                'kosher_category': restaurant.kosher_category,
-                'listing_type': restaurant.listing_type,
-                'status': restaurant.status,
-                'rating': restaurant.rating,
-                'price_range': restaurant.price_range,
-                'hours_of_operation': restaurant.hours_of_operation,
-                'short_description': restaurant.short_description,
-                'notes': restaurant.notes,
-                'latitude': restaurant.latitude,
-                'longitude': restaurant.longitude,
-                'image_url': restaurant.image_url,
-                'certificate_link': restaurant.certificate_link,
-                'created_date': restaurant.created_date.isoformat() if restaurant.created_date else None,
-                'updated_date': restaurant.updated_date.isoformat() if restaurant.updated_date else None
-            }
+            # Update fields
+            for key, value in update_data.items():
+                if hasattr(restaurant, key):
+                    setattr(restaurant, key, value)
             
-            session.close()
-            return result
+            restaurant.updated_at = datetime.utcnow()
+            session.commit()
             
-        except SQLAlchemyError as e:
-            logger.error("Database error getting restaurant", error=str(e))
+            logger.info("Restaurant updated successfully", restaurant_id=restaurant_id)
+            return True
+            
+        except Exception as e:
+            logger.error("Failed to update restaurant", error=str(e), restaurant_id=restaurant_id)
+            if session:
+                session.rollback()
+            return False
+        finally:
             if session:
                 session.close()
-            return None
     
-    def get_statistics(self) -> Dict[str, Any]:
-        """Get database statistics."""
+    def delete_restaurant(self, restaurant_id: int) -> bool:
+        """Delete a restaurant."""
+        session = None
+        try:
+            session = self.get_session()
+            restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
+            
+            if not restaurant:
+                logger.warning("Restaurant not found for deletion", restaurant_id=restaurant_id)
+                return False
+            
+            session.delete(restaurant)
+            session.commit()
+            
+            logger.info("Restaurant deleted successfully", restaurant_id=restaurant_id)
+            return True
+            
+        except Exception as e:
+            logger.error("Failed to delete restaurant", error=str(e), restaurant_id=restaurant_id)
+            if session:
+                session.rollback()
+            return False
+        finally:
+            if session:
+                session.close()
+    
+    def get_restaurant_stats(self) -> Dict[str, Any]:
+        """Get restaurant statistics."""
+        session = None
         try:
             session = self.get_session()
             
             total_restaurants = session.query(Restaurant).count()
-            active_restaurants = session.query(Restaurant).filter_by(status='active').count()
-            
-            # Count by category
-            from sqlalchemy import func
-            categories = session.query(Restaurant.listing_type, func.count(Restaurant.id).label('count')).group_by(Restaurant.listing_type).all()
-            
-            # Count by state
-            states = session.query(Restaurant.state, func.count(Restaurant.id).label('count')).group_by(Restaurant.state).all()
-            
-            # Count by certifying agency
-            agencies = session.query(Restaurant.certifying_agency, func.count(Restaurant.id).label('count')).group_by(Restaurant.certifying_agency).all()
-            
-            session.close()
+            kosher_restaurants = session.query(Restaurant).filter(Restaurant.is_kosher == True).count()
+            vegetarian_restaurants = session.query(Restaurant).filter(Restaurant.is_vegetarian_friendly == True).count()
+            vegan_restaurants = session.query(Restaurant).filter(Restaurant.is_vegan_friendly == True).count()
             
             return {
                 'total_restaurants': total_restaurants,
-                'active_restaurants': active_restaurants,
-                'categories': {cat: count for cat, count in categories},
-                'states': {state: count for state, count in states},
-                'agencies': {agency: count for agency, count in agencies},
-                'last_updated': datetime.utcnow().isoformat()
+                'kosher_restaurants': kosher_restaurants,
+                'vegetarian_restaurants': vegetarian_restaurants,
+                'vegan_restaurants': vegan_restaurants
             }
             
-        except SQLAlchemyError as e:
-            logger.error("Database error getting statistics", error=str(e))
+        except Exception as e:
+            logger.error("Failed to get restaurant stats", error=str(e))
+            return {}
+        finally:
             if session:
                 session.close()
-            return {}
     
-    def _calculate_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-        """Calculate distance between two points using Haversine formula."""
-        import math
-        
-        R = 3959  # Earth's radius in miles
-        
-        lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
-        dlat = lat2 - lat1
-        dlon = lon2 - lon1
-        
-        a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
-        c = 2 * math.asin(math.sqrt(a))
-        
-        return R * c 
+    def _validate_against_fpt_feed(self, restaurant_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Validate restaurant data against FPT feed to avoid misassignments.
+        This is a placeholder for the actual FPT validation logic.
+        """
+        # TODO: Implement actual FPT feed validation
+        # For now, just return the data as-is
+        return restaurant_data 

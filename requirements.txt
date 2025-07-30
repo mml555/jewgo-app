@@ -10,8 +10,8 @@ blinker==1.6.3
 
 # Database Support - Force psycopg2-binary
 psycopg2-binary==2.9.9
-SQLAlchemy==2.0.30
-alembic==1.13.1
+SQLAlchemy==1.4.54
+alembic==1.11.3
 
 # Environment & Configuration
 python-dotenv==1.0.1
