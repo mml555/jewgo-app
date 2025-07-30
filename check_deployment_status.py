@@ -1,115 +1,78 @@
 #!/usr/bin/env python3
 """
-Script to check deployment status and provide information about validation logic update
+Check deployment status after psycopg2 compatibility fix.
 """
 
 import requests
-import json
+import time
+import sys
 from datetime import datetime
 
-# Remote backend URL
-REMOTE_BACKEND_URL = "https://jewgo.onrender.com"
-
-def check_deployment_status():
-    """Check the current deployment status"""
+def check_app_health():
+    """Check if the application is responding correctly."""
+    url = "https://jewgo.onrender.com"
+    
     try:
-        print("🔍 Checking remote backend deployment status...")
-        print("=" * 50)
-        
-        response = requests.get(f"{REMOTE_BACKEND_URL}/", timeout=10)
+        print(f"🔍 Checking application health at {url}")
+        response = requests.get(url, timeout=10)
         
         if response.status_code == 200:
-            data = response.json()
-            current_version = data.get('version', 'unknown')
-            
-            print(f"📊 Current Version: {current_version}")
-            print(f"🎯 Target Version: 1.0.3")
-            print(f"📡 Status: {data.get('status', 'unknown')}")
-            print(f"📝 Message: {data.get('message', 'N/A')}")
-            
-            if current_version == '1.0.3':
-                print("\n✅ DEPLOYMENT COMPLETED SUCCESSFULLY!")
-                print("🔧 FPT Feed Validation Logic is now active!")
-                return True
-            else:
-                print(f"\n⏳ Deployment in progress...")
-                print(f"   Current version: {current_version}")
-                print(f"   Expected version: 1.0.3")
-                print(f"   This may take 5-10 minutes for Render to complete the deployment")
-                return False
-                
+            print("✅ Application is responding successfully!")
+            print(f"📊 Status Code: {response.status_code}")
+            print(f"⏱️  Response Time: {response.elapsed.total_seconds():.2f}s")
+            return True
         else:
-            print(f"❌ Remote backend returned status {response.status_code}")
-            print("   This might indicate the backend is still deploying...")
+            print(f"⚠️  Application responded with status code: {response.status_code}")
             return False
             
-    except requests.RequestException as e:
-        print(f"❌ Cannot connect to remote backend: {e}")
-        print("   This might indicate the backend is still deploying...")
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Failed to connect to application: {e}")
         return False
 
-def show_validation_features():
-    """Show the new validation features that will be available"""
-    print("\n🔧 NEW FPT FEED VALIDATION FEATURES:")
-    print("=" * 50)
-    print("✅ Certifying Agency Validation")
-    print("   - Validates against: ORB, OU, KOF-K, Star-K, CRC, Vaad HaRabbonim")
-    print("   - Prevents invalid agency assignments")
-    print()
-    print("✅ Kosher Category Validation")
-    print("   - Validates against: meat, dairy, pareve, fish, unknown")
-    print("   - Ensures proper category classification")
-    print()
-    print("✅ Business ID Duplicate Detection")
-    print("   - Checks for existing business IDs in the database")
-    print("   - Prevents duplicate restaurant entries")
-    print()
-    print("✅ Data Format Validation")
-    print("   - Phone number format validation")
-    print("   - Website URL format validation")
-    print("   - Address completeness validation")
-    print()
-    print("✅ Required Field Validation")
-    print("   - Ensures restaurant name is provided")
-    print("   - Ensures business ID is provided")
-    print()
-
-def show_deployment_instructions():
-    """Show instructions for monitoring deployment"""
-    print("📋 DEPLOYMENT MONITORING INSTRUCTIONS:")
-    print("=" * 50)
-    print("1. The code changes have been successfully pushed to the repository")
-    print("2. Render is automatically deploying the updated code")
-    print("3. Deployment typically takes 5-10 minutes")
-    print("4. You can monitor progress by running this script periodically:")
-    print("   python check_deployment_status.py")
-    print()
-    print("5. Once version shows 1.0.3, the validation logic will be active")
-    print("6. All new restaurant additions will be validated against FPT feed")
-    print()
+def check_api_endpoints():
+    """Check if the API endpoints are working."""
+    base_url = "https://jewgo.onrender.com"
+    endpoints = [
+        "/api/restaurants",
+        "/api/restaurants/search",
+        "/api/restaurants/stats"
+    ]
+    
+    print("\n🔍 Checking API endpoints...")
+    
+    for endpoint in endpoints:
+        url = f"{base_url}{endpoint}"
+        try:
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                print(f"✅ {endpoint} - OK")
+            else:
+                print(f"⚠️  {endpoint} - Status: {response.status_code}")
+        except requests.exceptions.RequestException as e:
+            print(f"❌ {endpoint} - Error: {e}")
 
 def main():
-    """Main function"""
-    print("🚀 JewGo Backend Deployment Status Check")
+    print(f"🚀 Deployment Status Check - {datetime.now()}")
     print("=" * 50)
-    print(f"⏰ Checked at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print()
     
-    # Check current status
-    is_deployed = check_deployment_status()
+    # Wait a bit for deployment to complete
+    print("⏳ Waiting for deployment to complete...")
+    time.sleep(30)
     
-    # Show features
-    show_validation_features()
-    
-    # Show instructions
-    show_deployment_instructions()
-    
-    if not is_deployed:
-        print("🔄 Deployment Status: IN PROGRESS")
-        print("   Please check again in a few minutes")
+    # Check application health
+    if check_app_health():
+        print("\n🎉 Application is live and responding!")
+        check_api_endpoints()
     else:
-        print("✅ Deployment Status: COMPLETED")
-        print("   FPT feed validation is now active!")
+        print("\n❌ Application is not responding correctly")
+        print("💡 This might indicate:")
+        print("   - Deployment is still in progress")
+        print("   - There's still an issue with the psycopg2 fix")
+        print("   - Database connection issues")
+        sys.exit(1)
+    
+    print("\n" + "=" * 50)
+    print("✅ Deployment status check completed!")
 
 if __name__ == "__main__":
     main() 

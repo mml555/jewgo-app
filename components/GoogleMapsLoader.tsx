@@ -34,8 +34,17 @@ export default function GoogleMapsLoader({ children }: GoogleMapsLoaderProps) {
       }
 
       // Load Google Maps API
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+      console.log('Google Maps API Key:', apiKey ? 'Present' : 'Missing');
+      
+      if (!apiKey) {
+        console.error('Google Maps API key is missing. Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your environment variables.');
+        setIsLoading(false);
+        return;
+      }
+      
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places,geometry&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry&loading=async`;
       script.async = true;
       script.defer = true;
       
