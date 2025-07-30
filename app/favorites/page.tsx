@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import NavTabs from '@/components/NavTabs';
+import SearchBar from '@/components/SearchBar';
 import { getFavorites, removeFromFavorites, FavoriteRestaurant } from '@/utils/favorites';
 import { formatDistance } from '@/utils/distance';
 
@@ -22,6 +23,7 @@ export default function FavoritesPage() {
     distanceRadius?: number;
   }>({});
   const [activeTab, setActiveTab] = useState('eatery');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Load favorites on component mount
   useEffect(() => {
@@ -47,6 +49,18 @@ export default function FavoritesPage() {
   useEffect(() => {
     let filtered = [...favorites];
 
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(favorite => 
+        favorite.name.toLowerCase().includes(query) ||
+        favorite.address?.toLowerCase().includes(query) ||
+        favorite.short_description?.toLowerCase().includes(query) ||
+        favorite.certifying_agency?.toLowerCase().includes(query) ||
+        favorite.kosher_category?.toLowerCase().includes(query)
+      );
+    }
+
     // Apply agency filter
     if (activeFilters.agency && activeFilters.agency !== 'all') {
       filtered = filtered.filter(favorite => 
@@ -69,7 +83,7 @@ export default function FavoritesPage() {
     }
 
     setFilteredFavorites(filtered);
-  }, [favorites, activeFilters]);
+  }, [favorites, activeFilters, searchQuery]);
 
   const removeFavorite = (id: number) => {
     const success = removeFromFavorites(id);
@@ -107,6 +121,10 @@ export default function FavoritesPage() {
     setActiveTab(tab);
   };
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
   const handleViewDetails = (restaurant: FavoriteRestaurant) => {
     router.push(`/restaurant/${restaurant.id}`);
   };
@@ -125,6 +143,11 @@ export default function FavoritesPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <Header />
+
+      {/* Search Bar */}
+      <div className="px-4 py-4">
+        <SearchBar onSearch={handleSearch} />
+      </div>
 
       {/* Navigation Tabs */}
       <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />

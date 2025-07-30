@@ -4,10 +4,12 @@ import { useState } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import NavTabs from '@/components/NavTabs';
+import SearchBar from '@/components/SearchBar';
 
 export default function SpecialsPage() {
   const [activeTab, setActiveTab] = useState('specials');
   const [categoryTab, setCategoryTab] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [activeFilters, setActiveFilters] = useState<{
     agency?: string;
     dietary?: string;

@@ -388,13 +388,13 @@ export default function LiveMapPage() {
       {/* Header */}
       <Header />
 
-      {/* Navigation Tabs */}
-      <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
-      
       {/* Search Bar */}
       <div className="px-4 py-4">
         <SearchBar onSearch={handleRestaurantSearch} />
       </div>
+
+      {/* Navigation Tabs */}
+      <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
       {/* Location Status */}
       <div className="px-4 mb-3">

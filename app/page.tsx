@@ -178,15 +178,19 @@ export default function HomePage() {
         {/* Header */}
         <Header />
 
+        {/* Search Bar */}
+        <div className="px-4 py-4">
+          <SearchBar onSearch={handleSearch} />
+        </div>
+
         {/* Navigation Tabs */}
         <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
         {/* Main Content */}
         {activeTab === 'eatery' && (
           <>
-            {/* Search and Action Buttons */}
+            {/* Action Buttons */}
             <div className="px-4 py-4 space-y-4">
-              <SearchBar onSearch={handleSearch} />
               <ActionButtons 
                 isOnMapPage={false}
                 onShowFilters={() => {}}
