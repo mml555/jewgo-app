@@ -339,6 +339,32 @@ class EnhancedDatabaseManager:
                 session.close()
             return False
     
+    def update_restaurant_hours(self, restaurant_id: int, hours_open: str) -> bool:
+        """Update restaurant hours."""
+        session = None
+        try:
+            session = self.get_session()
+            restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
+            
+            if not restaurant:
+                logger.warning("Restaurant not found for hours update", restaurant_id=restaurant_id)
+                return False
+            
+            # Update hours field
+            restaurant.hours = hours_open
+            restaurant.updated_at = datetime.utcnow()
+            
+            session.commit()
+            logger.info("Restaurant hours updated successfully", restaurant_id=restaurant_id, hours=hours_open)
+            return True
+            
+        except Exception as e:
+            logger.error("Failed to update restaurant hours", error=str(e), restaurant_id=restaurant_id)
+            if session:
+                session.rollback()
+                session.close()
+            return False
+    
     def delete_restaurant(self, restaurant_id: int) -> bool:
         """Delete a restaurant from the database."""
         session = None

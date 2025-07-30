@@ -72,13 +72,23 @@ def get_restaurants_from_api() -> List[Dict]:
         return []
 
 def update_restaurant_hours_via_api(restaurant_id: int, hours_open: str) -> bool:
-    """Update restaurant hours via the API (placeholder)."""
-    logger.info(f"✅ Would update restaurant ID {restaurant_id} with hours: {hours_open}")
-    # Note: This is a placeholder. In a real implementation, you would:
-    # 1. Use the Flask app's database connection directly
-    # 2. Create an API endpoint for updating hours
-    # 3. Use a direct database connection
-    return True
+    """Update restaurant hours via the API."""
+    try:
+        url = f'https://jewgo.onrender.com/api/restaurants/{restaurant_id}/hours'
+        data = {'hours_open': hours_open}
+        
+        response = requests.put(url, json=data, timeout=10)
+        
+        if response.status_code == 200:
+            logger.info(f"✅ Successfully updated restaurant ID {restaurant_id} with hours: {hours_open}")
+            return True
+        else:
+            logger.error(f"❌ Failed to update restaurant ID {restaurant_id}: {response.status_code} - {response.text}")
+            return False
+            
+    except Exception as e:
+        logger.error(f"❌ Error updating restaurant ID {restaurant_id}: {e}")
+        return False
 
 def main():
     """Main function."""
