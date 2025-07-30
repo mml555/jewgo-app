@@ -38,7 +38,7 @@ def init_database():
         print("📝 Database is empty. Loading restaurant data...")
         
         # Load restaurant data from JSON file
-        json_file = "restaurant_data_export_20250730_094500.json"
+        json_file = "restaurant_data_export_20250730_095036.json"
         if not os.path.exists(json_file):
             print(f"❌ Restaurant data file {json_file} not found")
             conn.close()

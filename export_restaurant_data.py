@@ -33,7 +33,7 @@ def export_restaurant_data():
             SELECT id, name, address, city, state, zip_code, phone, website, 
                    hechsher_details, cuisine_type, hours_of_operation, description, price_range, 
                    image_url, latitude, longitude, rating, review_count, 
-                   created_at, updated_at
+                   google_rating, google_review_count, google_reviews, created_at, updated_at
             FROM restaurants 
             ORDER BY id
         """)
@@ -59,8 +59,11 @@ def export_restaurant_data():
                 'longitude': row[15],
                 'rating': row[16],
                 'review_count': row[17],
-                'created_at': row[18].isoformat() if row[18] else None,
-                'updated_at': row[19].isoformat() if row[19] else None
+                'google_rating': row[18],
+                'google_review_count': row[19],
+                'google_reviews': row[20],
+                'created_at': row[21].isoformat() if row[21] else None,
+                'updated_at': row[22].isoformat() if row[22] else None
             }
             restaurants.append(restaurant)
         
