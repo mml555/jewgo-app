@@ -4,8 +4,11 @@ import { useEffect, useState } from 'react';
 
 export default function EnvDebug() {
   const [envVars, setEnvVars] = useState<Record<string, string | undefined>>({});
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+    
     // Check environment variables
     const vars = {
       NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -19,6 +22,11 @@ export default function EnvDebug() {
       NODE_ENV: vars.NODE_ENV,
     });
   }, []);
+
+  // Don't render anything until mounted to prevent hydration issues
+  if (!mounted) {
+    return null;
+  }
 
   // Only show in development
   if (process.env.NODE_ENV !== 'development') {

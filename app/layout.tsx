@@ -4,6 +4,7 @@ import './globals.css'
 import EnvDebug from '@/components/EnvDebug'
 import { ToastContainer } from '@/components/ui/Toast'
 import AuthProvider from '@/components/AuthProvider'
+import ErrorBoundary from '@/components/ui/ErrorBoundary'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -35,13 +36,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className={`${inter.className} h-full antialiased`}>
-        <AuthProvider>
-          <div className="min-h-full bg-gray-50 flex flex-col">
-            {children}
-          </div>
-          <ToastContainer />
-          <EnvDebug />
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <div className="min-h-full bg-gray-50 flex flex-col">
+              {children}
+            </div>
+            <ToastContainer />
+            <EnvDebug />
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )

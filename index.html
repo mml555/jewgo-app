@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JewGo Status</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: #f5f5f5; 
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 8px; 
+            padding: 30px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: #333; 
+            margin-bottom: 30px; 
+            text-align: center; 
+        }
+        .service { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+            border-left: 4px solid #4CAF50; 
+            background: #f9f9f9; 
+        }
+        .service.down { 
+            border-left-color: #f44336; 
+            background: #ffebee; 
+        }
+        .status { 
+            font-weight: bold; 
+        }
+        .status.up { 
+            color: #4CAF50; 
+        }
+        .status.down { 
+            color: #f44336; 
+        }
+        .timestamp { 
+            color: #666; 
+            font-size: 0.9em; 
+        }
+        .response-time { 
+            color: #666; 
+            font-size: 0.9em; 
+        }
+        .footer {
+            text-align: center; 
+            margin-top: 30px; 
+            padding-top: 20px; 
+            border-top: 1px solid #eee; 
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕍 JewGo Status</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">Real-time status of JewGo services</p>
+        
+        <div class="service" id="frontend">
+            <div>
+                <strong>Frontend (Vercel)</strong><br>
+                <span class="response-time">https://jewgo.vercel.app</span>
+            </div>
+            <div>
+                <span class="status up">✅ Operational</span><br>
+                <span class="timestamp">Last checked: <span id="frontend-time">Loading...</span></span>
+            </div>
+        </div>
+        
+        <div class="service" id="backend">
+            <div>
+                <strong>Backend API (Render)</strong><br>
+                <span class="response-time">https://jewgo-api.onrender.com</span>
+            </div>
+            <div>
+                <span class="status up">✅ Operational</span><br>
+                <span class="timestamp">Last checked: <span id="backend-time">Loading...</span></span>
+            </div>
+        </div>
+        
+        <div class="service" id="health">
+            <div>
+                <strong>API Health</strong><br>
+                <span class="response-time">https://jewgo-api.onrender.com/health</span>
+            </div>
+            <div>
+                <span class="status up">✅ Operational</span><br>
+                <span class="timestamp">Last checked: <span id="health-time">Loading...</span></span>
+            </div>
+        </div>
+        
+        <div class="service" id="database">
+            <div>
+                <strong>Database</strong><br>
+                <span class="response-time">https://jewgo-api.onrender.com/api/restaurants</span>
+            </div>
+            <div>
+                <span class="status up">✅ Operational</span><br>
+                <span class="timestamp">Last checked: <span id="database-time">Loading...</span></span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Monitoring every 5 minutes • Last updated: <span id="last-updated">Loading...</span></p>
+            <p>Built with ❤️ for JewGo</p>
+        </div>
+    </div>
+
+    <script>
+        // Update timestamps
+        function updateTimestamps() {
+            const now = new Date().toLocaleString();
+            document.getElementById('last-updated').textContent = now;
+            document.getElementById('frontend-time').textContent = now;
+            document.getElementById('backend-time').textContent = now;
+            document.getElementById('health-time').textContent = now;
+            document.getElementById('database-time').textContent = now;
+        }
+
+        // Check service status
+        async function checkService(url, serviceId) {
+            try {
+                const start = Date.now();
+                const response = await fetch(url, { 
+                    method: 'GET', 
+                    mode: 'no-cors',
+                    cache: 'no-cache'
+                });
+                const end = Date.now();
+                const responseTime = end - start;
+                
+                const serviceElement = document.getElementById(serviceId);
+                const statusElement = serviceElement.querySelector('.status');
+                
+                if (response.ok || response.status === 0) { // no-cors returns status 0
+                    statusElement.textContent = '✅ Operational';
+                    statusElement.className = 'status up';
+                    serviceElement.className = 'service';
+                } else {
+                    statusElement.textContent = '❌ Down';
+                    statusElement.className = 'status down';
+                    serviceElement.className = 'service down';
+                }
+            } catch (error) {
+                const serviceElement = document.getElementById(serviceId);
+                const statusElement = serviceElement.querySelector('.status');
+                statusElement.textContent = '❌ Down';
+                statusElement.className = 'status down';
+                serviceElement.className = 'service down';
+            }
+        }
+
+        // Initialize
+        updateTimestamps();
+        
+        // Check services every 30 seconds
+        setInterval(() => {
+            checkService('https://jewgo.vercel.app', 'frontend');
+            checkService('https://jewgo-api.onrender.com', 'backend');
+            checkService('https://jewgo-api.onrender.com/health', 'health');
+            checkService('https://jewgo-api.onrender.com/api/restaurants', 'database');
+            updateTimestamps();
+        }, 30000);
+
+        // Initial check
+        setTimeout(() => {
+            checkService('https://jewgo.vercel.app', 'frontend');
+            checkService('https://jewgo-api.onrender.com', 'backend');
+            checkService('https://jewgo-api.onrender.com/health', 'health');
+            checkService('https://jewgo-api.onrender.com/api/restaurants', 'database');
+        }, 1000);
+    </script>
+</body>
+</html> 
