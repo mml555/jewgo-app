@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
 Enhanced Database Manager for JewGo App
-Handles PostgreSQL database operations with SQLAlchemy 2.0
+Handles PostgreSQL database operations with SQLAlchemy 1.4
 """
 
 import os
 import logging
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Boolean
-from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 import structlog
 from typing import Dict, Any, List, Optional
@@ -34,9 +35,8 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
-# SQLAlchemy Base for SQLAlchemy 2.0
-class Base(DeclarativeBase):
-    pass
+# SQLAlchemy Base
+Base = declarative_base()
 
 class Restaurant(Base):
     """Restaurant model for SQLAlchemy."""
@@ -71,7 +71,7 @@ class Restaurant(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class EnhancedDatabaseManager:
-    """Enhanced database manager with SQLAlchemy 2.0 support."""
+    """Enhanced database manager with SQLAlchemy 1.4 support."""
     
     def __init__(self, database_url: str = None):
         """Initialize database manager with connection string."""
@@ -91,8 +91,7 @@ class EnhancedDatabaseManager:
     def connect(self) -> bool:
         """Connect to the database and create tables if they don't exist."""
         try:
-            # Create the engine with standard SQLAlchemy 2.0 + psycopg3
-            # SQLAlchemy 2.0.42+ automatically detects psycopg3 when available
+            # Create the engine with SQLAlchemy 1.4 + psycopg2-binary
             self.engine = create_engine(
                 self.database_url,
                 echo=False
