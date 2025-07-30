@@ -10,7 +10,7 @@ class Config:
     
     # Database Configuration
     DATABASE_URL = os.environ.get('DATABASE_URL')
-    SQLALCHEMY_DATABASE_URI = DATABASE_URL or 'sqlite:///restaurants.db'
+    SQLALCHEMY_DATABASE_URI = DATABASE_URL or 'postgresql://
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # CORS Configuration
@@ -41,7 +41,7 @@ class Config:
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///restaurants.db'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://
     CORS_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://jewgo-app.vercel.app', 'https://jewgo-j953cxrfi-mml555s-projects.vercel.app']
 
 class ProductionConfig(Config):
@@ -61,7 +61,7 @@ class ProductionConfig(Config):
 class TestingConfig(Config):
     """Testing configuration."""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://
     WTF_CSRF_ENABLED = False
 
 # Configuration mapping

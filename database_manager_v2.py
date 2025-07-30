@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Enhanced Database Manager with PostgreSQL Support
-Provides SQLAlchemy-based database operations with support for both SQLite and PostgreSQL.
+Provides SQLAlchemy-based database operations with PostgreSQL support only.
 """
 
 import os
@@ -95,7 +95,16 @@ class EnhancedDatabaseManager:
     
     def __init__(self, database_url: str = None):
         """Initialize database manager with connection string."""
-        self.database_url = database_url or os.environ.get('DATABASE_URL', 'sqlite:///restaurants.db')
+        self.database_url = database_url or os.environ.get('DATABASE_URL')
+
+        # Validate that DATABASE_URL is provided
+        if not self.database_url:
+            raise ValueError("DATABASE_URL environment variable is required for PostgreSQL connection")
+
+        # Ensure we're using PostgreSQL
+        if not self.database_url.startswith('postgresql://'):
+            raise ValueError("DATABASE_URL must be a PostgreSQL connection string (postgresql://...)")
+
         # For SQLAlchemy 1.4.53 with psycopg3, use standard postgresql:// URL
         # The psycopg3 driver will be used automatically when available
         self.engine = None
@@ -110,49 +119,6 @@ class EnhancedDatabaseManager:
         """Connect to the database and create tables if they don't exist."""
         try:
             # Configure engine based on database type
-            if 'sqlite' in self.database_url.lower():
-                # SQLite configuration (no pool parameters)
-                self.engine = create_engine(
-                    self.database_url,
-                    echo=False,  # Set to True for SQL debugging
-                    connect_args={"check_same_thread": False}
-                )
-            else:
-                # PostgreSQL configuration with enhanced error handling
-                try:
-                    self.engine = create_engine(
-                        self.database_url,
-                        echo=False,  # Set to True for SQL debugging
-                        pool_size=10,
-                        max_overflow=20,
-                        pool_pre_ping=True,
-                        pool_recycle=3600,  # Recycle connections every hour
-                        connect_args={
-                            "connect_timeout": 10,
-                            "application_name": "jewgo_app"
-                        }
-                    )
-                except Exception as pg_error:
-                    logger.error("PostgreSQL connection failed, trying with minimal config", 
-                               error=str(pg_error), database_url=self.database_url)
-                    # Fallback to minimal configuration
-                    try:
-                        self.engine = create_engine(
-                            self.database_url,
-                            echo=False,
-                            pool_pre_ping=True
-                        )
-                    except Exception as min_error:
-                        logger.error("PostgreSQL connection completely failed, falling back to SQLite", 
-                                   error=str(min_error), database_url=self.database_url)
-                        # Fallback to SQLite for development
-                        self.database_url = 'sqlite:///restaurants_fallback.db'
-                        self.engine = create_engine(
-                            self.database_url,
-                            echo=False,
-                            connect_args={"check_same_thread": False}
-                        )
-                        logger.warning("Using SQLite fallback database", fallback_url=self.database_url)
             
             # Test the connection
             with self.engine.connect() as conn:
