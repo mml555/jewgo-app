@@ -449,6 +449,66 @@ class EnhancedDatabaseManager:
             'updated_at': kosher_place.created_at.isoformat() if kosher_place.created_at else None
         }
     
+    def get_restaurant_by_name(self, name: str) -> Optional[Dict[str, Any]]:
+        """Get restaurant by name."""
+        try:
+            session = self.get_session()
+            restaurant = session.query(Restaurant).filter(Restaurant.name == name).first()
+            if restaurant:
+                return self._restaurant_to_unified_dict(restaurant)
+            return None
+        except Exception as e:
+            logger.error(f"Error getting restaurant by name {name}: {e}")
+            return None
+        finally:
+            session.close()
+    
+    def update_restaurant_orb_data(self, restaurant_id: int, address: str, kosher_type: str, certifying_agency: str) -> bool:
+        """Update restaurant with ORB data."""
+        try:
+            session = self.get_session()
+            restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
+            if restaurant:
+                restaurant.address = address
+                restaurant.kosher_type = kosher_type
+                restaurant.hechsher_details = certifying_agency
+                restaurant.updated_at = datetime.utcnow()
+                session.commit()
+                logger.info(f"Updated restaurant {restaurant_id} with ORB data")
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Error updating restaurant {restaurant_id} with ORB data: {e}")
+            session.rollback()
+            return False
+        finally:
+            session.close()
+    
+    def add_restaurant_simple(self, name: str, address: str = None, phone_number: str = None, 
+                      kosher_type: str = None, certifying_agency: str = None, source: str = 'orb') -> bool:
+        """Add a new restaurant with basic information (simplified version)."""
+        try:
+            session = self.get_session()
+            restaurant = Restaurant(
+                name=name,
+                address=address,
+                phone=phone_number,
+                kosher_type=kosher_type,
+                hechsher_details=certifying_agency,
+                is_kosher=True,
+                is_hechsher=True
+            )
+            session.add(restaurant)
+            session.commit()
+            logger.info(f"Added new restaurant: {name}")
+            return True
+        except Exception as e:
+            logger.error(f"Error adding restaurant {name}: {e}")
+            session.rollback()
+            return False
+        finally:
+            session.close()
+    
     def disconnect(self):
         """Disconnect from the database."""
         if self.session:
