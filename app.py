@@ -822,6 +822,39 @@ def create_app(config_name=None):
                 'timestamp': datetime.utcnow().isoformat()
             }), 500
     
+    @app.route('/deploy/populate-kosher-types', methods=['POST'])
+    @limiter.limit("5 per hour")  # Limit to prevent abuse
+    def deploy_populate_kosher_types():
+        """Manual trigger for kosher type population."""
+        try:
+            logger.info("Manual kosher type population triggered")
+            
+            # Import the kosher type determination logic
+            from populate_kosher_types import determine_kosher_type, populate_kosher_types
+            
+            success = populate_kosher_types()
+            
+            if success:
+                return jsonify({
+                    'status': 'success',
+                    'message': 'Kosher type population completed successfully',
+                    'timestamp': datetime.utcnow().isoformat()
+                }), 200
+            else:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Kosher type population failed',
+                    'timestamp': datetime.utcnow().isoformat()
+                }), 500
+                
+        except Exception as e:
+            logger.error("Manual kosher type population failed", error=str(e))
+            return jsonify({
+                'status': 'error',
+                'message': f'Kosher type population failed: {str(e)}',
+                'timestamp': datetime.utcnow().isoformat()
+            }), 500
+    
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
