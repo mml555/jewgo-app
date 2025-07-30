@@ -111,7 +111,8 @@ def create_app(config_name=None):
          origins=app.config['CORS_ORIGINS'],
          methods=app.config['CORS_METHODS'],
          allow_headers=app.config['CORS_ALLOW_HEADERS'],
-         supports_credentials=True)
+         supports_credentials=True,
+         expose_headers=['Content-Type', 'Authorization'])
     
     # Initialize rate limiter
     limiter = Limiter(
@@ -152,9 +153,11 @@ def create_app(config_name=None):
                 logger.error("Error disconnecting database", error=str(e))
             g.db_manager = None
     
-    @app.route('/')
+    @app.route('/', methods=['GET', 'OPTIONS'])
     @limiter.limit("100 per minute")
     def index():
+        if request.method == 'OPTIONS':
+            return '', 200
         """API server root with enhanced information."""
         return jsonify({
             'message': 'JewGo Restaurant API Server',
@@ -173,9 +176,11 @@ def create_app(config_name=None):
             'timestamp': datetime.utcnow().isoformat()
         })
     
-    @app.route('/api/restaurants')
+    @app.route('/api/restaurants', methods=['GET', 'OPTIONS'])
     @limiter.limit("200 per minute")
     def api_restaurants():
+        if request.method == 'OPTIONS':
+            return '', 200
         """Enhanced API endpoint for restaurant search with better error handling."""
         try:
             # Parse query parameters with validation
@@ -244,9 +249,11 @@ def create_app(config_name=None):
             logger.error("Error in restaurant search", error=str(e))
             return jsonify({'error': 'Internal server error'}), 500
     
-    @app.route('/api/restaurants/<business_id>')
+    @app.route('/api/restaurants/<business_id>', methods=['GET', 'OPTIONS'])
     @limiter.limit("100 per minute")
     def api_restaurant_detail(business_id):
+        if request.method == 'OPTIONS':
+            return '', 200
         """Get detailed information about a specific restaurant."""
         try:
             # Convert business_id to integer

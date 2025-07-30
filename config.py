@@ -14,9 +14,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # CORS Configuration
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,https://jewgo-app.vercel.app,https://jewgo-j953cxrfi-mml555s-projects.vercel.app').split(',')
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,https://jewgo-app.vercel.app,https://jewgo-j953cxrfi-mml555s-projects.vercel.app,https://jewgo-app-git-main-mml555s-projects.vercel.app').split(',')
     CORS_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
-    CORS_ALLOW_HEADERS = ['Content-Type', 'Authorization']
+    CORS_ALLOW_HEADERS = ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
     
     # Rate Limiting
     RATELIMIT_DEFAULT = "200 per day;50 per hour;10 per minute"
@@ -51,7 +51,7 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     
     # Production CORS origins
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://jewgo.com,https://jewgo-app.vercel.app,https://jewgo-j953cxrfi-mml555s-projects.vercel.app').split(',')
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://jewgo.com,https://jewgo-app.vercel.app,https://jewgo-j953cxrfi-mml555s-projects.vercel.app,https://jewgo-app-git-main-mml555s-projects.vercel.app').split(',')
     
     # Enhanced security for production
     SESSION_COOKIE_SECURE = True
