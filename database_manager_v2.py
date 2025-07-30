@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 import logging
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Boolean
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Boolean, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -154,7 +154,7 @@ class EnhancedDatabaseManager:
             
             # Test the connection
             with self.engine.connect() as conn:
-                conn.execute("SELECT 1")
+                conn.execute(text("SELECT 1"))
             
             # Create tables if they don't exist
             Base.metadata.create_all(self.engine)
