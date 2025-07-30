@@ -118,7 +118,8 @@ class EnhancedDatabaseManager:
     def connect(self) -> bool:
         """Connect to the database and create tables if they don't exist."""
         try:
-            # Configure engine based on database type
+            # Create the engine
+            self.engine = create_engine(self.database_url, echo=False)
             
             # Test the connection
             with self.engine.connect() as conn:
