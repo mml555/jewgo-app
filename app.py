@@ -609,14 +609,19 @@ def create_app(config_name=None):
             
             # Test a simple database query
             db_test_successful = False
+            db_error_message = None
             if db_healthy:
                 try:
-                    # Try to get restaurant count as a simple DB test
-                    count = g.db_manager.get_restaurant_count()
-                    db_test_successful = count is not None
+                    # Try to get a single restaurant as a simple DB test
+                    restaurants = g.db_manager.get_restaurants(limit=1)
+                    db_test_successful = restaurants is not None
+                    logger.info("Database test successful", restaurant_count=len(restaurants) if restaurants else 0)
                 except Exception as db_error:
-                    logger.warning("Database test failed", error=str(db_error))
+                    db_error_message = str(db_error)
+                    logger.warning("Database test failed", error=db_error_message)
                     db_test_successful = False
+            else:
+                db_error_message = "Database manager not available"
             
             # Overall health status
             overall_healthy = db_healthy and db_test_successful
@@ -629,7 +634,8 @@ def create_app(config_name=None):
                 'database': {
                     'status': 'connected' if db_healthy else 'disconnected',
                     'test_passed': db_test_successful,
-                    'type': 'PostgreSQL' if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI'] else 'SQLite'
+                    'type': 'PostgreSQL' if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI'] else 'SQLite',
+                    'error': db_error_message
                 },
                 'uptime': 'running',
                 'memory_usage': 'normal',
