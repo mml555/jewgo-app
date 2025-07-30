@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import EnvDebug from '@/components/EnvDebug'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -32,6 +33,7 @@ export default function RootLayout({
         <div className="min-h-full bg-gray-50 flex flex-col">
           {children}
         </div>
+        <EnvDebug />
       </body>
     </html>
   )
