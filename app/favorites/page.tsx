@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
-import CategoryNav from '@/components/CategoryNav';
 import BottomNavigation from '@/components/BottomNavigation';
 import { getFavorites, removeFromFavorites, FavoriteRestaurant } from '@/utils/favorites';
 import { formatDistance } from '@/utils/distance';
@@ -131,16 +130,7 @@ export default function FavoritesPage() {
             <p className="text-gray-600">Your saved kosher establishments</p>
           </div>
 
-          {/* Category Navigation */}
-          <div className="mb-6">
-            <CategoryNav
-              selectedFilters={activeFilters}
-              onFilterChange={handleFilterChange}
-              onToggleFilter={handleToggleFilter}
-              onDistanceChange={handleDistanceChange}
-              onClearAll={handleClearAll}
-            />
-          </div>
+
 
           {/* Favorites List */}
           {filteredFavorites.length === 0 ? (

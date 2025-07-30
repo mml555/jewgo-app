@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Header from '@/components/Header';
-import CategoryNav from '@/components/CategoryNav';
 import BottomNavigation from '@/components/BottomNavigation';
 
 export default function SpecialsPage() {
@@ -141,16 +140,7 @@ export default function SpecialsPage() {
             <p className="text-gray-600">Exclusive deals and promotions from kosher establishments</p>
           </div>
 
-          {/* Category Navigation */}
-          <div className="mb-6">
-            <CategoryNav
-              selectedFilters={activeFilters}
-              onFilterChange={handleFilterChange}
-              onToggleFilter={handleToggleFilter}
-              onDistanceChange={handleDistanceChange}
-              onClearAll={handleClearAll}
-            />
-          </div>
+
 
           {/* Category Tabs */}
           <div className="mb-6">

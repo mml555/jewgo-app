@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import SearchBar from '@/components/SearchBar';
-import CategoryNav from '@/components/CategoryNav';
 import ActionButtons from '@/components/ActionButtons';
 import RestaurantGrid from '@/components/RestaurantGrid';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -179,19 +178,15 @@ export default function HomePage() {
         {/* Header */}
         <Header />
 
+        {/* Navigation Tabs */}
+        <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
+
         {/* Main Content */}
         {activeTab === 'eatery' && (
           <>
-            {/* Search and Filters */}
+            {/* Search and Action Buttons */}
             <div className="px-4 py-4 space-y-4">
               <SearchBar onSearch={handleSearch} />
-              <CategoryNav 
-                selectedFilters={activeFilters}
-                onFilterChange={handleFilterChange}
-                onToggleFilter={handleToggleFilter}
-                onDistanceChange={handleDistanceChange}
-                onClearAll={handleClearAll}
-              />
               <ActionButtons 
                 isOnMapPage={false}
                 onShowFilters={() => {}}

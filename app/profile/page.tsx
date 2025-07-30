@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Header from '@/components/Header';
-import CategoryNav from '@/components/CategoryNav';
 import BottomNavigation from '@/components/BottomNavigation';
 
 export default function ProfilePage() {
@@ -89,16 +88,7 @@ export default function ProfilePage() {
             <p className="text-gray-600">Manage your account and preferences</p>
           </div>
 
-          {/* Category Navigation */}
-          <div className="mb-6">
-            <CategoryNav
-              selectedFilters={activeFilters}
-              onFilterChange={handleFilterChange}
-              onToggleFilter={handleToggleFilter}
-              onDistanceChange={handleDistanceChange}
-              onClearAll={handleClearAll}
-            />
-          </div>
+
 
           {/* Profile Tabs */}
           <div className="mb-6">
