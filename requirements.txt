@@ -1,4 +1,4 @@
-# Core Flask Framework - Exact versions
+# Core Flask Framework - Stable versions for Python 3.11
 Flask==2.3.3
 Flask-CORS==4.0.0
 Werkzeug==2.3.7
@@ -8,7 +8,7 @@ itsdangerous==2.1.2
 click==8.1.7
 blinker==1.6.3
 
-# Database Support - Force psycopg2-binary
+# Database Support - Stable with Python 3.11
 psycopg2-binary==2.9.9
 SQLAlchemy==1.4.54
 alembic==1.11.3
