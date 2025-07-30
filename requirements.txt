@@ -9,8 +9,8 @@ click==8.1.7
 blinker==1.7.0
 
 # Database Support
-psycopg[binary]==3.2.9   # PostgreSQL adapter (Python 3.12 compatible)
-SQLAlchemy==2.0.43       # ORM for database abstraction (Python 3.12 compatible)
+psycopg[binary]==3.2.9   # PostgreSQL adapter (Python 3.13 compatible)
+SQLAlchemy==2.0.42       # ORM for database abstraction (Python 3.13 compatible)
 alembic==1.13.1          # Database migrations (compatible with SQLAlchemy 2.0)
 
 # Environment & Configuration
