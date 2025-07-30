@@ -371,6 +371,44 @@ def create_app(config_name=None):
             logger.error("Error getting states", error=str(e))
             return jsonify({'error': 'Internal server error'}), 500
     
+    @app.route('/api/restaurants/<business_id>/hours', methods=['PUT', 'OPTIONS'])
+    @limiter.limit("50 per minute")
+    def api_update_restaurant_hours(business_id):
+        """Update restaurant hours."""
+        if request.method == 'OPTIONS':
+            return '', 200
+            
+        try:
+            # Get request data
+            data = request.get_json()
+            if not data or 'hours_open' not in data:
+                return jsonify({'error': 'hours_open field is required'}), 400
+            
+            hours_open = data['hours_open']
+            
+            # Update restaurant hours in database
+            success = g.db_manager.update_restaurant_hours(business_id, hours_open)
+            
+            if success:
+                response = {
+                    'success': True,
+                    'message': f'Hours updated for restaurant {business_id}',
+                    'data': {
+                        'restaurant_id': business_id,
+                        'hours_open': hours_open
+                    },
+                    'metadata': {
+                        'timestamp': datetime.utcnow().isoformat()
+                    }
+                }
+                return jsonify(response), 200
+            else:
+                return jsonify({'error': f'Restaurant {business_id} not found or update failed'}), 404
+                
+        except Exception as e:
+            logger.error("Error updating restaurant hours", error=str(e), restaurant_id=business_id)
+            return jsonify({'error': 'Internal server error'}), 500
+    
     @app.route('/health')
     @limiter.limit("200 per minute")
     def health_check():

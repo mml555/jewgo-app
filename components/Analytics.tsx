@@ -311,13 +311,15 @@ export default function Analytics({ userId, sessionId, pageName }: AnalyticsProp
 
   // Track Core Web Vitals
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'web-vital' in window) {
-      import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-        getCLS((metric) => trackPerformance('CLS', metric.value));
-        getFID((metric) => trackPerformance('FID', metric.value));
-        getFCP((metric) => trackPerformance('FCP', metric.value));
-        getLCP((metric) => trackPerformance('LCP', metric.value));
-        getTTFB((metric) => trackPerformance('TTFB', metric.value));
+    if (typeof window !== 'undefined' && 'performance' in window) {
+      import('web-vitals').then((webVitals) => {
+        webVitals.onCLS((metric) => trackPerformance('CLS', metric.value));
+        webVitals.onINP((metric) => trackPerformance('INP', metric.value));
+        webVitals.onFCP((metric) => trackPerformance('FCP', metric.value));
+        webVitals.onLCP((metric) => trackPerformance('LCP', metric.value));
+        webVitals.onTTFB((metric) => trackPerformance('TTFB', metric.value));
+      }).catch((error) => {
+        console.warn('Failed to load web-vitals:', error);
       });
     }
   }, []);
