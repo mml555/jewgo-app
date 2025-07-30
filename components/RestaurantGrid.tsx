@@ -63,8 +63,8 @@ const RestaurantGrid: React.FC<ExtendedRestaurantGridProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Responsive Grid - Up to 5 cards per row, minimum 2 */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      {/* Responsive Grid - Mobile-first design */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
         {loading ? (
           // Show skeleton loaders while loading
           Array.from({ length: 20 }).map((_, index) => (
@@ -85,9 +85,9 @@ const RestaurantGrid: React.FC<ExtendedRestaurantGridProps> = ({
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col items-center space-y-4 pt-4">
           {/* Page Info */}
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 text-center">
             Page {currentPage} of {totalPages} • {totalRestaurants} restaurants total
           </div>
         
@@ -97,9 +97,9 @@ const RestaurantGrid: React.FC<ExtendedRestaurantGridProps> = ({
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage <= 1}
-              className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[44px]"
             >
-              Previous
+              Prev
             </button>
 
             {/* Page Numbers */}
@@ -120,10 +120,10 @@ const RestaurantGrid: React.FC<ExtendedRestaurantGridProps> = ({
                   <button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
-                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors min-w-[44px] ${
                       currentPage === pageNum
-                        ? 'bg-jewgo-primary text-white'
-                        : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                        ? 'bg-mint-green text-white'
+                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
                     }`}
                   >
                     {pageNum}
@@ -136,32 +136,11 @@ const RestaurantGrid: React.FC<ExtendedRestaurantGridProps> = ({
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage >= totalPages}
-              className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[44px]"
             >
               Next
             </button>
           </div>
-        </div>
-      )}
-
-      {/* Quick Navigation */}
-      {totalPages > 5 && (
-        <div className="flex items-center space-x-2 text-sm">
-          <button
-            onClick={() => handlePageChange(1)}
-            disabled={currentPage === 1}
-            className="text-jewgo-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            First
-          </button>
-          <span className="text-gray-400">•</span>
-          <button
-            onClick={() => handlePageChange(totalPages)}
-            disabled={currentPage === totalPages}
-            className="text-jewgo-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Last
-          </button>
         </div>
       )}
     </div>

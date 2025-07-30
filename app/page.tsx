@@ -173,24 +173,29 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="pb-20">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="flex-1 pb-20 sm:pb-24">
         {/* Header */}
         <Header />
 
-        {/* Search Bar */}
-        <div className="px-4 py-4">
-          <SearchBar onSearch={handleSearch} />
-        </div>
+        {/* Search and Navigation Section */}
+        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+          {/* Search Bar */}
+          <div className="px-4 py-3 sm:px-6">
+            <SearchBar onSearch={handleSearch} />
+          </div>
 
-        {/* Navigation Tabs */}
-        <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
+          {/* Navigation Tabs */}
+          <div className="px-4 sm:px-6">
+            <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
+          </div>
+        </div>
 
         {/* Main Content */}
         {activeTab === 'eatery' && (
           <>
             {/* Action Buttons */}
-            <div className="px-4 py-4 space-y-4">
+            <div className="px-4 py-4 sm:px-6 sm:py-6 space-y-4">
               <ActionButtons 
                 isOnMapPage={false}
                 onShowFilters={() => {}}
@@ -208,7 +213,7 @@ export default function HomePage() {
             </div>
 
             {/* Restaurant Grid */}
-            <div className="px-4">
+            <div className="px-4 sm:px-6 pb-4">
               {loading ? (
                 <div className="flex justify-center items-center py-12">
                   <div className="text-gray-500">Loading restaurants...</div>
@@ -234,7 +239,7 @@ export default function HomePage() {
 
         {/* Other Tab Content */}
         {activeTab === 'specials' && (
-          <div className="px-4 pb-32">
+          <div className="px-4 sm:px-6 pb-32">
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="text-gray-500 mb-4">
                 <svg className="h-16 w-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,20 +255,20 @@ export default function HomePage() {
         )}
 
         {activeTab === 'mikvahs' && (
-          <div className="px-4 pb-32">
+          <div className="px-4 sm:px-6 pb-32">
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="text-gray-500 mb-4">
                 <svg className="h-16 w-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 18h16" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M6 19h2" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M10 19h2" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M14 19h2" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M18 19h2" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 6v12" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 6v12" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 8h8" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h8" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16h8" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 18h16" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M6 19h2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M10 19h2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M14 19h2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M18 19h2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 6v12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 6v12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 8h8" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h8" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16h8" />
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Mikvahs Coming Soon</h3>
@@ -275,7 +280,7 @@ export default function HomePage() {
         )}
 
         {activeTab === 'shuls' && (
-          <div className="px-4 pb-32">
+          <div className="px-4 sm:px-6 pb-32">
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="text-gray-500 mb-4">
                 <svg className="h-16 w-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -291,7 +296,7 @@ export default function HomePage() {
         )}
 
         {activeTab === 'stores' && (
-          <div className="px-4 pb-32">
+          <div className="px-4 sm:px-6 pb-32">
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="text-gray-500 mb-4">
                 <svg className="h-16 w-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

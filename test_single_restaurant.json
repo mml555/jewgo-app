@@ -1,0 +1,23 @@
+{
+  "business_id": "km_0001",
+  "name": "17 Restaurant and Sushi Bar",
+  "address": "1751 Alton Rd, Miami Beach, FL 33139, United States",
+  "city": "Miami Beach",
+  "state": "FL",
+  "zip_code": "33139",
+  "phone_number": "(305) 672-0565",
+  "website": "https://17restaurant.com/",
+  "kosher_category": "dairy",
+  "certifying_agency": "KM",
+  "listing_type": "restaurant",
+  "latitude": 25.7929483,
+  "longitude": -80.1409037,
+  "rating": 4.6,
+  "review_count": 1793,
+  "price_range": "$$",
+  "hours_open": "Mon 11:00 AM – 12:00 AM, Tue 11:00 AM – 12:00 AM, Wed 11:00 AM – 12:00 AM, Thu 11:00 AM – 12:00 AM, Fri 11:00 AM – 3:00 PM, Sat 9:30 PM – 1:30 AM, Sun 11:00 AM – 12:00 AM",
+  "takeout_available": 1,
+  "delivery_available": 0,
+  "dine_in_available": 1,
+  "status": "active"
+}

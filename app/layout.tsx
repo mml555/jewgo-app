@@ -9,11 +9,16 @@ export const metadata: Metadata = {
   description: 'Discover the best kosher restaurants, synagogues, and Jewish businesses in your area.',
   keywords: 'kosher, restaurants, Jewish, eatery, synagogue, mikvah, stores',
   authors: [{ name: 'Jewgo Team' }],
-}
-
-export const viewport = {
-  width: 'device-width',
-  initialScale: 1,
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
+  themeColor: '#A8E6CF',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Jewgo',
+  },
+  formatDetection: {
+    telephone: false,
+  },
 }
 
 export default function RootLayout({
@@ -22,9 +27,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <div className="min-h-screen bg-gray-50">
+    <html lang="en" className="h-full">
+      <body className={`${inter.className} h-full antialiased`}>
+        <div className="min-h-full bg-gray-50 flex flex-col">
           {children}
         </div>
       </body>

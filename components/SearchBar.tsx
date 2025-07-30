@@ -265,7 +265,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
             onFocus={handleFocus}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            className="search-bar pl-12 pr-12 transition-all duration-200 focus:shadow-lg"
+            className="w-full px-3 py-2.5 sm:px-4 sm:py-3 pl-12 pr-12 rounded-xl bg-white border border-gray-200 focus:border-jewgo-primary focus:ring-jewgo-primary/20 focus:outline-none transition-all duration-200 shadow-soft text-base"
             autoComplete="off"
           />
 

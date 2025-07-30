@@ -8,19 +8,19 @@ export default function Header() {
 
   return (
     <header className="bg-white shadow-soft border-b border-gray-200 sticky top-0 z-50 backdrop-blur-lg bg-white/95 w-full">
-      <div className="px-4 py-4">
+      <div className="px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center justify-between">
           {/* Logo and Brand */}
           <div className="flex items-center space-x-3">
             {/* Logo Container */}
-            <div className="w-12 h-12 bg-gray-800 rounded-xl flex items-center justify-center shadow-medium overflow-hidden">
-              <Logo size="sm" className="w-8 h-8" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-800 rounded-xl flex items-center justify-center shadow-medium overflow-hidden">
+              <Logo size="sm" className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
             
             {/* Brand Text */}
             <div>
               <h1 
-                className="text-xl font-bold text-mint-green tracking-wide"
+                className="text-lg sm:text-xl font-bold text-mint-green tracking-wide"
                 style={{ 
                   fontFamily: '"Comic Sans MS", "Chalkboard SE", "Marker Felt", "Arial Rounded MT Bold", "Helvetica Rounded", sans-serif',
                   fontWeight: '700',
@@ -31,14 +31,14 @@ export default function Header() {
               >
                 Jewgo
               </h1>
-              <p className="text-xs text-gray-500 -mt-1">Find Your Kosher Eatery</p>
+              <p className="text-xs text-gray-500 -mt-1 hidden sm:block">Find Your Kosher Eatery</p>
             </div>
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-3">
-            {/* Search Icon */}
-            <button className="p-2 text-gray-600 hover:text-mint-green hover:bg-mint-green/10 rounded-lg transition-all duration-200 focus-ring">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* Search Icon - Hidden on mobile since search bar is prominent */}
+            <button className="hidden sm:block p-2 text-gray-600 hover:text-mint-green hover:bg-mint-green/10 rounded-lg transition-all duration-200 focus-ring">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
@@ -68,31 +68,31 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="mt-4 pt-4 border-t border-gray-200 animate-fade-in-up">
-            <div className="space-y-2">
-              <button className="w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-50 hover:text-mint-green rounded-lg transition-colors duration-200">
+          <div className="mt-3 pt-3 border-t border-gray-200 animate-fade-in-up">
+            <div className="space-y-1">
+              <button className="w-full text-left px-3 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-mint-green rounded-lg transition-colors duration-200">
                 <div className="flex items-center space-x-3">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                   </svg>
-                  <span>Profile</span>
+                  <span className="text-sm font-medium">Profile</span>
                 </div>
               </button>
-              <button className="w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-50 hover:text-mint-green rounded-lg transition-colors duration-200">
+              <button className="w-full text-left px-3 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-mint-green rounded-lg transition-colors duration-200">
                 <div className="flex items-center space-x-3">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                   </svg>
-                  <span>Settings</span>
+                  <span className="text-sm font-medium">Settings</span>
                 </div>
               </button>
-              <button className="w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-50 hover:text-mint-green rounded-lg transition-colors duration-200">
+              <button className="w-full text-left px-3 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-mint-green rounded-lg transition-colors duration-200">
                 <div className="flex items-center space-x-3">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
-                  <span>Help</span>
+                  <span className="text-sm font-medium">Help</span>
                 </div>
               </button>
             </div>
