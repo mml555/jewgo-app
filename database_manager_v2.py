@@ -10,8 +10,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 import logging
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 import structlog
 
@@ -36,8 +35,9 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
-# SQLAlchemy Base
-Base = declarative_base()
+# SQLAlchemy Base for SQLAlchemy 2.0
+class Base(DeclarativeBase):
+    pass
 
 class Restaurant(Base):
     """Restaurant model for SQLAlchemy."""
@@ -99,22 +99,15 @@ class EnhancedDatabaseManager:
 
         # Validate that DATABASE_URL is provided
         if not self.database_url:
-            raise ValueError("DATABASE_URL environment variable is required for PostgreSQL connection")
+            raise ValueError("DATABASE_URL environment variable is required")
 
-        # Ensure we're using PostgreSQL
-        if not self.database_url.startswith('postgresql://'):
-            raise ValueError("DATABASE_URL must be a PostgreSQL connection string (postgresql://...)")
-
-        # For SQLAlchemy 1.4.53 with psycopg3, use standard postgresql:// URL
-        # The psycopg3 driver will be used automatically when available
+        # Initialize SQLAlchemy components
         self.engine = None
         self.SessionLocal = None
         self.session = None
-        
-        # Handle PostgreSQL URL format for SQLAlchemy
-        if self.database_url.startswith('postgres://'):
-            self.database_url = self.database_url.replace('postgres://', 'postgresql://', 1)
-    
+
+        logger.info("Database manager initialized", database_url=self.database_url[:50] + "...")
+
     def connect(self) -> bool:
         """Connect to the database and create tables if they don't exist."""
         try:
