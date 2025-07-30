@@ -855,6 +855,39 @@ def create_app(config_name=None):
                 'timestamp': datetime.utcnow().isoformat()
             }), 500
     
+    @app.route('/deploy/update-kosher-types', methods=['POST'])
+    @limiter.limit("5 per hour")  # Limit to prevent abuse
+    def deploy_update_kosher_types():
+        """Manual trigger for simple kosher type updates."""
+        try:
+            logger.info("Manual kosher type update triggered")
+            
+            # Import the simple update logic
+            from update_kosher_types_simple import update_kosher_types
+            
+            success = update_kosher_types()
+            
+            if success:
+                return jsonify({
+                    'status': 'success',
+                    'message': 'Kosher type update completed successfully',
+                    'timestamp': datetime.utcnow().isoformat()
+                }), 200
+            else:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Kosher type update failed',
+                    'timestamp': datetime.utcnow().isoformat()
+                }), 500
+                
+        except Exception as e:
+            logger.error("Manual kosher type update failed", error=str(e))
+            return jsonify({
+                'status': 'error',
+                'message': f'Kosher type update failed: {str(e)}',
+                'timestamp': datetime.utcnow().isoformat()
+            }), 500
+    
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
