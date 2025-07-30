@@ -10,8 +10,8 @@ blinker==1.6.3
 
 # Database Support
 psycopg[binary]==3.2.9   # PostgreSQL adapter (Python 3.13 compatible)
-SQLAlchemy==2.0.27       # ORM for database abstraction (Python 3.13 compatible)
-alembic==1.13.1          # Database migrations (compatible with SQLAlchemy 2.0)
+SQLAlchemy==1.4.57       # ORM for database abstraction (Python 3.13 compatible)
+alembic==1.13.1          # Database migrations (compatible with SQLAlchemy 1.4)
 
 # Environment & Configuration
 python-dotenv==1.0.0    # Environment variable management

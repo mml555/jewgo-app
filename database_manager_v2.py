@@ -10,7 +10,8 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 import logging
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Boolean
-from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 import structlog
 
@@ -35,9 +36,8 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
-# SQLAlchemy Base for SQLAlchemy 2.0
-class Base(DeclarativeBase):
-    pass
+# SQLAlchemy Base
+Base = declarative_base()
 
 class Restaurant(Base):
     """Restaurant model for SQLAlchemy."""
@@ -208,13 +208,7 @@ class EnhancedDatabaseManager:
                 session.rollback()
                 session.close()
             return False
-        except Exception as e:
-            logger.error("Unexpected error adding restaurant", error=str(e))
-            if session:
-                session.rollback()
-                session.close()
-            return False
-
+    
     def _validate_against_fpt_feed(self, restaurant_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Validate restaurant data against FPT feed to avoid misassignments.
