@@ -58,12 +58,18 @@ export default function LiveMapPage() {
     }
   }, [searchParams]);
 
+  // Fetch restaurants on component mount
+  useEffect(() => {
+    fetchRestaurants();
+  }, []);
+
   // Don't request location automatically - wait for user interaction
   // useEffect(() => {
   //   getUserLocation();
   // }, []);
 
   useEffect(() => {
+    // Fetch restaurants when user location changes
     if (userLocation) {
       fetchRestaurants();
     }
@@ -80,9 +86,8 @@ export default function LiveMapPage() {
       setLoading(true);
       setError(null);
       
-      const apiUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://jewgo.onrender.com/api/restaurants'
-        : 'http://127.0.0.1:8081/api/restaurants';
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://jewgo.onrender.com';
+      const apiUrl = `${backendUrl}/api/restaurants`;
       
       if (userLocation) {
         // If there's a search query, fetch all restaurants to ensure we can find the specific restaurant
