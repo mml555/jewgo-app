@@ -64,8 +64,8 @@ def restaurant_to_dict(restaurant):
             'kosher_category': restaurant.cuisine_type or 'restaurant',  # Map cuisine_type to kosher_category
             'listing_type': 'restaurant',  # Default value
             'status': 'active',  # Default value
-            'hours_of_operation': restaurant.hours,  # Map hours to hours_of_operation
-            'hours_open': restaurant.hours,  # Also map to hours_open
+            'hours_of_operation': restaurant.hours_of_operation,  # Map hours_of_operation to hours_of_operation
+            'hours_open': restaurant.hours_of_operation,  # Also map to hours_open
             'short_description': restaurant.description,  # Map description to short_description
             'price_range': restaurant.price_range,
             'image_url': restaurant.image_url,
