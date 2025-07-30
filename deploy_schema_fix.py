@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 """
-Deploy schema fix to add missing columns to the database.
-This script should be run on the deployed environment.
+Deployment Schema Fix Script
+This script should be run on the production server to fix the database schema.
 """
 
 import os
 import psycopg2
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import structlog
 
-# Configure logging
+# Configure structured logging
 structlog.configure(
     processors=[
         structlog.stdlib.filter_by_level,
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
         structlog.processors.JSONRenderer()
     ],
     context_class=dict,
@@ -25,66 +30,147 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
-def fix_database_schema():
-    """Add missing columns to the restaurants table."""
+def get_database_url():
+    """Get database URL from environment or Render configuration."""
+    # Try different environment variable names
     database_url = os.environ.get('DATABASE_URL')
     
     if not database_url:
-        print("❌ DATABASE_URL environment variable not found")
+        # Try Render-specific environment variables
+        database_url = os.environ.get('RENDER_DATABASE_URL')
+    
+    if not database_url:
+        # Try PostgreSQL-specific variables
+        pg_host = os.environ.get('PGHOST')
+        pg_port = os.environ.get('PGPORT', '5432')
+        pg_database = os.environ.get('PGDATABASE')
+        pg_user = os.environ.get('PGUSER')
+        pg_password = os.environ.get('PGPASSWORD')
+        
+        if all([pg_host, pg_database, pg_user, pg_password]):
+            database_url = f"postgresql://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_database}"
+    
+    return database_url
+
+def fix_database_schema():
+    """Fix database schema by adding missing Google reviews columns."""
+    database_url = get_database_url()
+    
+    if not database_url:
+        logger.error("No database URL found in environment variables")
+        print("❌ No database URL found. Please check environment variables.")
         return False
     
     try:
         # Connect to database
         conn = psycopg2.connect(database_url)
+        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cursor = conn.cursor()
         
-        print("🔧 Connected to database successfully")
+        logger.info("Connected to database for schema fix")
+        print("✅ Connected to database")
         
-        # SQL statements to add missing columns
-        alter_statements = [
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS phone TEXT",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS website TEXT",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS cuisine_type TEXT",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS price_range TEXT",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS review_count INTEGER",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS description TEXT",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS image_url TEXT",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_kosher BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_glatt BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_cholov_yisroel BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_pas_yisroel BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_bishul_yisroel BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_mehadrin BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_hechsher BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS hechsher_details TEXT",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
-        ]
+        # Check if columns already exist
+        cursor.execute("""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'restaurants' 
+            AND column_name IN ('google_rating', 'google_review_count', 'google_reviews')
+        """)
         
-        # Execute each ALTER statement
-        for sql in alter_statements:
-            try:
-                cursor.execute(sql)
-                print(f"✅ Executed: {sql}")
-            except Exception as e:
-                print(f"⚠️  Warning: {sql} - {e}")
+        existing_columns = [row[0] for row in cursor.fetchall()]
+        logger.info("Existing Google review columns", columns=existing_columns)
+        print(f"📊 Found existing columns: {existing_columns}")
         
-        # Commit changes
-        conn.commit()
-        print("✅ Schema update completed successfully")
+        # Add missing columns
+        columns_added = []
         
-        # Verify the table structure
+        if 'google_rating' not in existing_columns:
+            logger.info("Adding google_rating column")
+            cursor.execute("ALTER TABLE restaurants ADD COLUMN google_rating FLOAT")
+            columns_added.append('google_rating')
+            print("✅ Added google_rating column")
+        
+        if 'google_review_count' not in existing_columns:
+            logger.info("Adding google_review_count column")
+            cursor.execute("ALTER TABLE restaurants ADD COLUMN google_review_count INTEGER")
+            columns_added.append('google_review_count')
+            print("✅ Added google_review_count column")
+        
+        if 'google_reviews' not in existing_columns:
+            logger.info("Adding google_reviews column")
+            cursor.execute("ALTER TABLE restaurants ADD COLUMN google_reviews TEXT")
+            columns_added.append('google_reviews')
+            print("✅ Added google_reviews column")
+        
+        if columns_added:
+            # Update existing records to have default values
+            logger.info("Updating existing records with default values")
+            cursor.execute("""
+                UPDATE restaurants 
+                SET google_rating = rating,
+                    google_review_count = review_count,
+                    google_reviews = '[]'
+                WHERE google_rating IS NULL 
+                   OR google_review_count IS NULL 
+                   OR google_reviews IS NULL
+            """)
+            print("✅ Updated existing records with default values")
+        else:
+            print("ℹ️  All required columns already exist")
+        
+        # Verify the changes
         cursor.execute("""
             SELECT column_name, data_type 
             FROM information_schema.columns 
-            WHERE table_name = 'restaurants'
-            ORDER BY ordinal_position;
+            WHERE table_name = 'restaurants' 
+            AND column_name IN ('google_rating', 'google_review_count', 'google_reviews')
+            ORDER BY column_name
         """)
         
         columns = cursor.fetchall()
-        print(f"\n📋 Current table structure ({len(columns)} columns):")
-        for col_name, col_type in columns:
-            print(f"  {col_name:<25} {col_type}")
+        logger.info("Schema fix completed", columns=columns)
+        print(f"📋 Final schema: {columns}")
+        
+        # Test a query to make sure everything works
+        cursor.execute("SELECT id, name, google_rating, google_review_count FROM restaurants LIMIT 1")
+        result = cursor.fetchone()
+        logger.info("Test query successful", result=result)
+        print("✅ Test query successful")
+        
+        cursor.close()
+        conn.close()
+        
+        logger.info("Database schema fix completed successfully")
+        print("🎉 Database schema fix completed successfully!")
+        return True
+        
+    except Exception as e:
+        logger.error("Failed to fix database schema", error=str(e))
+        print(f"❌ Failed to fix database schema: {str(e)}")
+        return False
+
+def check_database_health():
+    """Check if the database is working properly after the fix."""
+    database_url = get_database_url()
+    
+    if not database_url:
+        print("❌ No database URL found for health check")
+        return False
+    
+    try:
+        conn = psycopg2.connect(database_url)
+        cursor = conn.cursor()
+        
+        # Test basic query
+        cursor.execute("SELECT COUNT(*) FROM restaurants")
+        count = cursor.fetchone()[0]
+        print(f"📊 Total restaurants in database: {count}")
+        
+        # Test Google reviews query
+        cursor.execute("SELECT id, name, google_rating, google_review_count FROM restaurants LIMIT 5")
+        results = cursor.fetchall()
+        print(f"✅ Google reviews query successful - found {len(results)} restaurants")
         
         cursor.close()
         conn.close()
@@ -92,15 +178,18 @@ def fix_database_schema():
         return True
         
     except Exception as e:
-        print(f"❌ Error fixing database schema: {e}")
+        print(f"❌ Database health check failed: {str(e)}")
         return False
 
 if __name__ == "__main__":
-    print("🔧 Fixing database schema...")
-    success = fix_database_schema()
+    print("🔧 Deploying database schema fix...")
+    print("=" * 50)
     
-    if success:
-        print("\n🎉 Database schema fixed successfully!")
-        print("Your Flask API should now work without column errors.")
+    if fix_database_schema():
+        print("\n🔍 Running health check...")
+        if check_database_health():
+            print("\n🎉 Deployment successful! Database is ready.")
+        else:
+            print("\n⚠️  Schema fix completed but health check failed.")
     else:
-        print("\n❌ Failed to fix database schema.") 
+        print("\n❌ Deployment failed!") 
