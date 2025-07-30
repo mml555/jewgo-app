@@ -888,6 +888,39 @@ def create_app(config_name=None):
                 'timestamp': datetime.utcnow().isoformat()
             }), 500
     
+    @app.route('/deploy/add-orb-dairy-restaurants', methods=['POST'])
+    @limiter.limit("5 per hour")  # Limit to prevent abuse
+    def deploy_add_orb_dairy_restaurants():
+        """Manual trigger for adding ORB dairy restaurants."""
+        try:
+            logger.info("Manual ORB dairy restaurants addition triggered")
+            
+            # Import the manual data entry logic
+            from manual_orb_data_entry import populate_orb_dairy_restaurants
+            
+            success = populate_orb_dairy_restaurants()
+            
+            if success:
+                return jsonify({
+                    'status': 'success',
+                    'message': 'ORB dairy restaurants added successfully',
+                    'timestamp': datetime.utcnow().isoformat()
+                }), 200
+            else:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'ORB dairy restaurants addition failed',
+                    'timestamp': datetime.utcnow().isoformat()
+                }), 500
+                
+        except Exception as e:
+            logger.error("Manual ORB dairy restaurants addition failed", error=str(e))
+            return jsonify({
+                'status': 'error',
+                'message': f'ORB dairy restaurants addition failed: {str(e)}',
+                'timestamp': datetime.utcnow().isoformat()
+            }), 500
+    
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
