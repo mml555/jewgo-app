@@ -195,14 +195,51 @@ def create_app(config_name=None):
     def api_restaurant_detail(business_id):
         """Get detailed information about a specific restaurant."""
         try:
-            restaurant = g.db_manager.get_restaurant(business_id)
+            # Convert business_id to integer
+            try:
+                restaurant_id = int(business_id)
+            except ValueError:
+                return jsonify({'error': 'Invalid restaurant ID'}), 400
+            
+            restaurant = g.db_manager.get_restaurant(restaurant_id)
             
             if not restaurant:
                 return jsonify({'error': 'Restaurant not found'}), 404
             
+            # Convert restaurant object to dictionary for JSON serialization
+            restaurant_data = {
+                'id': restaurant.id,
+                'name': restaurant.name,
+                'address': restaurant.address,
+                'city': restaurant.city,
+                'state': restaurant.state,
+                'zip_code': restaurant.zip_code,
+                'phone': restaurant.phone,
+                'website': restaurant.website,
+                'cuisine_type': restaurant.cuisine_type,
+                'price_range': restaurant.price_range,
+                'rating': restaurant.rating,
+                'review_count': restaurant.review_count,
+                'latitude': restaurant.latitude,
+                'longitude': restaurant.longitude,
+                'hours': restaurant.hours,
+                'description': restaurant.description,
+                'image_url': restaurant.image_url,
+                'is_kosher': restaurant.is_kosher,
+                'is_glatt': restaurant.is_glatt,
+                'is_cholov_yisroel': restaurant.is_cholov_yisroel,
+                'is_pas_yisroel': restaurant.is_pas_yisroel,
+                'is_bishul_yisroel': restaurant.is_bishul_yisroel,
+                'is_mehadrin': restaurant.is_mehadrin,
+                'is_hechsher': restaurant.is_hechsher,
+                'hechsher_details': restaurant.hechsher_details,
+                'created_at': restaurant.created_at.isoformat() if restaurant.created_at else None,
+                'updated_at': restaurant.updated_at.isoformat() if restaurant.updated_at else None
+            }
+            
             response = {
                 'success': True,
-                'data': restaurant,
+                'data': restaurant_data,
                 'metadata': {
                     'business_id': business_id,
                     'timestamp': datetime.utcnow().isoformat()

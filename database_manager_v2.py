@@ -275,12 +275,13 @@ class EnhancedDatabaseManager:
                 ratings = [r[0] for r in avg_rating_result if r[0] is not None]
                 avg_rating = sum(ratings) / len(ratings) if ratings else 0
             
-            # Get state distribution
-            states_result = session.query(Restaurant.state, session.query(Restaurant).filter(Restaurant.state == Restaurant.state).count().label('count')).group_by(Restaurant.state).all()
+            # Get state distribution using proper SQLAlchemy syntax
+            from sqlalchemy import func
+            states_result = session.query(Restaurant.state, func.count(Restaurant.id)).filter(Restaurant.state.isnot(None)).group_by(Restaurant.state).all()
             states = {state: count for state, count in states_result if state}
             
-            # Get cuisine type distribution
-            cuisine_result = session.query(Restaurant.cuisine_type, session.query(Restaurant).filter(Restaurant.cuisine_type == Restaurant.cuisine_type).count().label('count')).group_by(Restaurant.cuisine_type).all()
+            # Get cuisine type distribution using proper SQLAlchemy syntax
+            cuisine_result = session.query(Restaurant.cuisine_type, func.count(Restaurant.id)).filter(Restaurant.cuisine_type.isnot(None)).group_by(Restaurant.cuisine_type).all()
             cuisines = {cuisine: count for cuisine, count in cuisine_result if cuisine}
             
             session.close()
