@@ -373,6 +373,48 @@ def create_app(config_name=None):
             logger.error("Error getting restaurant detail", error=str(e), business_id=business_id)
             return jsonify({'error': 'Internal server error'}), 500
     
+    @app.route('/api/restaurants/<business_id>/hours', methods=['PUT', 'OPTIONS'])
+    @limiter.limit("50 per minute")
+    def api_update_restaurant_hours(business_id):
+        """Update restaurant hours."""
+        if request.method == 'OPTIONS':
+            return '', 200
+            
+        try:
+            # Convert business_id to integer
+            try:
+                restaurant_id = int(business_id)
+            except ValueError:
+                return jsonify({'error': 'Invalid restaurant ID'}), 400
+            
+            data = request.get_json()
+            if not data or 'hours_open' not in data:
+                return jsonify({'error': 'hours_open field is required'}), 400
+            
+            hours_open = data['hours_open']
+            
+            success = g.db_manager.update_restaurant_hours(restaurant_id, hours_open)
+            
+            if success:
+                response = {
+                    'success': True,
+                    'message': f'Hours updated for restaurant {business_id}',
+                    'data': {
+                        'restaurant_id': business_id,
+                        'hours_open': hours_open
+                    },
+                    'metadata': {
+                        'timestamp': datetime.utcnow().isoformat()
+                    }
+                }
+                return jsonify(response), 200
+            else:
+                return jsonify({'error': f'Restaurant {business_id} not found or update failed'}), 404
+                
+        except Exception as e:
+            logger.error("Error updating restaurant hours", error=str(e), restaurant_id=business_id)
+            return jsonify({'error': 'Internal server error'}), 500
+    
     @app.route('/api/statistics')
     @limiter.limit("50 per minute")
     def api_statistics():
