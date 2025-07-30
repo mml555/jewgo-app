@@ -275,7 +275,19 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
 
   return (
     <div className="relative">
-      <div className="bg-white rounded-xl shadow-soft border border-neutral-200 overflow-hidden hover:shadow-medium hover:scale-[1.02] transition-all duration-300 group h-[520px] flex flex-col">
+      <div 
+        className="bg-white rounded-xl shadow-soft border border-neutral-200 overflow-hidden hover:shadow-medium hover:scale-[1.02] transition-all duration-300 group h-[520px] flex flex-col cursor-pointer"
+        onClick={handleClick}
+        role="button"
+        tabIndex={0}
+        aria-label={`View details for ${restaurant.name}`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClick();
+          }
+        }}
+      >
         {/* Image Section */}
         <div className="relative h-52 w-full overflow-hidden flex-shrink-0">
           {!imageError ? (
@@ -306,7 +318,10 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
             <div className="absolute top-2 right-2 z-30 flex gap-2">
               {/* Share Button */}
               <button
-                onClick={handleShareClick}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleShareClick(e);
+                }}
                 className="p-2 rounded-full shadow-lg backdrop-blur-sm bg-white/90 text-neutral-700 hover:bg-white hover:scale-110 transition-all duration-200"
                 title="Share restaurant"
                 aria-label="Share restaurant"
@@ -318,7 +333,10 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
 
               {/* Favorite Button */}
               <button
-                onClick={handleFavoriteToggle}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleFavoriteToggle(e);
+                }}
                 className={`p-2 rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 ${
                   isFavorited 
                     ? 'bg-pink-500 text-white hover:bg-pink-600' 
@@ -337,7 +355,10 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
             {restaurant.certifying_agency && restaurant.certifying_agency !== 'Unknown' && (
               <div className="absolute bottom-2 left-2 z-30">
                 <button
-                  onClick={(e) => handleCertificationClick(restaurant.certifying_agency, e)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCertificationClick(restaurant.certifying_agency, e);
+                  }}
                   className={`px-2 py-1 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm border-2 transition-all duration-200 max-w-[100px] truncate ${getAgencyBadgeClass(restaurant.certifying_agency)}`}
                   title={`${restaurant.certifying_agency} Kosher Certification - Click to visit website`}
                   aria-label={`${restaurant.certifying_agency} kosher certification badge - click to visit website`}
@@ -491,14 +512,7 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
               </div>
             )}
 
-            {/* View Full Listing Button */}
-            <button
-              onClick={handleClick}
-              className="w-full border-2 border-jewgo-primary text-jewgo-primary py-2 px-4 rounded-full text-sm font-medium hover:bg-jewgo-primary hover:text-white transition-all duration-200 mb-3"
-              aria-label={`View full listing for ${restaurant.name}`}
-            >
-              View More
-            </button>
+            {/* Card is now fully clickable - no need for separate button */}
 
             {/* Address - Single Line */}
             {restaurant.address ? (
