@@ -1,4 +1,5 @@
 'use client';
+// This page intentionally uses client-side rendering for interactive map features and geolocation
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
