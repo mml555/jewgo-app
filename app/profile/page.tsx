@@ -1,9 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import NavTabs from '@/components/NavTabs';
+import ConfirmModal from '@/components/ui/ConfirmModal';
+import { showToast } from '@/components/ui/Toast';
+import { mockExportUserData, mockDeleteAccount } from '@/lib/api/mock';
+import { getFavorites } from '@/utils/favorites';
 
 export default function ProfilePage() {
   const [activeFilters, setActiveFilters] = useState<{
@@ -32,6 +37,13 @@ export default function ProfilePage() {
 
   const [activeTab, setActiveTab] = useState('profile');
   const [profileTab, setProfileTab] = useState('profile');
+  
+  // ✅ Phase 1: Add router and state management
+  const router = useRouter();
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const updateProfile = (field: string, value: any) => {
     setUserProfile(prev => ({
@@ -77,6 +89,57 @@ export default function ProfilePage() {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
+  };
+
+  // ✅ Phase 1: Implement handler functions
+  const handleChangePassword = () => {
+    setShowPasswordModal(true);
+  };
+
+  const handlePrivacySettings = () => {
+    router.push('/profile/privacy');
+  };
+
+  const handleExportData = async () => {
+    setIsExporting(true);
+    try {
+      const userData = await mockExportUserData();
+      
+      const blob = new Blob([JSON.stringify(userData, null, 2)], { 
+        type: 'application/json' 
+      });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `jewgo-data-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      
+      showToast('Data exported successfully!', 'success');
+    } catch (error) {
+      console.error('Export failed:', error);
+      showToast('Failed to export data. Please try again.', 'error');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    setShowDeleteConfirmation(true);
+  };
+
+  const handleConfirmDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      await mockDeleteAccount('password123'); // In real app, get from form
+      showToast('Account deleted successfully.', 'success');
+      // Redirect to home page after deletion
+      setTimeout(() => router.push('/'), 2000);
+    } catch (error) {
+      console.error('Delete failed:', error);
+      showToast('Failed to delete account. Please try again.', 'error');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirmation(false);
+    }
   };
 
   return (
