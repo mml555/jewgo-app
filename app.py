@@ -147,6 +147,15 @@ def create_app(config_name=None):
             logger.error("Database connection error", error=str(e))
             return jsonify({'error': 'Database connection failed'}), 500
     
+    # Run schema fix on app startup
+    with app.app_context():
+        try:
+            logger.info("Running database schema fix on startup...")
+            fix_database_schema()
+            logger.info("Database schema fix completed successfully")
+        except Exception as e:
+            logger.error("Failed to run schema fix on startup", error=str(e))
+    
     @app.teardown_appcontext
     def teardown_db(exception):
         """Close database connection after each request."""
