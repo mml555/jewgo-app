@@ -31,7 +31,7 @@ def export_restaurant_data():
         # Get all restaurants
         cursor.execute("""
             SELECT id, name, address, city, state, zip_code, phone, website, 
-                   hechsher_details, cuisine_type, hours, description, price_range, 
+                   hechsher_details, cuisine_type, hours_of_operation, description, price_range, 
                    image_url, latitude, longitude, rating, review_count, 
                    created_at, updated_at
             FROM restaurants 
@@ -51,7 +51,7 @@ def export_restaurant_data():
                 'website': row[7],
                 'hechsher_details': row[8],
                 'cuisine_type': row[9],
-                'hours': row[10],
+                'hours_of_operation': row[10],
                 'description': row[11],
                 'price_range': row[12],
                 'image_url': row[13],
@@ -89,7 +89,7 @@ def export_restaurant_data():
             sample = restaurants[0]
             print(f"   Name: {sample['name']}")
             print(f"   Address: {sample['address']}")
-            print(f"   Hours: {sample['hours']}")
+            print(f"   Hours: {sample['hours_of_operation']}")
             print(f"   Category: {sample['cuisine_type']}")
         
         return filename
