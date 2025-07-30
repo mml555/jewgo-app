@@ -611,7 +611,7 @@ export default function LiveMapClient() {
         />
       </div>
 
-      <BottomNavigation activeTab={activeTab} />
+      <BottomNavigation />
     </div>
   );
 } 
