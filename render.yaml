@@ -8,3 +8,13 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.8
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+    buildFilter:
+      paths:
+        - requirements.txt
+        - runtime.txt
+        - render.yaml
+        - app.py
+        - database_manager_v2.py
+        - config.py

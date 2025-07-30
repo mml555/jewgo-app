@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
 Enhanced Database Manager for JewGo App
-Handles PostgreSQL database operations with SQLAlchemy 1.4
+Handles PostgreSQL database operations with SQLAlchemy 2.0
 """
 
 import os
 import logging
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 import structlog
 from typing import Dict, Any, List, Optional
@@ -35,8 +34,9 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
-# SQLAlchemy Base
-Base = declarative_base()
+# SQLAlchemy Base for SQLAlchemy 2.0
+class Base(DeclarativeBase):
+    pass
 
 class Restaurant(Base):
     """Restaurant model for SQLAlchemy."""
@@ -50,25 +50,28 @@ class Restaurant(Base):
     zip_code = Column(String(20))
     phone = Column(String(50))
     website = Column(String(500))
-    description = Column(Text)
     cuisine_type = Column(String(100))
     price_range = Column(String(20))
     rating = Column(Float)
     review_count = Column(Integer)
     latitude = Column(Float)
     longitude = Column(Float)
-    hours = Column(Text)  # JSON string
-    images = Column(Text)  # JSON string
-    menu_items = Column(Text)  # JSON string
-    specials = Column(Text)  # JSON string
+    hours = Column(Text)
+    description = Column(Text)
+    image_url = Column(String(500))
     is_kosher = Column(Boolean, default=False)
-    is_vegetarian_friendly = Column(Boolean, default=False)
-    is_vegan_friendly = Column(Boolean, default=False)
+    is_glatt = Column(Boolean, default=False)
+    is_cholov_yisroel = Column(Boolean, default=False)
+    is_pas_yisroel = Column(Boolean, default=False)
+    is_bishul_yisroel = Column(Boolean, default=False)
+    is_mehadrin = Column(Boolean, default=False)
+    is_hechsher = Column(Boolean, default=False)
+    hechsher_details = Column(String(500))
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class EnhancedDatabaseManager:
-    """Enhanced database manager with SQLAlchemy 1.4."""
+    """Enhanced database manager with SQLAlchemy 2.0 support."""
     
     def __init__(self, database_url: str = None):
         """Initialize database manager with connection string."""
@@ -78,22 +81,22 @@ class EnhancedDatabaseManager:
         if not self.database_url:
             raise ValueError("DATABASE_URL environment variable is required")
         
-        # Handle PostgreSQL URL format for SQLAlchemy 1.4
-        if self.database_url.startswith('postgres://'):
-            self.database_url = self.database_url.replace('postgres://', 'postgresql://', 1)
-        
-        logger.info("Database manager initialized", database_url=self.database_url[:50] + "...")
-        
         # Initialize SQLAlchemy components
         self.engine = None
         self.SessionLocal = None
         self.session = None
+        
+        logger.info("Database manager initialized", database_url=self.database_url[:50] + "...")
     
     def connect(self) -> bool:
         """Connect to the database and create tables if they don't exist."""
         try:
-            # Create the engine with standard SQLAlchemy 1.4 + psycopg2-binary
-            self.engine = create_engine(self.database_url, echo=False)
+            # Create the engine with standard SQLAlchemy 2.0 + psycopg3
+            # SQLAlchemy 2.0.42+ automatically detects psycopg3 when available
+            self.engine = create_engine(
+                self.database_url,
+                echo=False
+            )
             
             # Test the connection
             with self.engine.connect() as conn:
@@ -110,7 +113,7 @@ class EnhancedDatabaseManager:
             return True
             
         except Exception as e:
-            logger.error("Failed to connect to database", error=str(e), database_url=self.database_url)
+            logger.error("Failed to connect to database", error=str(e), database_url=self.database_url[:50] + "...")
             return False
     
     def get_session(self) -> Session:
@@ -141,58 +144,56 @@ class EnhancedDatabaseManager:
             logger.error("Failed to add restaurant", error=str(e))
             if session:
                 session.rollback()
+                session.close()
             return False
-        finally:
-            if session:
-                session.close()
     
-    def get_restaurant(self, restaurant_id: int) -> Optional[Restaurant]:
-        """Get a restaurant by ID."""
-        session = None
+    def _validate_against_fpt_feed(self, restaurant_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Validate restaurant data against FPT feed to avoid misassignments.
+        This is a placeholder for the actual FPT feed validation logic.
+        """
+        # TODO: Implement actual FPT feed validation
+        # For now, return the data as-is
+        return restaurant_data
+    
+    def get_restaurants(self, limit: int = 100, offset: int = 0) -> List[Restaurant]:
+        """Get restaurants from the database."""
         try:
             session = self.get_session()
-            restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
-            return restaurant
-        except Exception as e:
-            logger.error("Failed to get restaurant", error=str(e), restaurant_id=restaurant_id)
-            return None
-        finally:
-            if session:
-                session.close()
-    
-    def get_all_restaurants(self) -> List[Restaurant]:
-        """Get all restaurants."""
-        session = None
-        try:
-            session = self.get_session()
-            restaurants = session.query(Restaurant).all()
+            restaurants = session.query(Restaurant).limit(limit).offset(offset).all()
+            session.close()
             return restaurants
         except Exception as e:
-            logger.error("Failed to get all restaurants", error=str(e))
+            logger.error("Failed to get restaurants", error=str(e))
             return []
-        finally:
-            if session:
-                session.close()
     
-    def search_restaurants(self, query: str) -> List[Restaurant]:
+    def search_restaurants(self, query: str, limit: int = 50) -> List[Restaurant]:
         """Search restaurants by name or description."""
-        session = None
         try:
             session = self.get_session()
             restaurants = session.query(Restaurant).filter(
                 Restaurant.name.ilike(f'%{query}%') | 
                 Restaurant.description.ilike(f'%{query}%')
-            ).all()
+            ).limit(limit).all()
+            session.close()
             return restaurants
         except Exception as e:
-            logger.error("Failed to search restaurants", error=str(e), query=query)
+            logger.error("Failed to search restaurants", error=str(e))
             return []
-        finally:
-            if session:
-                session.close()
+    
+    def get_restaurant_by_id(self, restaurant_id: int) -> Optional[Restaurant]:
+        """Get a restaurant by ID."""
+        try:
+            session = self.get_session()
+            restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
+            session.close()
+            return restaurant
+        except Exception as e:
+            logger.error("Failed to get restaurant by ID", error=str(e), restaurant_id=restaurant_id)
+            return None
     
     def update_restaurant(self, restaurant_id: int, update_data: Dict[str, Any]) -> bool:
-        """Update a restaurant."""
+        """Update a restaurant in the database."""
         session = None
         try:
             session = self.get_session()
@@ -217,13 +218,11 @@ class EnhancedDatabaseManager:
             logger.error("Failed to update restaurant", error=str(e), restaurant_id=restaurant_id)
             if session:
                 session.rollback()
-            return False
-        finally:
-            if session:
                 session.close()
+            return False
     
     def delete_restaurant(self, restaurant_id: int) -> bool:
-        """Delete a restaurant."""
+        """Delete a restaurant from the database."""
         session = None
         try:
             session = self.get_session()
@@ -243,41 +242,13 @@ class EnhancedDatabaseManager:
             logger.error("Failed to delete restaurant", error=str(e), restaurant_id=restaurant_id)
             if session:
                 session.rollback()
+                session.close()
             return False
-        finally:
-            if session:
-                session.close()
     
-    def get_restaurant_stats(self) -> Dict[str, Any]:
-        """Get restaurant statistics."""
-        session = None
-        try:
-            session = self.get_session()
-            
-            total_restaurants = session.query(Restaurant).count()
-            kosher_restaurants = session.query(Restaurant).filter(Restaurant.is_kosher == True).count()
-            vegetarian_restaurants = session.query(Restaurant).filter(Restaurant.is_vegetarian_friendly == True).count()
-            vegan_restaurants = session.query(Restaurant).filter(Restaurant.is_vegan_friendly == True).count()
-            
-            return {
-                'total_restaurants': total_restaurants,
-                'kosher_restaurants': kosher_restaurants,
-                'vegetarian_restaurants': vegetarian_restaurants,
-                'vegan_restaurants': vegan_restaurants
-            }
-            
-        except Exception as e:
-            logger.error("Failed to get restaurant stats", error=str(e))
-            return {}
-        finally:
-            if session:
-                session.close()
-    
-    def _validate_against_fpt_feed(self, restaurant_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Validate restaurant data against FPT feed to avoid misassignments.
-        This is a placeholder for the actual FPT validation logic.
-        """
-        # TODO: Implement actual FPT feed validation
-        # For now, just return the data as-is
-        return restaurant_data 
+    def close(self):
+        """Close database connections."""
+        if self.session:
+            self.session.close()
+        if self.engine:
+            self.engine.dispose()
+        logger.info("Database connections closed") 
