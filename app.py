@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Production-Ready Restaurant Database Web Application
-Enhanced Flask-based web server with PostgreSQL support, security features, and monitoring.
+JewGo Restaurant API
+A Flask-based REST API for kosher restaurant discovery with FPT feed validation.
 """
 
 import os
@@ -15,6 +15,7 @@ from flask_limiter.util import get_remote_address
 from database_manager_v2 import EnhancedDatabaseManager
 from config import get_config
 import structlog
+import psycopg2
 
 # Configure structured logging
 structlog.configure(
@@ -36,6 +37,63 @@ structlog.configure(
 )
 
 logger = structlog.get_logger()
+
+def fix_database_schema():
+    """Fix database schema by adding missing columns."""
+    database_url = os.environ.get('DATABASE_URL')
+    
+    if not database_url:
+        logger.error("DATABASE_URL environment variable not found")
+        return False
+    
+    try:
+        # Connect to database
+        conn = psycopg2.connect(database_url)
+        cursor = conn.cursor()
+        
+        logger.info("Connected to database for schema fix")
+        
+        # SQL statements to add missing columns
+        alter_statements = [
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS phone TEXT",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS website TEXT",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS cuisine_type TEXT",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS price_range TEXT",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS review_count INTEGER",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS description TEXT",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS image_url TEXT",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_kosher BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_glatt BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_cholov_yisroel BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_pas_yisroel BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_bishul_yisroel BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_mehadrin BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_hechsher BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS hechsher_details TEXT",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        ]
+        
+        # Execute each ALTER statement
+        for sql in alter_statements:
+            try:
+                cursor.execute(sql)
+                logger.info(f"Schema fix: {sql}")
+            except Exception as e:
+                logger.warning(f"Schema fix warning: {sql} - {e}")
+        
+        # Commit changes
+        conn.commit()
+        logger.info("Database schema fix completed successfully")
+        
+        cursor.close()
+        conn.close()
+        
+        return True
+        
+    except Exception as e:
+        logger.error("Error fixing database schema", error=str(e))
+        return False
 
 def create_app(config_name=None):
     """Application factory pattern for Flask app creation."""
@@ -67,6 +125,14 @@ def create_app(config_name=None):
         if not db_manager.connect():
             raise Exception("Failed to connect to database")
         return db_manager
+    
+    # Fix database schema on startup
+    try:
+        logger.info("Running database schema fix on startup...")
+        fix_database_schema()
+        logger.info("Database schema fix completed on startup")
+    except Exception as e:
+        logger.error("Failed to fix database schema on startup", error=str(e))
     
     @app.before_request
     def before_request():
