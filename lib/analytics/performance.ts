@@ -1,6 +1,6 @@
 // Performance monitoring and analytics system
 
-interface PerformanceMetrics {
+export interface PerformanceMetrics {
   // Core Web Vitals
   lcp?: number; // Largest Contentful Paint
   fid?: number; // First Input Delay
@@ -53,8 +53,8 @@ class PerformanceMonitor {
           const entries = list.getEntries();
           const lastEntry = entries[entries.length - 1];
           this.recordEvent('LCP', lastEntry.startTime, 'paint', {
-            element: lastEntry.element?.tagName,
-            url: lastEntry.url
+            element: (lastEntry as any).element?.tagName,
+            url: (lastEntry as any).url
           });
         });
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
@@ -68,7 +68,7 @@ class PerformanceMonitor {
         const fidObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries();
           entries.forEach(entry => {
-            this.recordEvent('FID', entry.processingStart - entry.startTime, 'navigation', {
+            this.recordEvent('FID', (entry as any).processingStart - entry.startTime, 'navigation', {
               name: entry.name,
               type: entry.entryType
             });
@@ -86,7 +86,7 @@ class PerformanceMonitor {
           let clsValue = 0;
           const entries = list.getEntries();
           entries.forEach(entry => {
-            if (!entry.hadRecentInput) {
+            if (!(entry as any).hadRecentInput) {
               clsValue += (entry as any).value;
             }
           });
