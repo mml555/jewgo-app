@@ -233,7 +233,10 @@ export default function LiveMapClient() {
         
         const data = await response.json();
         
-        if (data.restaurants && Array.isArray(data.restaurants)) {
+        if (data.data && Array.isArray(data.data)) {
+          setAllRestaurants(data.data);
+        } else if (data.restaurants && Array.isArray(data.restaurants)) {
+          // Fallback for old format
           setAllRestaurants(data.restaurants);
         } else {
           throw new Error('Invalid response format');
@@ -248,7 +251,10 @@ export default function LiveMapClient() {
         
         const data = await response.json();
         
-        if (data.restaurants && Array.isArray(data.restaurants)) {
+        if (data.data && Array.isArray(data.data)) {
+          setAllRestaurants(data.data);
+        } else if (data.restaurants && Array.isArray(data.restaurants)) {
+          // Fallback for old format
           setAllRestaurants(data.restaurants);
         } else {
           throw new Error('Invalid response format');
