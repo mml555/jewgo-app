@@ -38,6 +38,41 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
+def restaurant_to_dict(restaurant):
+    """Convert a Restaurant SQLAlchemy object to a dictionary."""
+    if not restaurant:
+        return None
+    
+    return {
+        'id': restaurant.id,
+        'name': restaurant.name,
+        'address': restaurant.address,
+        'city': restaurant.city,
+        'state': restaurant.state,
+        'zip_code': restaurant.zip_code,
+        'phone': restaurant.phone,
+        'website': restaurant.website,
+        'cuisine_type': restaurant.cuisine_type,
+        'price_range': restaurant.price_range,
+        'rating': restaurant.rating,
+        'review_count': restaurant.review_count,
+        'latitude': restaurant.latitude,
+        'longitude': restaurant.longitude,
+        'hours': restaurant.hours,
+        'description': restaurant.description,
+        'image_url': restaurant.image_url,
+        'is_kosher': restaurant.is_kosher,
+        'is_glatt': restaurant.is_glatt,
+        'is_cholov_yisroel': restaurant.is_cholov_yisroel,
+        'is_pas_yisroel': restaurant.is_pas_yisroel,
+        'is_bishul_yisroel': restaurant.is_bishul_yisroel,
+        'is_mehadrin': restaurant.is_mehadrin,
+        'is_hechsher': restaurant.is_hechsher,
+        'hechsher_details': restaurant.hechsher_details,
+        'created_at': restaurant.created_at.isoformat() if restaurant.created_at else None,
+        'updated_at': restaurant.updated_at.isoformat() if restaurant.updated_at else None
+    }
+
 def fix_database_schema():
     """Fix database schema by adding missing columns."""
     database_url = os.environ.get('DATABASE_URL')
@@ -239,10 +274,13 @@ def create_app(config_name=None):
                     limit=limit, offset=offset
                 )
             
+            # Convert Restaurant objects to dictionaries for JSON serialization
+            restaurants_data = [restaurant_to_dict(restaurant) for restaurant in restaurants]
+            
             # Add metadata to response
             response = {
                 'success': True,
-                'data': restaurants,
+                'data': restaurants_data,
                 'metadata': {
                     'total_results': len(restaurants),
                     'limit': limit,
@@ -283,35 +321,7 @@ def create_app(config_name=None):
                 return jsonify({'error': 'Restaurant not found'}), 404
             
             # Convert restaurant object to dictionary for JSON serialization
-            restaurant_data = {
-                'id': restaurant.id,
-                'name': restaurant.name,
-                'address': restaurant.address,
-                'city': restaurant.city,
-                'state': restaurant.state,
-                'zip_code': restaurant.zip_code,
-                'phone': restaurant.phone,
-                'website': restaurant.website,
-                'cuisine_type': restaurant.cuisine_type,
-                'price_range': restaurant.price_range,
-                'rating': restaurant.rating,
-                'review_count': restaurant.review_count,
-                'latitude': restaurant.latitude,
-                'longitude': restaurant.longitude,
-                'hours': restaurant.hours,
-                'description': restaurant.description,
-                'image_url': restaurant.image_url,
-                'is_kosher': restaurant.is_kosher,
-                'is_glatt': restaurant.is_glatt,
-                'is_cholov_yisroel': restaurant.is_cholov_yisroel,
-                'is_pas_yisroel': restaurant.is_pas_yisroel,
-                'is_bishul_yisroel': restaurant.is_bishul_yisroel,
-                'is_mehadrin': restaurant.is_mehadrin,
-                'is_hechsher': restaurant.is_hechsher,
-                'hechsher_details': restaurant.hechsher_details,
-                'created_at': restaurant.created_at.isoformat() if restaurant.created_at else None,
-                'updated_at': restaurant.updated_at.isoformat() if restaurant.updated_at else None
-            }
+            restaurant_data = restaurant_to_dict(restaurant)
             
             response = {
                 'success': True,
