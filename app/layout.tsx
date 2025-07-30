@@ -13,8 +13,6 @@ export const metadata: Metadata = {
   description: 'Discover the best kosher restaurants, synagogues, and Jewish businesses in your area.',
   keywords: 'kosher, restaurants, Jewish, eatery, synagogue, mikvah, stores',
   authors: [{ name: 'Jewgo Team' }],
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
-  themeColor: '#A8E6CF',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -26,6 +24,14 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#A8E6CF',
 }
 
 export default function RootLayout({
