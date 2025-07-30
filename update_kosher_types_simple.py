@@ -28,18 +28,23 @@ def update_kosher_types():
         
         print("✅ Connected to database")
         
-        # Define specific updates based on restaurant names
+        # Define specific updates based on ORB website data
         updates = [
-            ("Gifted Pizza (Food Truck)", "dairy"),  # Pizza is dairy
-            ("Grand Cafe Hollywood", "dairy"),       # Cafe is dairy
-            ("A La Carte", "pareve"),                # Generic restaurant, default to pareve
-            ("Test Restaurant", "pareve"),           # Test restaurant, default to pareve
-            ("Yum Berry Cafe & Sushi Bar", "dairy"), # Cafe is dairy
-            ("Mizrachi's Pizza in Hollywood", "dairy"), # Pizza is dairy
-            ("Cafe 95 at JARC", "dairy"),           # Cafe is dairy
-            ("Oak and Ember", "meat"),               # Grill/BBQ is meat
-            ("Toast 770", "dairy"),                  # Toast/cafe is dairy
-            ("Grill Xpress", "meat"),                # Grill is meat
+            # Dairy restaurants (confirmed from ORB)
+            ("Gifted Pizza (Food Truck)", "dairy"),      # ORB Dairy category
+            ("Grand Cafe Hollywood", "dairy"),           # ORB Dairy category
+            ("A La Carte", "dairy"),                     # ORB Dairy category
+            ("Yum Berry Cafe & Sushi Bar", "dairy"),     # ORB Dairy category
+            ("Mizrachi's Pizza in Hollywood", "dairy"),  # ORB Dairy category
+            ("Cafe 95 at JARC", "dairy"),               # ORB Dairy category
+            ("Toast 770", "dairy"),                      # ORB Dairy category
+            
+            # Meat restaurants (based on names)
+            ("Oak and Ember", "meat"),                   # Grill/BBQ is meat
+            ("Grill Xpress", "meat"),                    # Grill is meat
+            
+            # Test/Unknown restaurants
+            ("Test Restaurant", "pareve"),               # Test restaurant, default to pareve
         ]
         
         updated_count = 0
