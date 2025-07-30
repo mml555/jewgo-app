@@ -92,22 +92,22 @@ export default function EnhancedMap({
     loadGoogleMapsAPI();
   }, []);
 
-  // Get user location
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        },
-        (error) => {
-          console.log('Geolocation error:', error);
-        }
-      );
-    }
-  }, []);
+  // Don't request location automatically - wait for user interaction
+  // useEffect(() => {
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => {
+  //         setUserLocation({
+  //           lat: position.coords.latitude,
+  //           lng: position.coords.longitude
+  //         });
+  //       },
+  //       (error) => {
+  //         console.log('Geolocation error:', error);
+  //       }
+  //     );
+  //   }
+  // }, []);
 
   // Initialize map when API is loaded
   useEffect(() => {

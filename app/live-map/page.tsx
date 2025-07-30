@@ -56,9 +56,10 @@ export default function LiveMapPage() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    getUserLocation();
-  }, []);
+  // Don't request location automatically - wait for user interaction
+  // useEffect(() => {
+  //   getUserLocation();
+  // }, []);
 
   useEffect(() => {
     if (userLocation) {
