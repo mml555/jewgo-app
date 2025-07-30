@@ -10,8 +10,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 import logging
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 import structlog
 
@@ -36,8 +35,9 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
-# SQLAlchemy Base
-Base = declarative_base()
+# SQLAlchemy Base for SQLAlchemy 2.0
+class Base(DeclarativeBase):
+    pass
 
 class Restaurant(Base):
     """Restaurant model for SQLAlchemy."""
