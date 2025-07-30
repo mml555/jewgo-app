@@ -24,6 +24,8 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
   const [placeSuggestions, setPlaceSuggestions] = useState<PlaceSuggestion[]>([]);
   const [isLoadingPlaces, setIsLoadingPlaces] = useState(false);
   const [placesApiError, setPlacesApiError] = useState<string | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
   const placesTimeoutRef = useRef<NodeJS.Timeout>();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -123,6 +125,9 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
   const fetchPlaceSuggestions = async (searchQuery: string) => {
     if (!autocompleteServiceRef.current) return;
 
+    setIsLoadingPlaces(true);
+    setPlacesApiError(null);
+
     try {
       // Check if we're using the newer API
       if (autocompleteServiceRef.current.getPlacePredictions) {
@@ -158,11 +163,24 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
           }
         });
       }
+      
+      setRetryCount(0); // Reset retry count on success
     } catch (error) {
       console.error('Error fetching place suggestions:', error);
       setIsLoadingPlaces(false);
       setPlaceSuggestions([]);
-      setPlacesApiError('Failed to fetch suggestions');
+      
+      // Enhanced error handling with retry logic
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch suggestions';
+      setPlacesApiError(errorMessage);
+      
+      // Auto-retry logic for network errors
+      if (retryCount < 2 && errorMessage.includes('network')) {
+        setRetryCount(prev => prev + 1);
+        setTimeout(() => {
+          fetchPlaceSuggestions(searchQuery);
+        }, 1000 * (retryCount + 1)); // Exponential backoff
+      }
     }
   };
 
@@ -171,6 +189,8 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
     onSearch('');
     setPlaceSuggestions([]);
     setPlacesApiError(null);
+    setSearchError(null);
+    setRetryCount(0);
     inputRef.current?.focus();
   };
 

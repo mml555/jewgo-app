@@ -43,9 +43,37 @@ export default function SharePopup({ restaurant, isOpen, onClose }: SharePopupPr
       await navigator.clipboard.writeText(shareUrl);
       setLinkCopied(true);
       setTimeout(() => setLinkCopied(false), 2000);
+      
+      // Show success toast
+      if (typeof window !== 'undefined' && (window as any).showToast) {
+        (window as any).showToast('Link copied to clipboard!', 'success');
+      }
     } catch (error) {
       console.error('Failed to copy link:', error);
-      alert('Failed to copy link. Please try again.');
+      
+      // Show error toast and provide fallback
+      if (typeof window !== 'undefined' && (window as any).showToast) {
+        (window as any).showToast('Failed to copy link. Please try again.', 'error');
+      }
+      
+      // Fallback: select text for manual copy
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = shareUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (typeof window !== 'undefined' && (window as any).showToast) {
+          (window as any).showToast('Link copied using fallback method!', 'info');
+        }
+      } catch (fallbackError) {
+        console.error('Fallback copy also failed:', fallbackError);
+        if (typeof window !== 'undefined' && (window as any).showToast) {
+          (window as any).showToast('Please copy the link manually', 'error');
+        }
+      }
     }
   };
 
@@ -59,12 +87,23 @@ export default function SharePopup({ restaurant, isOpen, onClose }: SharePopupPr
     try {
       if (navigator.share) {
         await navigator.share(shareData);
+        
+        // Show success toast
+        if (typeof window !== 'undefined' && (window as any).showToast) {
+          (window as any).showToast('Shared successfully!', 'success');
+        }
       } else {
         // Fallback to copy link
         await handleCopyLink();
       }
     } catch (error) {
       console.error('Failed to share:', error);
+      
+      // Show error toast
+      if (typeof window !== 'undefined' && (window as any).showToast) {
+        (window as any).showToast('Failed to share. Copying link instead.', 'warning');
+      }
+      
       // Fallback to copy link
       await handleCopyLink();
     }

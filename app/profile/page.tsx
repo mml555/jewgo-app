@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import NavTabs from '@/components/NavTabs';
 import ConfirmModal from '@/components/ui/ConfirmModal';
+import PasswordChangeModal from '@/components/ui/PasswordChangeModal';
 import { showToast } from '@/components/ui/Toast';
 import { mockExportUserData, mockDeleteAccount } from '@/lib/api/mock';
 import { getFavorites } from '@/utils/favorites';
@@ -453,6 +454,15 @@ export default function ProfilePage() {
           isLoading={isDeleting}
         />
       )}
+      
+      {/* ✅ Phase 2: Add password change modal */}
+      <PasswordChangeModal
+        isOpen={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        onSuccess={() => {
+          showToast('Password changed successfully!', 'success');
+        }}
+      />
     </div>
   );
 } 
