@@ -92,30 +92,30 @@ export default function LiveMapClient() {
         restaurant.address.toLowerCase().includes(query) ||
         restaurant.city.toLowerCase().includes(query) ||
         restaurant.state.toLowerCase().includes(query) ||
-        (restaurant.cuisine_type && restaurant.cuisine_type.toLowerCase().includes(query)) ||
-        (restaurant.hechsher_details && restaurant.hechsher_details.toLowerCase().includes(query))
+        (restaurant.listing_type && restaurant.listing_type.toLowerCase().includes(query)) ||
+        (restaurant.certifying_agency && restaurant.certifying_agency.toLowerCase().includes(query))
       );
     }
 
     // Apply agency filter
     if (activeFilters.agency) {
       filtered = filtered.filter(restaurant => 
-        restaurant.hechsher_details && 
-        restaurant.hechsher_details.toLowerCase().includes(activeFilters.agency!.toLowerCase())
+        restaurant.certifying_agency && 
+        restaurant.certifying_agency.toLowerCase().includes(activeFilters.agency!.toLowerCase())
       );
     }
 
     // Apply dietary filter
     if (activeFilters.dietary) {
       filtered = filtered.filter(restaurant => {
-        const hechsher = restaurant.hechsher_details?.toLowerCase() || '';
+        const kosherCategory = restaurant.kosher_category?.toLowerCase() || '';
         switch (activeFilters.dietary) {
           case 'meat':
-            return hechsher.includes('meat') || hechsher.includes('fleishig');
+            return kosherCategory === 'meat';
           case 'dairy':
-            return hechsher.includes('dairy') || hechsher.includes('milchig');
+            return kosherCategory === 'dairy';
           case 'pareve':
-            return hechsher.includes('pareve') || hechsher.includes('parve');
+            return kosherCategory === 'pareve';
           default:
             return true;
         }
@@ -125,8 +125,8 @@ export default function LiveMapClient() {
     // Apply category filter
     if (activeFilters.category) {
       filtered = filtered.filter(restaurant => 
-        restaurant.cuisine_type && 
-        restaurant.cuisine_type.toLowerCase().includes(activeFilters.category!.toLowerCase())
+        restaurant.listing_type && 
+        restaurant.listing_type.toLowerCase().includes(activeFilters.category!.toLowerCase())
       );
     }
 
@@ -148,7 +148,7 @@ export default function LiveMapClient() {
     // Apply "open now" filter
     if (activeFilters.openNow) {
       const now = new Date();
-      const currentDay = now.toLocaleDateString('en-US', { weekday: 'lowercase' });
+      const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
       const currentTime = now.getHours() * 60 + now.getMinutes(); // Convert to minutes
 
       filtered = filtered.filter(restaurant => {
@@ -208,23 +208,6 @@ export default function LiveMapClient() {
     console.log('Filtered restaurants count:', filtered.length);
     setDisplayedRestaurants(filtered);
   }, [allRestaurants, searchQuery, activeFilters, userLocation]);
-
-  // Helper function to convert time string to minutes
-  const timeToMinutes = (timeStr: string): number => {
-    const time = timeStr.toLowerCase().trim();
-    const match = time.match(/(\d+):?(\d*)\s*(am|pm)/);
-    
-    if (!match) return -1;
-    
-    let hours = parseInt(match[1]);
-    const minutes = match[2] ? parseInt(match[2]) : 0;
-    const period = match[3];
-    
-    if (period === 'pm' && hours !== 12) hours += 12;
-    if (period === 'am' && hours === 12) hours = 0;
-    
-    return hours * 60 + minutes;
-  };
 
   const fetchRestaurants = useCallback(async () => {
     try {
@@ -350,30 +333,30 @@ export default function LiveMapClient() {
         restaurant.address.toLowerCase().includes(query) ||
         restaurant.city.toLowerCase().includes(query) ||
         restaurant.state.toLowerCase().includes(query) ||
-        (restaurant.cuisine_type && restaurant.cuisine_type.toLowerCase().includes(query)) ||
-        (restaurant.hechsher_details && restaurant.hechsher_details.toLowerCase().includes(query))
+        (restaurant.listing_type && restaurant.listing_type.toLowerCase().includes(query)) ||
+        (restaurant.certifying_agency && restaurant.certifying_agency.toLowerCase().includes(query))
       );
     }
 
     // Apply agency filter
     if (activeFilters.agency) {
       filtered = filtered.filter(restaurant => 
-        restaurant.hechsher_details && 
-        restaurant.hechsher_details.toLowerCase().includes(activeFilters.agency!.toLowerCase())
+        restaurant.certifying_agency && 
+        restaurant.certifying_agency.toLowerCase().includes(activeFilters.agency!.toLowerCase())
       );
     }
 
     // Apply dietary filter
     if (activeFilters.dietary) {
       filtered = filtered.filter(restaurant => {
-        const hechsher = restaurant.hechsher_details?.toLowerCase() || '';
+        const kosherCategory = restaurant.kosher_category?.toLowerCase() || '';
         switch (activeFilters.dietary) {
           case 'meat':
-            return hechsher.includes('meat') || hechsher.includes('fleishig');
+            return kosherCategory === 'meat';
           case 'dairy':
-            return hechsher.includes('dairy') || hechsher.includes('milchig');
+            return kosherCategory === 'dairy';
           case 'pareve':
-            return hechsher.includes('pareve') || hechsher.includes('parve');
+            return kosherCategory === 'pareve';
           default:
             return true;
         }
@@ -383,8 +366,8 @@ export default function LiveMapClient() {
     // Apply category filter
     if (activeFilters.category) {
       filtered = filtered.filter(restaurant => 
-        restaurant.cuisine_type && 
-        restaurant.cuisine_type.toLowerCase().includes(activeFilters.category!.toLowerCase())
+        restaurant.listing_type && 
+        restaurant.listing_type.toLowerCase().includes(activeFilters.category!.toLowerCase())
       );
     }
 
@@ -406,7 +389,7 @@ export default function LiveMapClient() {
     // Apply "open now" filter
     if (activeFilters.openNow) {
       const now = new Date();
-      const currentDay = now.toLocaleDateString('en-US', { weekday: 'lowercase' });
+      const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
       const currentTime = now.getHours() * 60 + now.getMinutes(); // Convert to minutes
 
       filtered = filtered.filter(restaurant => {
@@ -514,8 +497,8 @@ export default function LiveMapClient() {
     return displayedRestaurants.length;
   };
 
-  const hasActiveFilters = () => {
-    return searchQuery.trim() || 
+  const hasActiveFilters = (): boolean => {
+    return Boolean(searchQuery.trim()) || 
            Object.values(activeFilters).some(value => 
              value !== undefined && value !== false && value !== ''
            );
@@ -555,18 +538,30 @@ export default function LiveMapClient() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header title="Live Map" showBackButton />
+      <Header />
       
       <div className="px-4 py-2 bg-white border-b border-gray-100">
         <SearchBar 
           onSearch={handleRestaurantSearch}
           placeholder="Search restaurants..."
-          value={searchQuery}
         />
       </div>
 
       <div className="px-4 py-2 bg-white border-b border-gray-100">
-        <ActionButtons />
+        <ActionButtons 
+          onShowFilters={() => {}}
+          onShowMap={() => {}}
+          onAddEatery={() => {}}
+          onFilterChange={handleFilterChange}
+          onToggleFilter={handleToggleFilter}
+          onDistanceChange={handleDistanceChange}
+          onClearAll={handleClearAll}
+          activeFilters={activeFilters}
+          userLocation={userLocation ? { lat: userLocation.latitude, lng: userLocation.longitude } : null}
+          locationLoading={locationLoading}
+          hasActiveFilters={hasActiveFilters()}
+          isOnMapPage={true}
+        />
       </div>
 
       <div className="px-4 py-2 bg-white border-b border-gray-100">
@@ -610,10 +605,9 @@ export default function LiveMapClient() {
         <InteractiveRestaurantMap
           restaurants={displayedRestaurants}
           userLocation={userLocation}
-          selectedRestaurant={selectedRestaurant}
+          selectedRestaurantId={selectedRestaurant?.id}
           onRestaurantSelect={handleRestaurantSelect}
           mapCenter={mapCenter}
-          loading={loading}
         />
       </div>
 
