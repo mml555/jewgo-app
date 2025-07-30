@@ -23,28 +23,32 @@ def populate_orb_dairy_restaurants():
             "address": "2905 Stirling Rd, Fort Lauderdale, FL 33312",
             "phone": "954-986-6860",
             "kosher_type": "dairy",
-            "certifying_agency": "ORB Kosher"
+            "certifying_agency": "ORB Kosher",
+            "extra_kosher_info": "Cholov Yisroel, Pas Yisroel"
         },
         {
             "name": "Yum Berry Cafe & Sushi Bar",
             "address": "4009 Oakwood Blvd, Hollywood, FL 33020",
             "phone": "954-922-7876",
             "kosher_type": "dairy",
-            "certifying_agency": "ORB Kosher"
+            "certifying_agency": "ORB Kosher",
+            "extra_kosher_info": "Cholov Yisroel, Pas Yisroel"
         },
         {
             "name": "Mizrachi's Pizza in Hollywood",
             "address": "5650 Stirling Rd, Hollywood, FL 33021",
             "phone": "954-505-3190",
             "kosher_type": "dairy",
-            "certifying_agency": "ORB Kosher"
+            "certifying_agency": "ORB Kosher",
+            "extra_kosher_info": "Pas Yisroel"
         },
         {
             "name": "Cafe 95 at JARC",
             "address": "21160 95th Ave South, Boca 33428",
             "phone": "561-558-2550",
             "kosher_type": "dairy",
-            "certifying_agency": "ORB Kosher"
+            "certifying_agency": "ORB Kosher",
+            "extra_kosher_info": "Cholov Yisroel, Bishul Yisroel"
         },
         {
             "name": "Hollywood Deli",
@@ -277,7 +281,8 @@ def populate_orb_dairy_restaurants():
                         existing['id'],
                         restaurant['address'],
                         restaurant['kosher_type'],
-                        restaurant['certifying_agency']
+                        restaurant['certifying_agency'],
+                        restaurant.get('extra_kosher_info')
                     )
                     if success:
                         update_count += 1
@@ -292,6 +297,7 @@ def populate_orb_dairy_restaurants():
                         phone_number=restaurant['phone'],
                         kosher_type=restaurant['kosher_type'],
                         certifying_agency=restaurant['certifying_agency'],
+                        extra_kosher_info=restaurant.get('extra_kosher_info'),
                         source='orb'
                     )
                     if success:

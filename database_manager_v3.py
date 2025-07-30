@@ -463,7 +463,7 @@ class EnhancedDatabaseManager:
         finally:
             session.close()
     
-    def update_restaurant_orb_data(self, restaurant_id: int, address: str, kosher_type: str, certifying_agency: str) -> bool:
+    def update_restaurant_orb_data(self, restaurant_id: int, address: str, kosher_type: str, certifying_agency: str, extra_kosher_info: str = None) -> bool:
         """Update restaurant with ORB data."""
         try:
             session = self.get_session()
@@ -472,6 +472,18 @@ class EnhancedDatabaseManager:
                 restaurant.address = address
                 restaurant.kosher_type = kosher_type
                 restaurant.hechsher_details = certifying_agency
+                
+                # Update extra kosher information
+                if extra_kosher_info:
+                    # Parse extra kosher info and update boolean fields
+                    extra_info_lower = extra_kosher_info.lower()
+                    restaurant.is_cholov_yisroel = 'cholov yisroel' in extra_info_lower
+                    restaurant.is_pas_yisroel = 'pas yisroel' in extra_info_lower
+                    restaurant.is_bishul_yisroel = 'bishul yisroel' in extra_info_lower
+                    # Note: Cholov Stam is the default when Cholov Yisroel is not specified
+                    if 'cholov stam' in extra_info_lower:
+                        restaurant.is_cholov_yisroel = False
+                
                 restaurant.updated_at = datetime.utcnow()
                 session.commit()
                 logger.info(f"Updated restaurant {restaurant_id} with ORB data")
@@ -485,7 +497,7 @@ class EnhancedDatabaseManager:
             session.close()
     
     def add_restaurant_simple(self, name: str, address: str = None, phone_number: str = None, 
-                      kosher_type: str = None, certifying_agency: str = None, source: str = 'orb') -> bool:
+                      kosher_type: str = None, certifying_agency: str = None, extra_kosher_info: str = None, source: str = 'orb') -> bool:
         """Add a new restaurant with basic information (simplified version)."""
         try:
             session = self.get_session()
@@ -498,6 +510,17 @@ class EnhancedDatabaseManager:
                 is_kosher=True,
                 is_hechsher=True
             )
+            
+            # Set extra kosher information
+            if extra_kosher_info:
+                extra_info_lower = extra_kosher_info.lower()
+                restaurant.is_cholov_yisroel = 'cholov yisroel' in extra_info_lower
+                restaurant.is_pas_yisroel = 'pas yisroel' in extra_info_lower
+                restaurant.is_bishul_yisroel = 'bishul yisroel' in extra_info_lower
+                # Note: Cholov Stam is the default when Cholov Yisroel is not specified
+                if 'cholov stam' in extra_info_lower:
+                    restaurant.is_cholov_yisroel = False
+            
             session.add(restaurant)
             session.commit()
             logger.info(f"Added new restaurant: {name}")
