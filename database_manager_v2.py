@@ -166,18 +166,80 @@ class EnhancedDatabaseManager:
             logger.error("Failed to get restaurants", error=str(e))
             return []
     
-    def search_restaurants(self, query: str, limit: int = 50) -> List[Restaurant]:
-        """Search restaurants by name or description."""
+    def search_restaurants(self, query: str = None, category: str = None, state: str = None, limit: int = 50, offset: int = 0, 
+                          rating_min: float = None, price_range: str = None, is_kosher: bool = None) -> List[Restaurant]:
+        """Search restaurants with various filters."""
         try:
             session = self.get_session()
-            restaurants = session.query(Restaurant).filter(
-                Restaurant.name.ilike(f'%{query}%') | 
-                Restaurant.description.ilike(f'%{query}%')
-            ).limit(limit).all()
+            query_obj = session.query(Restaurant)
+            
+            # Apply filters
+            if query:
+                query_obj = query_obj.filter(
+                    Restaurant.name.ilike(f'%{query}%') | 
+                    Restaurant.description.ilike(f'%{query}%')
+                )
+            
+            if category:
+                query_obj = query_obj.filter(Restaurant.cuisine_type.ilike(f'%{category}%'))
+            
+            if state:
+                query_obj = query_obj.filter(Restaurant.state.ilike(f'%{state}%'))
+            
+            if rating_min is not None:
+                query_obj = query_obj.filter(Restaurant.rating >= rating_min)
+            
+            if price_range:
+                query_obj = query_obj.filter(Restaurant.price_range == price_range)
+            
+            if is_kosher is not None:
+                query_obj = query_obj.filter(Restaurant.is_kosher == is_kosher)
+            
+            # Apply limit and offset
+            restaurants = query_obj.limit(limit).offset(offset).all()
             session.close()
             return restaurants
+            
         except Exception as e:
             logger.error("Failed to search restaurants", error=str(e))
+            return []
+    
+    def search_restaurants_near_location(self, lat: float, lng: float, radius: float = 50, 
+                                       query: str = None, category: str = None, limit: int = 50, offset: int = 0) -> List[Restaurant]:
+        """Search restaurants near a specific location using distance calculation."""
+        try:
+            session = self.get_session()
+            query_obj = session.query(Restaurant)
+            
+            # Apply basic filters first
+            if query:
+                query_obj = query_obj.filter(
+                    Restaurant.name.ilike(f'%{query}%') | 
+                    Restaurant.description.ilike(f'%{query}%')
+                )
+            
+            if category:
+                query_obj = query_obj.filter(Restaurant.cuisine_type.ilike(f'%{category}%'))
+            
+            # Get all restaurants and filter by distance (simplified approach)
+            restaurants = query_obj.limit(limit * 2).offset(offset).all()  # Get more to account for distance filtering
+            
+            # Filter by distance (simplified - in production you'd use PostGIS or similar)
+            nearby_restaurants = []
+            for restaurant in restaurants:
+                if restaurant.latitude and restaurant.longitude:
+                    # Simple distance calculation (Haversine formula would be better)
+                    distance = ((restaurant.latitude - lat) ** 2 + (restaurant.longitude - lng) ** 2) ** 0.5
+                    if distance <= radius / 69:  # Rough conversion: 1 degree ≈ 69 miles
+                        nearby_restaurants.append(restaurant)
+                        if len(nearby_restaurants) >= limit:
+                            break
+            
+            session.close()
+            return nearby_restaurants[:limit]
+            
+        except Exception as e:
+            logger.error("Failed to search restaurants near location", error=str(e))
             return []
     
     def get_restaurant_by_id(self, restaurant_id: int) -> Optional[Restaurant]:
@@ -190,6 +252,10 @@ class EnhancedDatabaseManager:
         except Exception as e:
             logger.error("Failed to get restaurant by ID", error=str(e), restaurant_id=restaurant_id)
             return None
+    
+    def get_restaurant(self, restaurant_id: int) -> Optional[Restaurant]:
+        """Get a restaurant by ID (alias for get_restaurant_by_id)."""
+        return self.get_restaurant_by_id(restaurant_id)
     
     def update_restaurant(self, restaurant_id: int, update_data: Dict[str, Any]) -> bool:
         """Update a restaurant in the database."""
@@ -243,6 +309,10 @@ class EnhancedDatabaseManager:
                 session.rollback()
                 session.close()
             return False
+    
+    def disconnect(self):
+        """Disconnect from the database (alias for close)."""
+        self.close()
     
     def close(self):
         """Close database connections."""
