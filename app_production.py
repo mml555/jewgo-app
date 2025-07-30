@@ -37,6 +37,50 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
+def restaurant_to_dict(restaurant):
+    """Convert a Restaurant SQLAlchemy object to a dictionary."""
+    if not restaurant:
+        return None
+    
+    try:
+        # Map backend fields to frontend expected fields
+        return {
+            'id': restaurant.id,
+            'name': restaurant.name,
+            'address': restaurant.address,
+            'city': restaurant.city,
+            'state': restaurant.state,
+            'zip_code': restaurant.zip_code,
+            'phone_number': restaurant.phone,  # Map phone to phone_number
+            'website': restaurant.website,
+            'certifying_agency': restaurant.hechsher_details or 'Unknown',  # Map hechsher_details to certifying_agency
+            'kosher_category': restaurant.cuisine_type or 'restaurant',  # Map cuisine_type to kosher_category
+            'listing_type': 'restaurant',  # Default value
+            'status': 'active',  # Default value
+            'hours_of_operation': restaurant.hours,  # Map hours to hours_of_operation
+            'hours_open': restaurant.hours,  # Also map to hours_open
+            'short_description': restaurant.description,  # Map description to short_description
+            'price_range': restaurant.price_range,
+            'image_url': restaurant.image_url,
+            'latitude': restaurant.latitude,
+            'longitude': restaurant.longitude,
+            'rating': restaurant.rating,
+            'review_count': restaurant.review_count,
+            'google_rating': restaurant.rating,  # Use same rating for Google
+            'google_review_count': restaurant.review_count,  # Use same count for Google
+            'specials': [],  # Default empty array for specials
+            'created_at': restaurant.created_at.isoformat() if restaurant.created_at else None,
+            'updated_at': restaurant.updated_at.isoformat() if restaurant.updated_at else None
+        }
+    except Exception as e:
+        logger.error("Error converting restaurant to dict", error=str(e), restaurant_id=getattr(restaurant, 'id', 'unknown'))
+        # Return a minimal dict with available data
+        return {
+            'id': getattr(restaurant, 'id', None),
+            'name': getattr(restaurant, 'name', 'Unknown'),
+            'error': 'Failed to serialize restaurant data'
+        }
+
 def create_app(config_name=None):
     """Application factory pattern for Flask app creation."""
     app = Flask(__name__)
@@ -188,14 +232,23 @@ def create_app(config_name=None):
     def api_restaurant_detail(business_id):
         """Get detailed information about a specific restaurant."""
         try:
-            restaurant = g.db_manager.get_restaurant(business_id)
+            # Convert business_id to integer
+            try:
+                restaurant_id = int(business_id)
+            except ValueError:
+                return jsonify({'error': 'Invalid restaurant ID'}), 400
+            
+            restaurant = g.db_manager.get_restaurant(restaurant_id)
             
             if not restaurant:
                 return jsonify({'error': 'Restaurant not found'}), 404
             
+            # Convert restaurant object to dictionary for JSON serialization
+            restaurant_data = restaurant_to_dict(restaurant)
+            
             response = {
                 'success': True,
-                'data': restaurant,
+                'restaurant': restaurant_data,
                 'metadata': {
                     'business_id': business_id,
                     'timestamp': datetime.utcnow().isoformat()
