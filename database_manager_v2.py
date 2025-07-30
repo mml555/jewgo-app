@@ -257,6 +257,54 @@ class EnhancedDatabaseManager:
         """Get a restaurant by ID (alias for get_restaurant_by_id)."""
         return self.get_restaurant_by_id(restaurant_id)
     
+    def get_statistics(self) -> Dict[str, Any]:
+        """Get comprehensive database statistics."""
+        try:
+            session = self.get_session()
+            
+            # Get total count
+            total_restaurants = session.query(Restaurant).count()
+            
+            # Get kosher count
+            kosher_count = session.query(Restaurant).filter(Restaurant.is_kosher == True).count()
+            
+            # Get average rating
+            avg_rating_result = session.query(Restaurant.rating).filter(Restaurant.rating.isnot(None)).all()
+            avg_rating = 0
+            if avg_rating_result:
+                ratings = [r[0] for r in avg_rating_result if r[0] is not None]
+                avg_rating = sum(ratings) / len(ratings) if ratings else 0
+            
+            # Get state distribution
+            states_result = session.query(Restaurant.state, session.query(Restaurant).filter(Restaurant.state == Restaurant.state).count().label('count')).group_by(Restaurant.state).all()
+            states = {state: count for state, count in states_result if state}
+            
+            # Get cuisine type distribution
+            cuisine_result = session.query(Restaurant.cuisine_type, session.query(Restaurant).filter(Restaurant.cuisine_type == Restaurant.cuisine_type).count().label('count')).group_by(Restaurant.cuisine_type).all()
+            cuisines = {cuisine: count for cuisine, count in cuisine_result if cuisine}
+            
+            session.close()
+            
+            return {
+                'total_restaurants': total_restaurants,
+                'kosher_restaurants': kosher_count,
+                'average_rating': round(avg_rating, 2),
+                'states': states,
+                'cuisines': cuisines,
+                'last_updated': datetime.utcnow().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error("Failed to get statistics", error=str(e))
+            return {
+                'total_restaurants': 0,
+                'kosher_restaurants': 0,
+                'average_rating': 0,
+                'states': {},
+                'cuisines': {},
+                'last_updated': datetime.utcnow().isoformat()
+            }
+    
     def update_restaurant(self, restaurant_id: int, update_data: Dict[str, Any]) -> bool:
         """Update a restaurant in the database."""
         session = None
