@@ -44,14 +44,103 @@ export default function HomePageClient() {
     }
   }, [mounted]);
 
-  // Update displayed restaurants when allRestaurants or currentPage changes
+  // Update displayed restaurants when allRestaurants, currentPage, searchQuery, or activeFilters change
   useEffect(() => {
     if (allRestaurants.length > 0) {
+      // Apply search and filter logic
+      let filteredRestaurants = [...allRestaurants];
+      
+      // Apply search query filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase().trim();
+        filteredRestaurants = filteredRestaurants.filter(restaurant => 
+          restaurant.name?.toLowerCase().includes(query) ||
+          restaurant.address?.toLowerCase().includes(query) ||
+          restaurant.city?.toLowerCase().includes(query) ||
+          restaurant.state?.toLowerCase().includes(query) ||
+          restaurant.certifying_agency?.toLowerCase().includes(query) ||
+          restaurant.listing_type?.toLowerCase().includes(query) ||
+          restaurant.kosher_category?.toLowerCase().includes(query)
+        );
+      }
+      
+      // Apply agency filter
+      if (activeFilters.agency) {
+        filteredRestaurants = filteredRestaurants.filter(restaurant => 
+          restaurant.certifying_agency && 
+          restaurant.certifying_agency.toLowerCase().includes(activeFilters.agency!.toLowerCase())
+        );
+      }
+      
+      // Apply dietary filter
+      if (activeFilters.dietary) {
+        filteredRestaurants = filteredRestaurants.filter(restaurant => {
+          const kosherCategory = restaurant.kosher_category?.toLowerCase() || '';
+          switch (activeFilters.dietary) {
+            case 'meat':
+              return kosherCategory === 'meat';
+            case 'dairy':
+              return kosherCategory === 'dairy';
+            case 'pareve':
+              return kosherCategory === 'pareve';
+            default:
+              return true;
+          }
+        });
+      }
+      
+      // Apply category filter
+      if (activeFilters.category) {
+        filteredRestaurants = filteredRestaurants.filter(restaurant => 
+          restaurant.listing_type && 
+          restaurant.listing_type.toLowerCase().includes(activeFilters.category!.toLowerCase())
+        );
+      }
+      
+      // Apply "near me" filter
+      if (activeFilters.nearMe && userLocation) {
+        const maxDistance = activeFilters.distanceRadius || 10; // Default 10 miles
+        filteredRestaurants = filteredRestaurants.filter(restaurant => {
+          if (!restaurant.latitude || !restaurant.longitude) return false;
+          const distance = calculateDistance(
+            userLocation.latitude, 
+            userLocation.longitude, 
+            restaurant.latitude, 
+            restaurant.longitude
+          );
+          return distance <= maxDistance;
+        });
+      }
+      
+      // Sort by distance if user location is available
+      if (userLocation) {
+        filteredRestaurants.sort((a, b) => {
+          if (!a.latitude || !a.longitude) return 1;
+          if (!b.latitude || !b.longitude) return -1;
+          
+          const distanceA = calculateDistance(
+            userLocation.latitude, 
+            userLocation.longitude, 
+            a.latitude, 
+            a.longitude
+          );
+          const distanceB = calculateDistance(
+            userLocation.latitude, 
+            userLocation.longitude, 
+            b.latitude, 
+            b.longitude
+          );
+          
+          return distanceA - distanceB;
+        });
+      }
+      
+      // Apply pagination
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
-      setDisplayedRestaurants(allRestaurants.slice(startIndex, endIndex));
+      setDisplayedRestaurants(filteredRestaurants.slice(startIndex, endIndex));
     }
-  }, [allRestaurants, currentPage, itemsPerPage]);
+  }, [allRestaurants, currentPage, itemsPerPage, searchQuery, activeFilters, userLocation]);
 
   const handleTabChange = (tab: string) => {
     // If specials tab is clicked, redirect to the specials page
@@ -182,8 +271,85 @@ export default function HomePageClient() {
     setCurrentPage(page);
   };
 
+  // Helper function to calculate distance between two points
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 3959; // Earth's radius in miles
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
   const getFilteredCount = () => {
-    return allRestaurants.length;
+    // Apply the same filtering logic as in the useEffect
+    let filteredRestaurants = [...allRestaurants];
+    
+    // Apply search query filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filteredRestaurants = filteredRestaurants.filter(restaurant => 
+        restaurant.name?.toLowerCase().includes(query) ||
+        restaurant.address?.toLowerCase().includes(query) ||
+        restaurant.city?.toLowerCase().includes(query) ||
+        restaurant.state?.toLowerCase().includes(query) ||
+        restaurant.certifying_agency?.toLowerCase().includes(query) ||
+        restaurant.listing_type?.toLowerCase().includes(query) ||
+        restaurant.kosher_category?.toLowerCase().includes(query)
+      );
+    }
+    
+    // Apply agency filter
+    if (activeFilters.agency) {
+      filteredRestaurants = filteredRestaurants.filter(restaurant => 
+        restaurant.certifying_agency && 
+        restaurant.certifying_agency.toLowerCase().includes(activeFilters.agency!.toLowerCase())
+      );
+    }
+    
+    // Apply dietary filter
+    if (activeFilters.dietary) {
+      filteredRestaurants = filteredRestaurants.filter(restaurant => {
+        const kosherCategory = restaurant.kosher_category?.toLowerCase() || '';
+        switch (activeFilters.dietary) {
+          case 'meat':
+            return kosherCategory === 'meat';
+          case 'dairy':
+            return kosherCategory === 'dairy';
+          case 'pareve':
+            return kosherCategory === 'pareve';
+          default:
+            return true;
+        }
+      });
+    }
+    
+    // Apply category filter
+    if (activeFilters.category) {
+      filteredRestaurants = filteredRestaurants.filter(restaurant => 
+        restaurant.listing_type && 
+        restaurant.listing_type.toLowerCase().includes(activeFilters.category!.toLowerCase())
+      );
+    }
+    
+    // Apply "near me" filter
+    if (activeFilters.nearMe && userLocation) {
+      const maxDistance = activeFilters.distanceRadius || 10;
+      filteredRestaurants = filteredRestaurants.filter(restaurant => {
+        if (!restaurant.latitude || !restaurant.longitude) return false;
+        const distance = calculateDistance(
+          userLocation.latitude, 
+          userLocation.longitude, 
+          restaurant.latitude, 
+          restaurant.longitude
+        );
+        return distance <= maxDistance;
+      });
+    }
+    
+    return filteredRestaurants.length;
   };
 
   const totalFilteredRestaurants = getFilteredCount();
