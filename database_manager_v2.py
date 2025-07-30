@@ -111,23 +111,11 @@ class EnhancedDatabaseManager:
     def connect(self) -> bool:
         """Connect to the database and create tables if they don't exist."""
         try:
-            # Create the engine with explicit psycopg dialect
-            # For SQLAlchemy 2.0 with psycopg3, we need to use postgresql+psycopg://
-            if self.database_url.startswith('postgresql://'):
-                # Replace postgresql:// with postgresql+psycopg:// to use psycopg3
-                engine_url = self.database_url.replace('postgresql://', 'postgresql+psycopg://', 1)
-            elif self.database_url.startswith('postgres://'):
-                # Handle postgres:// URLs as well
-                engine_url = self.database_url.replace('postgres://', 'postgresql+psycopg://', 1)
-            else:
-                engine_url = self.database_url
-            
-            # Create engine with explicit dialect configuration
+            # Create the engine with standard SQLAlchemy 2.0 + psycopg3
+            # SQLAlchemy 2.0.43+ automatically detects psycopg3 when available
             self.engine = create_engine(
-                engine_url, 
-                echo=False,
-                # Explicitly configure for psycopg3
-                connect_args={"server_settings": {"jit": "off"}}
+                self.database_url, 
+                echo=False
             )
             
             # Test the connection
