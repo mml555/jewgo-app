@@ -55,13 +55,14 @@ def fix_database_schema():
         
         # SQL statements to add missing columns
         alter_statements = [
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS phone TEXT",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS website TEXT",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS cuisine_type TEXT",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS price_range TEXT",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS phone VARCHAR(50)",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS website VARCHAR(500)",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS cuisine_type VARCHAR(100)",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS price_range VARCHAR(20)",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS review_count INTEGER",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS hours TEXT",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS description TEXT",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS image_url TEXT",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS image_url VARCHAR(500)",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_kosher BOOLEAN DEFAULT FALSE",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_glatt BOOLEAN DEFAULT FALSE",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_cholov_yisroel BOOLEAN DEFAULT FALSE",
@@ -69,7 +70,7 @@ def fix_database_schema():
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_bishul_yisroel BOOLEAN DEFAULT FALSE",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_mehadrin BOOLEAN DEFAULT FALSE",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_hechsher BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS hechsher_details TEXT",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS hechsher_details VARCHAR(500)",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
         ]
