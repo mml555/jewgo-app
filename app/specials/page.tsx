@@ -4,13 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
-import NavTabs from '@/components/NavTabs';
 import SearchBar from '@/components/SearchBar';
 import { showToast } from '@/components/ui/Toast';
 import { mockClaimDeal } from '@/lib/api/mock';
 
 export default function SpecialsPage() {
-  const [activeTab, setActiveTab] = useState('specials');
   const [categoryTab, setCategoryTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilters, setActiveFilters] = useState<{
@@ -141,9 +139,7 @@ export default function SpecialsPage() {
     setActiveFilters({});
   };
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-  };
+
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -184,8 +180,20 @@ export default function SpecialsPage() {
         <SearchBar onSearch={handleSearch} />
       </div>
 
-      {/* Navigation Tabs */}
-      <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
+      {/* Simple Back Navigation */}
+      <div className="px-4 py-2 bg-white border-b border-gray-100">
+        <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Eatery
+          </button>
+        </div>
+      </div>
       
       {/* Content */}
       <div className="px-4 py-6 pb-24">
