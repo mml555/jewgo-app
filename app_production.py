@@ -16,6 +16,13 @@ from database_manager_v2 import EnhancedDatabaseManager
 from config import get_config
 import structlog
 
+# Import database initialization
+try:
+    from init_database import init_database
+    INIT_DB_AVAILABLE = True
+except ImportError:
+    INIT_DB_AVAILABLE = False
+
 # Configure structured logging
 structlog.configure(
     processors=[
@@ -89,6 +96,15 @@ def create_app(config_name=None):
     # Load configuration
     config = get_config()
     app.config.from_object(config)
+    
+    # Initialize database with restaurant data if available
+    if INIT_DB_AVAILABLE:
+        try:
+            logger.info("Initializing database with restaurant data...")
+            init_database()
+            logger.info("Database initialization completed")
+        except Exception as e:
+            logger.error("Failed to initialize database", error=str(e))
     
     # Initialize CORS with production-ready settings
     CORS(app, 
