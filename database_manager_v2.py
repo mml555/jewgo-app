@@ -54,6 +54,10 @@ class Restaurant(Base):
     price_range = Column(String(20))
     rating = Column(Float)
     review_count = Column(Integer)
+    # Google Reviews fields
+    google_rating = Column(Float)
+    google_review_count = Column(Integer)
+    google_reviews = Column(Text)  # JSON string of review data
     latitude = Column(Float)
     longitude = Column(Float)
     hours = Column(Text)

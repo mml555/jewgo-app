@@ -66,8 +66,9 @@ def restaurant_to_dict(restaurant):
             'longitude': restaurant.longitude,
             'rating': restaurant.rating,
             'review_count': restaurant.review_count,
-            'google_rating': restaurant.rating,  # Use same rating for Google
-            'google_review_count': restaurant.review_count,  # Use same count for Google
+            'google_rating': restaurant.google_rating or restaurant.rating,  # Use Google rating if available, fallback to regular rating
+            'google_review_count': restaurant.google_review_count or restaurant.review_count,  # Use Google count if available, fallback to regular count
+            'google_reviews': restaurant.google_reviews,  # JSON string of Google reviews
             'specials': [],  # Default empty array for specials
             'created_at': restaurant.created_at.isoformat() if restaurant.created_at else None,
             'updated_at': restaurant.updated_at.isoformat() if restaurant.updated_at else None
