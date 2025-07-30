@@ -12,7 +12,7 @@ from flask import Flask, request, jsonify, g
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from database_manager_v2 import EnhancedDatabaseManager
+from database_manager_v3 import EnhancedDatabaseManager
 from config import get_config
 import structlog
 import psycopg2
@@ -84,7 +84,7 @@ def restaurant_to_dict(restaurant):
         }
 
 def fix_database_schema():
-    """Fix database schema by adding missing columns."""
+    """Fix database schema by adding missing columns including Google reviews."""
     database_url = os.environ.get('DATABASE_URL')
     
     if not database_url:
@@ -98,7 +98,18 @@ def fix_database_schema():
         
         logger.info("Connected to database for schema fix")
         
-        # SQL statements to add missing columns
+        # Check if Google review columns already exist
+        cursor.execute("""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'restaurants' 
+            AND column_name IN ('google_rating', 'google_review_count', 'google_reviews')
+        """)
+        
+        existing_columns = [row[0] for row in cursor.fetchall()]
+        logger.info(f"Existing Google review columns: {existing_columns}")
+        
+        # SQL statements to add missing columns (including Google reviews)
         alter_statements = [
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS phone VARCHAR(50)",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS website VARCHAR(500)",
@@ -117,16 +128,39 @@ def fix_database_schema():
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_hechsher BOOLEAN DEFAULT FALSE",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS hechsher_details VARCHAR(500)",
             "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+            # Google Reviews columns
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS google_rating FLOAT",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS google_review_count INTEGER",
+            "ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS google_reviews TEXT"
         ]
         
         # Execute each ALTER statement
+        columns_added = []
         for sql in alter_statements:
             try:
                 cursor.execute(sql)
+                if "google_rating" in sql or "google_review_count" in sql or "google_reviews" in sql:
+                    columns_added.append(sql.split()[-1])
                 logger.info(f"Schema fix: {sql}")
             except Exception as e:
                 logger.warning(f"Schema fix warning: {sql} - {e}")
+        
+        # Update existing records with default values for Google reviews
+        if columns_added:
+            try:
+                cursor.execute("""
+                    UPDATE restaurants 
+                    SET google_rating = rating,
+                        google_review_count = review_count,
+                        google_reviews = '[]'
+                    WHERE google_rating IS NULL 
+                       OR google_review_count IS NULL 
+                       OR google_reviews IS NULL
+                """)
+                logger.info("Updated existing records with default Google review values")
+            except Exception as e:
+                logger.warning(f"Warning updating Google review defaults: {e}")
         
         # Commit changes
         conn.commit()
@@ -184,13 +218,16 @@ def create_app(config_name=None):
             raise Exception("Failed to connect to database")
         return db_manager
     
-    # Fix database schema on startup
-    try:
-        logger.info("Running database schema fix on startup...")
-        fix_database_schema()
-        logger.info("Database schema fix completed on startup")
-    except Exception as e:
-        logger.error("Failed to fix database schema on startup", error=str(e))
+    # Fix database schema on startup (runs once when app starts)
+    with app.app_context():
+        try:
+            logger.info("Running database schema fix on startup...")
+            if fix_database_schema():
+                logger.info("Database schema fix completed successfully")
+            else:
+                logger.warning("Database schema fix failed or was not needed")
+        except Exception as e:
+            logger.error("Failed to run schema fix on startup", error=str(e))
     
     @app.before_request
     def before_request():
@@ -204,15 +241,6 @@ def create_app(config_name=None):
         except Exception as e:
             logger.error("Database connection error", error=str(e))
             return jsonify({'error': 'Database connection failed'}), 500
-    
-    # Run schema fix on app startup
-    with app.app_context():
-        try:
-            logger.info("Running database schema fix on startup...")
-            fix_database_schema()
-            logger.info("Database schema fix completed successfully")
-        except Exception as e:
-            logger.error("Failed to run schema fix on startup", error=str(e))
     
     @app.teardown_appcontext
     def teardown_db(exception):
@@ -273,6 +301,9 @@ def create_app(config_name=None):
             lng = request.args.get('lng')
             radius = request.args.get('radius', 50)
             
+            # Get source parameter for filtering
+            source = request.args.get('source', '').strip()  # 'legacy', 'orb', or 'all'
+            
             if lat and lng:
                 try:
                     lat = float(lat)
@@ -282,39 +313,55 @@ def create_app(config_name=None):
                     # Validate coordinates
                     if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
                         return jsonify({'error': 'Invalid coordinates'}), 400
-                        
+                    
+                    # For now, use the old method for location-based search
+                    # TODO: Implement location-based search for kosher_places
                     restaurants = g.db_manager.search_restaurants_near_location(
                         lat=lat, lng=lng, radius=radius,
                         query=query, category=category,
                         limit=limit, offset=offset
                     )
+                    
+                    # Convert to unified format
+                    restaurants_data = []
+                    for restaurant in restaurants:
+                        try:
+                            restaurant_dict = restaurant_to_dict(restaurant)
+                            if restaurant_dict:
+                                restaurant_dict['source'] = 'legacy'
+                                restaurants_data.append(restaurant_dict)
+                        except Exception as e:
+                            logger.error("Error converting restaurant to dict", error=str(e))
+                            continue
+                            
                 except ValueError:
                     return jsonify({'error': 'Invalid location parameters'}), 400
             else:
-                restaurants = g.db_manager.search_restaurants(
+                # Use new unified search method
+                places = g.db_manager.search_places(
                     query=query, category=category, state=state,
                     limit=limit, offset=offset
                 )
+                
+                # Filter by source if specified
+                if source:
+                    if source == 'legacy':
+                        places = [place for place in places if place.get('source') == 'legacy']
+                    elif source == 'orb':
+                        places = [place for place in places if place.get('source') == 'orb']
+                
+                restaurants_data = places
             
-            # Ensure restaurants is a list
-            if restaurants is None:
-                restaurants = []
-            
-            # Convert Restaurant objects to dictionaries for JSON serialization
-            restaurants_data = []
-            for restaurant in restaurants:
-                try:
-                    restaurant_dict = restaurant_to_dict(restaurant)
-                    if restaurant_dict:
-                        restaurants_data.append(restaurant_dict)
-                except Exception as e:
-                    logger.error("Error converting restaurant to dict", error=str(e))
-                    continue
+            # Ensure restaurants_data is a list
+            if restaurants_data is None:
+                restaurants_data = []
             
             # Add metadata to response
             response = {
                 'success': True,
                 'data': restaurants_data,
+                'restaurants': restaurants_data,  # Keep backward compatibility
+                'places': restaurants_data,       # Add new format
                 'metadata': {
                     'total_results': len(restaurants_data),
                     'limit': limit,
@@ -322,6 +369,7 @@ def create_app(config_name=None):
                     'query': query,
                     'category': category,
                     'state': state,
+                    'source': source,
                     'location_based': bool(lat and lng),
                     'timestamp': datetime.utcnow().isoformat()
                 }
@@ -330,7 +378,8 @@ def create_app(config_name=None):
             logger.info("Restaurant search completed", 
                        query=query, 
                        category=category, 
-                       results_count=len(restaurants))
+                       source=source,
+                       results_count=len(restaurants_data))
             
             return jsonify(response)
             
@@ -341,32 +390,35 @@ def create_app(config_name=None):
     @app.route('/api/restaurants/<business_id>')
     @limiter.limit("100 per minute")
     def api_restaurant_detail(business_id):
-        """Get detailed information about a specific restaurant."""
+        """Get detailed information about a specific restaurant or kosher place."""
         try:
+            # Get source parameter
+            source = request.args.get('source', 'legacy').strip()  # 'legacy' or 'orb'
+            
             # Convert business_id to integer
             try:
-                restaurant_id = int(business_id)
+                place_id = int(business_id)
             except ValueError:
                 return jsonify({'error': 'Invalid restaurant ID'}), 400
             
-            restaurant = g.db_manager.get_restaurant(restaurant_id)
+            # Get place from the appropriate source
+            place_data = g.db_manager.get_place_by_id(place_id, source)
             
-            if not restaurant:
+            if not place_data:
                 return jsonify({'error': 'Restaurant not found'}), 404
-            
-            # Convert restaurant object to dictionary for JSON serialization
-            restaurant_data = restaurant_to_dict(restaurant)
             
             response = {
                 'success': True,
-                'restaurant': restaurant_data,
+                'restaurant': place_data,  # Keep backward compatibility
+                'place': place_data,        # Add new format
                 'metadata': {
                     'business_id': business_id,
+                    'source': source,
                     'timestamp': datetime.utcnow().isoformat()
                 }
             }
             
-            logger.info("Restaurant detail retrieved", business_id=business_id)
+            logger.info("Restaurant detail retrieved", business_id=business_id, source=source)
             return jsonify(response)
             
         except Exception as e:
@@ -440,9 +492,14 @@ def create_app(config_name=None):
     @app.route('/api/categories')
     @limiter.limit("100 per minute")
     def api_categories():
-        """Get available restaurant categories."""
+        """Get available restaurant categories from both tables."""
         try:
-            categories = [
+            # Get categories from database
+            stats = g.db_manager.get_statistics()
+            db_categories = stats.get('categories', [])
+            
+            # Base categories
+            base_categories = [
                 {'id': 'restaurant', 'name': 'Restaurants', 'icon': '🍽️'},
                 {'id': 'bakery', 'name': 'Bakeries', 'icon': '🥖'},
                 {'id': 'grocery', 'name': 'Grocery Stores', 'icon': '🛒'},
@@ -450,14 +507,28 @@ def create_app(config_name=None):
                 {'id': 'deli', 'name': 'Delis', 'icon': '🥪'},
                 {'id': 'ice_cream', 'name': 'Ice Cream', 'icon': '🍦'},
                 {'id': 'pizza', 'name': 'Pizza', 'icon': '🍕'},
-                {'id': 'coffee', 'name': 'Coffee Shops', 'icon': '☕'}
+                {'id': 'coffee', 'name': 'Coffee Shops', 'icon': '☕'},
+                {'id': 'cafe', 'name': 'Cafes', 'icon': '☕'},
+                {'id': 'sushi', 'name': 'Sushi', 'icon': '🍣'},
+                {'id': 'grill', 'name': 'Grills', 'icon': '🔥'},
+                {'id': 'steakhouse', 'name': 'Steakhouses', 'icon': '🥩'}
             ]
+            
+            # Add database categories
+            for cat in db_categories:
+                if cat and cat not in [c['id'] for c in base_categories]:
+                    base_categories.append({
+                        'id': cat.lower(),
+                        'name': cat.title(),
+                        'icon': '🍽️'
+                    })
             
             response = {
                 'success': True,
-                'data': categories,
+                'data': base_categories,
                 'metadata': {
-                    'total_categories': len(categories),
+                    'total_categories': len(base_categories),
+                    'db_categories': db_categories,
                     'timestamp': datetime.utcnow().isoformat()
                 }
             }
@@ -720,6 +791,35 @@ def create_app(config_name=None):
             'pong': True,
             'timestamp': datetime.utcnow().isoformat()
         }), 200
+    
+    @app.route('/deploy/schema-fix', methods=['POST'])
+    @limiter.limit("5 per hour")  # Limit to prevent abuse
+    def deploy_schema_fix():
+        """Manual trigger for database schema fix."""
+        try:
+            logger.info("Manual schema fix triggered")
+            success = fix_database_schema()
+            
+            if success:
+                return jsonify({
+                    'status': 'success',
+                    'message': 'Database schema fix completed successfully',
+                    'timestamp': datetime.utcnow().isoformat()
+                }), 200
+            else:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Database schema fix failed',
+                    'timestamp': datetime.utcnow().isoformat()
+                }), 500
+                
+        except Exception as e:
+            logger.error("Manual schema fix failed", error=str(e))
+            return jsonify({
+                'status': 'error',
+                'message': f'Schema fix failed: {str(e)}',
+                'timestamp': datetime.utcnow().isoformat()
+            }), 500
     
     # Error handlers
     @app.errorhandler(404)
