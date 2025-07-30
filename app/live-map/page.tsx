@@ -63,10 +63,10 @@ export default function LiveMapPage() {
     fetchRestaurants();
   }, []);
 
-  // Don't request location automatically - wait for user interaction
-  // useEffect(() => {
-  //   getUserLocation();
-  // }, []);
+  // Request location automatically when live map loads
+  useEffect(() => {
+    getUserLocation();
+  }, []);
 
   useEffect(() => {
     // Fetch restaurants when user location changes
@@ -425,6 +425,24 @@ export default function LiveMapPage() {
         {userLocation && (
           <div className="flex items-center justify-between text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">
             <span>📍 Location found! Showing nearby restaurants</span>
+            <button 
+              onClick={getUserLocation}
+              className="text-green-800 hover:text-green-900 font-medium text-xs"
+            >
+              Refresh
+            </button>
+          </div>
+        )}
+
+        {!userLocation && !locationLoading && !locationError && (
+          <div className="flex items-center justify-between text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+            <span>📍 Enable location to see nearby restaurants</span>
+            <button 
+              onClick={getUserLocation}
+              className="text-blue-600 hover:text-blue-700 font-medium text-xs"
+            >
+              Get Location
+            </button>
           </div>
         )}
       </div>
