@@ -1,0 +1,52 @@
+{
+  "timestamp": "2025-07-30T18:45:56.521Z",
+  "healthPercentage": 80,
+  "avgResponseTime": 1215.5,
+  "services": [
+    {
+      "name": "Frontend (Vercel)",
+      "url": "https://jewgo-app.vercel.app",
+      "status": 200,
+      "responseTime": 365,
+      "healthy": true,
+      "data": "<!DOCTYPE html><html lang=\"en\" class=\"h-full\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no\"/><link rel=\"preload\" h"
+    },
+    {
+      "name": "Backend Health Endpoint",
+      "url": "https://jewgo.onrender.com/health",
+      "status": 200,
+      "responseTime": 1739,
+      "healthy": true,
+      "data": "{\"database\":{\"error\":null,\"status\":\"connected\",\"test_passed\":true,\"type\":\"PostgreSQL\"},\"environment\":\"production\",\"memory_usage\":\"normal\",\"monitoring\":{\"cronitor\":\"ready\",\"uptimerobot\":\"ready\"},\"statu"
+    },
+    {
+      "name": "Backend API (Restaurants)",
+      "url": "https://jewgo.onrender.com/api/restaurants",
+      "status": 200,
+      "responseTime": 1528,
+      "healthy": true,
+      "data": "{\"data\":[{\"address\":\"9543 Harding Ave, Surfside, FL 33154\",\"certifying_agency\":\"Unknown\",\"city\":\"Surfside\",\"created_at\":\"2025-07-30T05:49:58.821858\",\"google_rating\":4.5,\"google_review_count\":3,\"google"
+    },
+    {
+      "name": "Backend Ping",
+      "url": "https://jewgo.onrender.com/ping",
+      "status": 200,
+      "responseTime": 1230,
+      "healthy": true,
+      "data": "{\"pong\":true,\"timestamp\":\"2025-07-30T18:45:54.161496\"}\n"
+    },
+    {
+      "name": "Frontend Health Page",
+      "url": "https://jewgo-app.vercel.app/health",
+      "status": 404,
+      "responseTime": 339,
+      "healthy": false,
+      "data": "<!DOCTYPE html><html lang=\"en\" class=\"h-full\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no\"/><link rel=\"preload\" h"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "healthy": 4,
+    "degraded": 1
+  }
+}

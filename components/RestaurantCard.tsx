@@ -24,75 +24,90 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
   const [isNavigating, setIsNavigating] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [showSharePopup, setShowSharePopup] = useState(false);
+  const [hoursStatus, setHoursStatus] = useState<any>(null);
 
   // Helper functions - defined before use
   const getCategoryEmoji = (name: string, category?: string) => {
-    const lowerName = name.toLowerCase();
-    const lowerCategory = category?.toLowerCase() || '';
-    
-    // Check for specific food types in name
-    if (lowerName.includes('sushi') || lowerName.includes('japanese')) return '🍣';
-    if (lowerName.includes('pizza') || lowerName.includes('italian')) return '🍕';
-    if (lowerName.includes('burger') || lowerName.includes('american')) return '🍔';
-    if (lowerName.includes('ice cream') || lowerName.includes('dessert')) return '🍦';
-    if (lowerName.includes('coffee') || lowerName.includes('cafe')) return '☕';
-    if (lowerName.includes('bakery') || lowerName.includes('bread')) return '🥖';
-    if (lowerName.includes('steak') || lowerName.includes('grill')) return '🥩';
-    if (lowerName.includes('salad') || lowerName.includes('healthy')) return '🥗';
-    if (lowerName.includes('chicken') || lowerName.includes('poultry')) return '🍗';
-    if (lowerName.includes('fish') || lowerName.includes('seafood')) return '🐟';
-    
-    // Check category
-    if (lowerCategory.includes('dairy')) return '🥛';
-    if (lowerCategory.includes('meat')) return '🥩';
-    if (lowerCategory.includes('pareve')) return '🥬';
-    
-    // Default restaurant emoji
-    return '🍽️';
+    try {
+      const lowerName = name.toLowerCase();
+      const lowerCategory = category?.toLowerCase() || '';
+      
+      // Check for specific food types in name
+      if (lowerName.includes('sushi') || lowerName.includes('japanese')) return '🍣';
+      if (lowerName.includes('pizza') || lowerName.includes('italian')) return '🍕';
+      if (lowerName.includes('burger') || lowerName.includes('american')) return '🍔';
+      if (lowerName.includes('ice cream') || lowerName.includes('dessert')) return '🍦';
+      if (lowerName.includes('coffee') || lowerName.includes('cafe')) return '☕';
+      if (lowerName.includes('bakery') || lowerName.includes('bread')) return '🥖';
+      if (lowerName.includes('steak') || lowerName.includes('grill')) return '🥩';
+      if (lowerName.includes('salad') || lowerName.includes('healthy')) return '🥗';
+      if (lowerName.includes('chicken') || lowerName.includes('poultry')) return '🍗';
+      if (lowerName.includes('fish') || lowerName.includes('seafood')) return '🐟';
+      
+      // Check category
+      if (lowerCategory.includes('dairy')) return '🥛';
+      if (lowerCategory.includes('meat')) return '🥩';
+      if (lowerCategory.includes('pareve')) return '🥬';
+      
+      // Default restaurant emoji
+      return '🍽️';
+    } catch (error) {
+      console.warn('Error getting category emoji:', error);
+      return '🍽️';
+    }
   };
 
   const getHeroImage = (restaurant: Restaurant) => {
-    // Check if image_url is a Google Places photo URL
-    const isGooglePlacesUrl = restaurant.image_url?.includes('maps.googleapis.com/maps/api/place/photo');
-    
-    if (isGooglePlacesUrl) {
-      // Replace the API key in the Google Places photo URL with our configured key
-      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-      if (apiKey && apiKey !== 'YOUR_API_KEY_HERE') {
-        // Extract the photo reference and other parameters
-        const url = new URL(restaurant.image_url!);
-        const photoReference = url.searchParams.get('photo_reference');
-        const maxWidth = url.searchParams.get('maxwidth') || '400';
-        
-        if (photoReference) {
-          // Construct a new URL with our API key
-          return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${apiKey}`;
+    try {
+      // Check if image_url is a Google Places photo URL
+      const isGooglePlacesUrl = restaurant.image_url?.includes('maps.googleapis.com/maps/api/place/photo');
+      
+      if (isGooglePlacesUrl) {
+        // Replace the API key in the Google Places photo URL with our configured key
+        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+        if (apiKey && apiKey !== 'YOUR_API_KEY_HERE') {
+          // Extract the photo reference and other parameters
+          const url = new URL(restaurant.image_url!);
+          const photoReference = url.searchParams.get('photo_reference');
+          const maxWidth = url.searchParams.get('maxwidth') || '400';
+          
+          if (photoReference) {
+            // Construct a new URL with our API key
+            return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${apiKey}`;
+          }
         }
+        // If we can't construct a proper URL, fall back to category images
+        console.log('Using fallback image for Google Places photo');
+      } else if (restaurant.image_url) {
+        // Use non-Google Places image URLs
+        return restaurant.image_url;
       }
-      // If we can't construct a proper URL, fall back to category images
-      console.log('Using fallback image for Google Places photo');
-    } else if (restaurant.image_url) {
-      // Use non-Google Places image URLs
-      return restaurant.image_url;
+      
+      // Category-specific Unsplash fallbacks with reliable URLs
+      const category = restaurant.kosher_category?.toLowerCase() || 'restaurant';
+      const fallbackImages = {
+        dairy: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=400&h=300&q=80',
+        meat: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&h=300&q=80',
+        pareve: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&h=300&q=80',
+        restaurant: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&h=300&q=80'
+      };
+      
+      return fallbackImages[category as keyof typeof fallbackImages] || fallbackImages.restaurant;
+    } catch (error) {
+      console.warn('Error getting hero image:', error);
+      return 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&h=300&q=80';
     }
-    
-    // Category-specific Unsplash fallbacks with reliable URLs
-    const category = restaurant.kosher_category?.toLowerCase() || 'restaurant';
-    const fallbackImages = {
-      dairy: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=400&h=300&q=80',
-      meat: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&h=300&q=80',
-      pareve: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&h=300&q=80',
-      restaurant: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&h=300&q=80'
-    };
-    
-    return fallbackImages[category as keyof typeof fallbackImages] || fallbackImages.restaurant;
   };
 
   const handleClick = () => {
-    if (onClick) {
-      onClick();
-    } else {
-      router.push(`/restaurant/${restaurant.id}`);
+    try {
+      if (onClick) {
+        onClick();
+      } else {
+        router.push(`/restaurant/${restaurant.id}`);
+      }
+    } catch (error) {
+      console.warn('Error handling click:', error);
     }
   };
 
@@ -105,94 +120,150 @@ export default function RestaurantCard({ restaurant, onClick, userLocation, inde
 
   // Check if restaurant is favorited on mount
   useEffect(() => {
-    setIsFavorited(isFavorite(restaurant.id));
+    try {
+      setIsFavorited(isFavorite(restaurant.id));
+    } catch (error) {
+      console.warn('Error checking favorite status:', error);
+    }
   }, [restaurant.id]);
+
+  // Calculate hours status safely
+  useEffect(() => {
+    try {
+      const status = getHoursStatus(restaurant.hours_open || restaurant.hours_of_operation);
+      setHoursStatus(status);
+    } catch (error) {
+      console.warn('Error calculating hours status:', error);
+      setHoursStatus({
+        badge: 'text-gray-500',
+        label: 'Hours not available',
+        type: 'unknown',
+        tooltip: 'Hours information not available',
+        icon: '⏰',
+        isOpenNow: false,
+        isClosedForToday: true
+      });
+    }
+  }, [restaurant.hours_open, restaurant.hours_of_operation]);
 
   // Handle favorite toggle
   const handleFavoriteToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isFavorited) {
-      removeFromFavorites(restaurant.id);
-      setIsFavorited(false);
-    } else {
-      addToFavorites(restaurant);
-      setIsFavorited(true);
+    try {
+      e.stopPropagation();
+      if (isFavorited) {
+        removeFromFavorites(restaurant.id);
+        setIsFavorited(false);
+      } else {
+        addToFavorites(restaurant);
+        setIsFavorited(true);
+      }
+    } catch (error) {
+      console.warn('Error toggling favorite:', error);
     }
   };
 
   // Handle share button click
   const handleShareClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowSharePopup(true);
+    try {
+      e.stopPropagation();
+      setShowSharePopup(true);
+    } catch (error) {
+      console.warn('Error handling share click:', error);
+    }
   };
 
   const getAgencyBadgeClass = (agency: string) => {
-    switch (agency?.toUpperCase()) {
-      case 'ORB':
-        return 'border-agency-orb text-white hover:bg-agency-orb hover:text-white border-white';
-      case 'KM':
-        return 'border-agency-km text-agency-km hover:bg-agency-km hover:text-white';
-      case 'KDM':
-        return 'border-agency-kdm text-agency-kdm hover:bg-agency-kdm hover:text-white';
-      case 'DIAMOND K':
-        return 'border-agency-diamond-k text-agency-diamond-k hover:bg-agency-diamond-k hover:text-white';
-      default:
-        return 'border-kosher-unknown text-kosher-unknown hover:bg-kosher-unknown hover:text-white';
+    try {
+      switch (agency?.toUpperCase()) {
+        case 'ORB':
+          return 'border-agency-orb text-white hover:bg-agency-orb hover:text-white border-white';
+        case 'KM':
+          return 'border-agency-km text-agency-km hover:bg-agency-km hover:text-white';
+        case 'KDM':
+          return 'border-agency-kdm text-agency-kdm hover:bg-agency-kdm hover:text-white';
+        case 'DIAMOND K':
+          return 'border-agency-diamond-k text-agency-diamond-k hover:bg-agency-diamond-k hover:text-white';
+        default:
+          return 'border-kosher-unknown text-kosher-unknown hover:bg-kosher-unknown hover:text-white';
+      }
+    } catch (error) {
+      console.warn('Error getting agency badge class:', error);
+      return 'border-kosher-unknown text-kosher-unknown hover:bg-kosher-unknown hover:text-white';
     }
   };
 
   const getKosherBadgeClass = (category: string) => {
-    switch (category?.toLowerCase()) {
-      case 'meat':
-        return 'bg-kosher-meat text-white';
-      case 'dairy':
-        return 'bg-kosher-dairy text-white';
-      case 'pareve':
-        return 'bg-kosher-pareve text-white';
-      default:
-        return 'bg-kosher-unknown text-white';
+    try {
+      switch (category?.toLowerCase()) {
+        case 'meat':
+          return 'bg-kosher-meat text-white';
+        case 'dairy':
+          return 'bg-kosher-dairy text-white';
+        case 'pareve':
+          return 'bg-kosher-pareve text-white';
+        default:
+          return 'bg-kosher-unknown text-white';
+      }
+    } catch (error) {
+      console.warn('Error getting kosher badge class:', error);
+      return 'bg-kosher-unknown text-white';
     }
   };
 
   const formatAddress = (address: string, city?: string, state?: string) => {
-    const parts = [address, city, state].filter(Boolean);
-    const fullAddress = parts.join(', ');
-    
-    // Truncate very long addresses to prevent overflow
-    if (fullAddress.length > 50) {
-      return fullAddress.substring(0, 47) + '...';
+    try {
+      const parts = [address, city, state].filter(Boolean);
+      const fullAddress = parts.join(', ');
+      
+      // Truncate very long addresses to prevent overflow
+      if (fullAddress.length > 50) {
+        return fullAddress.substring(0, 47) + '...';
+      }
+      
+      return fullAddress;
+    } catch (error) {
+      console.warn('Error formatting address:', error);
+      return 'Address not available';
     }
-    
-    return fullAddress;
   };
 
   const getGoogleMapsUrl = (name: string, address?: string) => {
-    const searchQuery = encodeURIComponent(`${name} ${address || ''}`.trim());
-    return `https://www.google.com/maps/search/${searchQuery}`;
+    try {
+      const searchQuery = encodeURIComponent(`${name} ${address || ''}`.trim());
+      return `https://www.google.com/maps/search/${searchQuery}`;
+    } catch (error) {
+      console.warn('Error getting Google Maps URL:', error);
+      return 'https://www.google.com/maps';
+    }
   };
 
-  // Get hours status using the utility function
-  const hoursStatus = getHoursStatus(restaurant.hours_open || restaurant.hours_of_operation);
-
-
   const getCertificationWebsite = (agency: string) => {
-    switch (agency?.toUpperCase()) {
-      case 'ORB': return 'https://www.orbkosher.com';
-      case 'KM': return 'https://koshermiami.org';
-      case 'KDM': return 'https://koshermiami.org';
-      case 'DIAMOND K': return 'https://www.orbkosher.com';
-      case 'OU': return 'https://oukosher.org';
-      case 'STAR-K': return 'https://www.star-k.org';
-      case 'CRC': return 'https://www.crcweb.org';
-      default: return null;
+    try {
+      switch (agency?.toUpperCase()) {
+        case 'ORB': return 'https://www.orbkosher.com';
+        case 'KM': return 'https://koshermiami.org';
+        case 'KDM': return 'https://koshermiami.org';
+        case 'DIAMOND K': return 'https://www.orbkosher.com';
+        case 'OU': return 'https://oukosher.org';
+        case 'STAR-K': return 'https://www.star-k.org';
+        case 'CRC': return 'https://www.crcweb.org';
+        default: return null;
+      }
+    } catch (error) {
+      console.warn('Error getting certification website:', error);
+      return null;
     }
   };
 
   const handleCertificationClick = (agency: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
-    const website = getCertificationWebsite(agency);
-    if (website) {
-      window.open(website, '_blank', 'noopener,noreferrer');
+    try {
+      e.stopPropagation(); // Prevent card click
+      const website = getCertificationWebsite(agency);
+      if (website) {
+        window.open(website, '_blank', 'noopener,noreferrer');
+      }
+    } catch (error) {
+      console.warn('Error handling certification click:', error);
     }
   };
 
