@@ -44,6 +44,7 @@ def restaurant_to_dict(restaurant):
         return None
     
     try:
+        # Map backend fields to frontend expected fields
         return {
             'id': restaurant.id,
             'name': restaurant.name,
@@ -51,25 +52,24 @@ def restaurant_to_dict(restaurant):
             'city': restaurant.city,
             'state': restaurant.state,
             'zip_code': restaurant.zip_code,
-            'phone': restaurant.phone,
+            'phone_number': restaurant.phone,  # Map phone to phone_number
             'website': restaurant.website,
-            'cuisine_type': restaurant.cuisine_type,
+            'certifying_agency': restaurant.hechsher_details or 'Unknown',  # Map hechsher_details to certifying_agency
+            'kosher_category': restaurant.cuisine_type or 'restaurant',  # Map cuisine_type to kosher_category
+            'listing_type': 'restaurant',  # Default value
+            'status': 'active',  # Default value
+            'hours_of_operation': restaurant.hours,  # Map hours to hours_of_operation
+            'hours_open': restaurant.hours,  # Also map to hours_open
+            'short_description': restaurant.description,  # Map description to short_description
             'price_range': restaurant.price_range,
-            'rating': restaurant.rating,
-            'review_count': restaurant.review_count,
+            'image_url': restaurant.image_url,
             'latitude': restaurant.latitude,
             'longitude': restaurant.longitude,
-            'hours': restaurant.hours,
-            'description': restaurant.description,
-            'image_url': restaurant.image_url,
-            'is_kosher': restaurant.is_kosher,
-            'is_glatt': restaurant.is_glatt,
-            'is_cholov_yisroel': restaurant.is_cholov_yisroel,
-            'is_pas_yisroel': restaurant.is_pas_yisroel,
-            'is_bishul_yisroel': restaurant.is_bishul_yisroel,
-            'is_mehadrin': restaurant.is_mehadrin,
-            'is_hechsher': restaurant.is_hechsher,
-            'hechsher_details': restaurant.hechsher_details,
+            'rating': restaurant.rating,
+            'review_count': restaurant.review_count,
+            'google_rating': restaurant.rating,  # Use same rating for Google
+            'google_review_count': restaurant.review_count,  # Use same count for Google
+            'specials': [],  # Default empty array for specials
             'created_at': restaurant.created_at.isoformat() if restaurant.created_at else None,
             'updated_at': restaurant.updated_at.isoformat() if restaurant.updated_at else None
         }
@@ -346,7 +346,7 @@ def create_app(config_name=None):
             
             response = {
                 'success': True,
-                'data': restaurant_data,
+                'restaurant': restaurant_data,
                 'metadata': {
                     'business_id': business_id,
                     'timestamp': datetime.utcnow().isoformat()

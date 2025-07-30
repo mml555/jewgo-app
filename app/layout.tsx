@@ -17,6 +17,9 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'Jewgo',
   },
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
   formatDetection: {
     telephone: false,
   },
