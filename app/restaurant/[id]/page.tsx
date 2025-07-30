@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Restaurant, RestaurantSpecial } from '@/types/restaurant';
 import Logo from '@/components/Logo';
 import Reviews from '@/components/Reviews';
+import BottomNavigation from '@/components/BottomNavigation';
 import { formatWeeklyHoursArray, getHoursStatus } from '@/utils/hours';
 
 const RestaurantDetailPage: React.FC = () => {
@@ -805,6 +806,9 @@ const RestaurantDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Bottom Navigation */}
+      <BottomNavigation activeTab="eatery" />
     </div>
   );
 };
