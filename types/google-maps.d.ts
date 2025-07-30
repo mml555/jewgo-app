@@ -419,6 +419,127 @@ declare namespace google.maps {
       setOptions(options: AutocompleteOptions): void;
       setTypes(types: string[]): void;
     }
+
+    class AutocompleteService {
+      constructor();
+      getPlacePredictions(request: AutocompletionRequest, callback: (predictions: AutocompletePrediction[] | null, status: PlacesServiceStatus) => void): void;
+    }
+
+    class PlacesService {
+      constructor(attrContainer: HTMLDivElement | Map);
+      getDetails(request: PlaceDetailsRequest, callback: (result: PlaceResult | null, status: PlacesServiceStatus) => void): void;
+      findPlaceFromQuery(request: FindPlaceFromQueryRequest, callback: (results: PlaceResult[], status: PlacesServiceStatus) => void): void;
+      nearbySearch(request: PlaceSearchRequest, callback: (results: PlaceResult[] | null, status: PlacesServiceStatus, pagination: PlaceSearchPagination) => void): void;
+      textSearch(request: TextSearchRequest, callback: (results: PlaceResult[] | null, status: PlacesServiceStatus, pagination: PlaceSearchPagination) => void): void;
+    }
+
+    interface AutocompletionRequest {
+      input: string;
+      bounds?: LatLngBounds;
+      componentRestrictions?: ComponentRestrictions;
+      location?: LatLng;
+      offset?: number;
+      origin?: LatLng;
+      radius?: number;
+      sessionToken?: AutocompleteSessionToken;
+      types?: string[];
+    }
+
+    interface AutocompletePrediction {
+      description: string;
+      matched_substrings: PredictionSubstring[];
+      place_id: string;
+      reference: string;
+      structured_formatting: StructuredFormatting;
+      terms: PredictionTerm[];
+      types: string[];
+    }
+
+    interface PredictionSubstring {
+      length: number;
+      offset: number;
+    }
+
+    interface PredictionTerm {
+      offset: number;
+      value: string;
+    }
+
+    interface StructuredFormatting {
+      main_text: string;
+      main_text_matched_substrings: PredictionSubstring[];
+      secondary_text: string;
+    }
+
+    interface PlaceDetailsRequest {
+      placeId: string;
+      fields?: string[];
+      language?: string;
+      region?: string;
+      sessionToken?: AutocompleteSessionToken;
+    }
+
+    interface FindPlaceFromQueryRequest {
+      query: string;
+      fields: string[];
+      locationBias?: LocationBias;
+      language?: string;
+    }
+
+    interface PlaceSearchRequest {
+      bounds?: LatLngBounds;
+      keyword?: string;
+      location?: LatLng;
+      maxPriceLevel?: number;
+      minPriceLevel?: number;
+      name?: string;
+      openNow?: boolean;
+      radius?: number;
+      rankBy?: RankBy;
+      type?: string;
+      types?: string[];
+    }
+
+    interface TextSearchRequest {
+      bounds?: LatLngBounds;
+      location?: LatLng;
+      maxPriceLevel?: number;
+      minPriceLevel?: number;
+      openNow?: boolean;
+      query: string;
+      radius?: number;
+      type?: string;
+      types?: string[];
+    }
+
+    interface PlaceSearchPagination {
+      hasNextPage: boolean;
+    }
+
+    interface LocationBias {
+      center?: LatLng;
+      radius?: number;
+      bounds?: LatLngBounds;
+    }
+
+    enum PlacesServiceStatus {
+      OK = 'OK',
+      ZERO_RESULTS = 'ZERO_RESULTS',
+      OVER_QUERY_LIMIT = 'OVER_QUERY_LIMIT',
+      REQUEST_DENIED = 'REQUEST_DENIED',
+      INVALID_REQUEST = 'INVALID_REQUEST',
+      NOT_FOUND = 'NOT_FOUND',
+      UNKNOWN_ERROR = 'UNKNOWN_ERROR'
+    }
+
+    enum RankBy {
+      PROMINENCE = 0,
+      DISTANCE = 1
+    }
+
+    class AutocompleteSessionToken {
+      constructor();
+    }
   }
 
   class Autocomplete {
