@@ -11,7 +11,7 @@ import os
 # Add the current directory to Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from database_manager_v3 import DatabaseManager
+from database_manager_v3 import EnhancedDatabaseManager as DatabaseManager
 
 def populate_orb_dairy_restaurants():
     """Populate database with ORB Dairy restaurants."""
