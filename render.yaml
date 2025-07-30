@@ -2,9 +2,9 @@ services:
   - type: web
     name: jewgo-backend
     env: python
-    pythonVersion: "3.11.9"
+    pythonVersion: "3.13.5"
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.9 
+        value: 3.13.5

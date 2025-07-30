@@ -30,4 +30,4 @@ requests==2.32.4        # HTTP library for API calls
 
 # Development & Testing
 pytest==7.4.2           # Testing framework
-pytest-flask==1.2.0     # Flask testing utilities 
+pytest-flask==1.2.0     # Flask testing utilities
