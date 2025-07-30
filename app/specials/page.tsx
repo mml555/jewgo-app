@@ -92,9 +92,14 @@ export default function SpecialsPage() {
     { id: 'catering', name: 'Catering', count: specials.filter(s => s.category === 'catering').length }
   ];
 
-  const filteredSpecials = categoryTab === 'all' 
-    ? specials 
-    : specials.filter(special => special.category === categoryTab);
+  const filteredSpecials = specials
+    .filter(special => categoryTab === 'all' || special.category === categoryTab)
+    .filter(special => 
+      !searchQuery.trim() || 
+      special.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      special.restaurant.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      special.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -133,10 +138,19 @@ export default function SpecialsPage() {
     setActiveTab(tab);
   };
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <Header />
+
+      {/* Search Bar */}
+      <div className="px-4 py-4">
+        <SearchBar onSearch={handleSearch} />
+      </div>
 
       {/* Navigation Tabs */}
       <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
