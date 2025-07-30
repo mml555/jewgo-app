@@ -125,6 +125,11 @@ export default function FavoritesPage() {
     setSearchQuery(query);
   };
 
+  // ✅ Phase 1: Implement handler function
+  const handleExploreRestaurants = () => {
+    router.push('/');
+  };
+
   const handleViewDetails = (restaurant: FavoriteRestaurant) => {
     router.push(`/restaurant/${restaurant.id}`);
   };
@@ -170,7 +175,12 @@ export default function FavoritesPage() {
               <div className="text-6xl mb-4">💔</div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">No Favorites Yet</h3>
               <p className="text-gray-600 mb-6">Start exploring and save your favorite kosher establishments!</p>
-              <button className="bg-jewgo-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-jewgo-primary-dark transition-colors">
+              {/* ✅ Phase 1: Updated button with onClick handler */}
+              <button 
+                onClick={handleExploreRestaurants}
+                className="bg-jewgo-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-jewgo-primary-dark transition-colors"
+                aria-label="Explore Restaurants"
+              >
                 Explore Restaurants
               </button>
             </div>

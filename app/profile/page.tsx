@@ -384,7 +384,11 @@ export default function ProfilePage() {
           <div className="mt-6 bg-white rounded-lg shadow-md p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Account Actions</h3>
             <div className="space-y-3">
-              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+              {/* ✅ Phase 1: Updated button elements with onClick handlers */}
+              <button 
+                onClick={handleChangePassword}
+                className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors"
+              >
                 <div className="flex items-center justify-between">
                   <span className="text-gray-700">Change Password</span>
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -392,7 +396,10 @@ export default function ProfilePage() {
                   </svg>
                 </div>
               </button>
-              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+              <button 
+                onClick={handlePrivacySettings}
+                className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors"
+              >
                 <div className="flex items-center justify-between">
                   <span className="text-gray-700">Privacy Settings</span>
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -400,15 +407,24 @@ export default function ProfilePage() {
                   </svg>
                 </div>
               </button>
-              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+              <button 
+                onClick={handleExportData}
+                disabled={isExporting}
+                className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-700">Export Data</span>
+                  <span className="text-gray-700">
+                    {isExporting ? 'Exporting...' : 'Export Data'}
+                  </span>
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
               </button>
-              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition-colors">
+              <button 
+                onClick={handleDeleteAccount}
+                className="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition-colors"
+              >
                 <div className="flex items-center justify-between">
                   <span className="text-red-600">Delete Account</span>
                   <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -423,6 +439,20 @@ export default function ProfilePage() {
 
       {/* Bottom Navigation */}
       <BottomNavigation />
+      
+      {/* ✅ Phase 1: Add modal components */}
+      {showDeleteConfirmation && (
+        <ConfirmModal
+          isOpen={showDeleteConfirmation}
+          onClose={() => setShowDeleteConfirmation(false)}
+          onConfirm={handleConfirmDeleteAccount}
+          title="Delete Account"
+          message="Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed."
+          confirmText="Delete Account"
+          confirmColor="red"
+          isLoading={isDeleting}
+        />
+      )}
     </div>
   );
 } 

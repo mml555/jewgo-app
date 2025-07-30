@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import NavTabs from '@/components/NavTabs';
 import SearchBar from '@/components/SearchBar';
+import { showToast } from '@/components/ui/Toast';
+import { mockClaimDeal } from '@/lib/api/mock';
 
 export default function SpecialsPage() {
   const [activeTab, setActiveTab] = useState('specials');
@@ -18,6 +21,10 @@ export default function SpecialsPage() {
     nearMe?: boolean;
     distanceRadius?: number;
   }>({});
+  
+  // ✅ Phase 1: Add router and state management
+  const router = useRouter();
+  const [claimingDeals, setClaimingDeals] = useState<Set<number>>(new Set());
 
   const specials = [
     {
@@ -142,6 +149,31 @@ export default function SpecialsPage() {
     setSearchQuery(query);
   };
 
+  // ✅ Phase 1: Implement handler functions
+  const handleClaimDeal = async (specialId: number) => {
+    setClaimingDeals(prev => new Set(prev).add(specialId));
+    
+    try {
+      const result = await mockClaimDeal(specialId);
+      showToast(result.message, 'success');
+    } catch (error) {
+      console.error('Failed to claim deal:', error);
+      showToast('Failed to claim deal. Please try again.', 'error');
+    } finally {
+      setClaimingDeals(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(specialId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleViewRestaurant = (restaurantName: string) => {
+    // Navigate to restaurant search or detail page
+    const searchQuery = encodeURIComponent(restaurantName);
+    router.push(`/?search=${searchQuery}`);
+  };
+
   return (
     <div className="min-h-screen bg-neutral-50">
       {/* Header */}
@@ -229,12 +261,26 @@ export default function SpecialsPage() {
                       </div>
                     </div>
 
-                    {/* Action Buttons */}
+                    {/* ✅ Phase 1: Updated action buttons with onClick handlers */}
                     <div className="flex space-x-2">
-                      <button className="flex-1 bg-gradient-jewgo text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-jewgo-600 transition-colors">
-                        Claim Deal
+                      <button 
+                        onClick={() => handleClaimDeal(special.id)}
+                        disabled={claimingDeals.has(special.id)}
+                        className="flex-1 bg-gradient-jewgo text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-jewgo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {claimingDeals.has(special.id) ? (
+                          <div className="flex items-center justify-center space-x-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            <span>Claiming...</span>
+                          </div>
+                        ) : (
+                          'Claim Deal'
+                        )}
                       </button>
-                      <button className="flex-1 bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-neutral-200 transition-colors">
+                      <button 
+                        onClick={() => handleViewRestaurant(special.restaurant)}
+                        className="flex-1 bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-neutral-200 transition-colors"
+                      >
                         View Restaurant
                       </button>
                     </div>
