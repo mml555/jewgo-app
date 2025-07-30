@@ -808,7 +808,7 @@ const RestaurantDetailPage: React.FC = () => {
       </div>
 
       {/* Bottom Navigation */}
-      <BottomNavigation activeTab="eatery" />
+      <BottomNavigation />
     </div>
   );
 };
