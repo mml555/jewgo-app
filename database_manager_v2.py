@@ -116,10 +116,19 @@ class EnhancedDatabaseManager:
             if self.database_url.startswith('postgresql://'):
                 # Replace postgresql:// with postgresql+psycopg:// to use psycopg3
                 engine_url = self.database_url.replace('postgresql://', 'postgresql+psycopg://', 1)
+            elif self.database_url.startswith('postgres://'):
+                # Handle postgres:// URLs as well
+                engine_url = self.database_url.replace('postgres://', 'postgresql+psycopg://', 1)
             else:
                 engine_url = self.database_url
             
-            self.engine = create_engine(engine_url, echo=False)
+            # Create engine with explicit dialect configuration
+            self.engine = create_engine(
+                engine_url, 
+                echo=False,
+                # Explicitly configure for psycopg3
+                connect_args={"server_settings": {"jit": "off"}}
+            )
             
             # Test the connection
             with self.engine.connect() as conn:
