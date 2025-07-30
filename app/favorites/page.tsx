@@ -26,20 +26,20 @@ export default function FavoritesPage() {
   useEffect(() => {
     setFavorites(getFavorites());
     
-    // Get user location for distance calculations
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
-        },
-        (error) => {
-          console.log('Location not available:', error);
-        }
-      );
-    }
+    // Don't request location automatically - wait for user interaction
+    // if (navigator.geolocation) {
+    //   navigator.geolocation.getCurrentPosition(
+    //     (position) => {
+    //       setUserLocation({
+    //         latitude: position.coords.latitude,
+    //         longitude: position.coords.longitude
+    //       });
+    //     },
+    //     (error) => {
+    //       console.log('Location not available:', error);
+    //     }
+    //   );
+    // }
   }, []);
 
   // Apply filters when favorites or filters change
