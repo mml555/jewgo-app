@@ -1,169 +1,134 @@
-# Jewgo Frontend
+# JewGo App Documentation
 
-A modern, mobile-first restaurant directory application built with Next.js, TypeScript, and Tailwind CSS.
+## Overview
 
-## Features
+JewGo is a comprehensive kosher restaurant discovery and management platform that helps users find kosher restaurants, bakeries, and other food establishments. The platform includes advanced filtering, location-based search, and comprehensive kosher supervision information.
 
-- **Modern UI**: Clean, responsive design matching the Jewgo brand
-- **Restaurant Directory**: Browse 246+ kosher restaurants
-- **Search & Filter**: Find restaurants by name, category, and location
-- **Mobile-First**: Optimized for mobile devices with touch-friendly interface
-- **Real-time Data**: Connected to Flask backend API
-- **Kosher Categories**: Meat, Dairy, Pareve, and Unknown classifications
-- **Star Ratings**: Restaurant ratings and reviews
-- **Price Ranges**: Average price information for each restaurant
-
-## Tech Stack
-
-- **Framework**: Next.js 14 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **Backend**: Flask API (running on port 8081)
-
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-
 - Node.js 18+ 
-- npm or yarn
-- Flask backend running on port 8081
+- Python 3.11
+- PostgreSQL database
+- Google Places API key
 
-### Installation
-
-1. **Install dependencies**:
-   ```bash
-   cd jewgo-frontend
-   npm install
-   ```
-
-2. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
-
-3. **Open your browser**:
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-### Build for Production
-
+### Development Setup
 ```bash
-npm run build
-npm start
+# Clone the repository
+git clone https://github.com/mml555/jewgo-app.git
+cd jewgo-app
+
+# Frontend setup
+cd frontend
+npm install
+npm run dev
+
+# Backend setup
+cd ../backend
+pip install -r requirements.txt
+python app.py
 ```
 
-## Project Structure
+## 📁 Documentation Structure
 
-```
-jewgo-frontend/
-├── app/                    # Next.js App Router
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Home page
-├── components/            # React components
-│   ├── Header.tsx         # App header with logo
-│   ├── SearchBar.tsx      # Search functionality
-│   ├── CategoryNav.tsx    # Category navigation
-│   ├── ActionButtons.tsx  # Action buttons
-│   ├── RestaurantCard.tsx # Restaurant card component
-│   ├── RestaurantGrid.tsx # Restaurant grid layout
-│   └── BottomNavigation.tsx # Bottom navigation
-├── types/                 # TypeScript type definitions
-│   └── restaurant.ts      # Restaurant data types
-├── public/                # Static assets
-└── package.json           # Dependencies and scripts
-```
+### [Deployment](./deployment/README.md)
+- Render deployment configuration
+- Neon database setup
+- Environment configuration
+- Troubleshooting guides
 
-## API Integration
+### [Development](./development/README.md)
+- Development environment setup
+- Architecture overview
+- Contributing guidelines
+- Code standards
 
-The frontend connects to the Flask backend API running on port 8081:
+### [API](./api/README.md)
+- API endpoints documentation
+- Authentication
+- Request/response formats
+- Error handling
 
-- **Restaurants**: `/api/restaurants`
-- **Search**: `/api/restaurants?query=...`
-- **Statistics**: `/api/statistics`
-- **States**: `/api/states`
+### [Database](./database/README.md)
+- Database schema
+- Migration guides
+- Data management
+- Backup procedures
 
-## Design System
+### [Features](./features/README.md)
+- ORB scraper system
+- Advanced filtering
+- Authentication system
+- Monitoring and health checks
 
-### Colors
-- **Primary**: `#4ade80` (Light mint green)
-- **Secondary**: `#374151` (Dark grey)
-- **Accent**: `#10b981` (Darker green)
+### [Maintenance](./maintenance/README.md)
+- Data cleanup procedures
+- Update processes
+- System maintenance
+- Performance optimization
 
-### Kosher Type Colors
-- **Meat**: `#ef4444` (Red)
-- **Dairy**: `#3b82f6` (Blue)
-- **Pareve**: `#f59e0b` (Yellow)
-- **Unknown**: `#6b7280` (Grey)
+## 🏗️ Architecture
 
-## Features in Detail
+### Frontend
+- **Framework**: Next.js 14 with TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: React hooks
+- **Maps**: Google Maps API
+- **Authentication**: NextAuth.js
 
-### 1. Search & Discovery
-- Real-time search with instant results
-- Category-based filtering (Mikvahs, Shuls, Specials, Eatery, Stores)
-- Advanced filters for location and kosher type
+### Backend
+- **Framework**: Flask (Python)
+- **Database**: PostgreSQL with SQLAlchemy
+- **ORM**: SQLAlchemy 1.4
+- **API**: RESTful endpoints
+- **Scraping**: ORB data integration
 
-### 2. Restaurant Cards
-- High-quality restaurant images
-- Kosher type badges
-- Star ratings and price ranges
-- Short descriptions
-- "View Eatery" links
+### Database
+- **Primary**: PostgreSQL (Neon)
+- **Schema**: 28 optimized columns
+- **Features**: Kosher supervision flags, location data, reviews
 
-### 3. Mobile Navigation
-- Bottom navigation bar
-- Touch-friendly interface
-- Responsive grid layout (2 columns on mobile)
+## 🔧 Key Features
 
-### 4. Data Integration
-- 246+ restaurants from database
-- Real-time API calls
-- Error handling and loading states
+### Restaurant Discovery
+- Advanced filtering by kosher type, certifying agency, location
+- Map-based search with distance calculations
+- Real-time availability and hours
+- User reviews and ratings
 
-## Development
+### Kosher Information
+- Comprehensive kosher supervision details
+- Chalav Yisroel, Pas Yisroel, Glatt kosher flags
+- Certifying agency information
+- Kosher certificate links
 
-### Adding New Features
+### User Experience
+- Mobile-responsive design
+- Location-based recommendations
+- Favorites system
+- Add new restaurant submissions
 
-1. **New Components**: Add to `components/` directory
-2. **Types**: Extend `types/restaurant.ts`
-3. **Styling**: Use Tailwind classes or extend `globals.css`
-4. **API**: Update backend endpoints as needed
+## 📊 Current Status
 
-### Code Style
+- **Total Restaurants**: 107
+- **Dairy Restaurants**: 99
+- **Pareve Restaurants**: 8
+- **Chalav Yisroel**: 104
+- **Pas Yisroel**: 22
 
-- Use TypeScript for all components
-- Follow React functional component patterns
-- Use Tailwind CSS for styling
-- Implement proper error handling
-- Add loading states for better UX
+## 🔗 Quick Links
 
-## Deployment
+- [Live Application](https://jewgo-app.vercel.app)
+- [Backend API](https://jewgo.onrender.com)
+- [GitHub Repository](https://github.com/mml555/jewgo-app)
 
-### Vercel (Recommended)
-```bash
-npm run build
-vercel --prod
-```
+## 📞 Support
 
-### Other Platforms
-The app can be deployed to any platform that supports Next.js:
-- Netlify
-- AWS Amplify
-- DigitalOcean App Platform
-- Self-hosted servers
+For questions or issues:
+- Check the [troubleshooting guide](./deployment/troubleshooting.md)
+- Review [maintenance procedures](./maintenance/README.md)
+- Open an issue on GitHub
 
-## Contributing
+---
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-This project is part of the Jewgo restaurant directory application.
-
-## Support
-
-For support or questions, please contact the development team. 
+*Last updated: July 2024* 
