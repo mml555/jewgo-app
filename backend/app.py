@@ -1096,4 +1096,4 @@ if __name__ == '__main__':
         )
     else:
         logger.error("Failed to initialize database. Exiting.")
-        exit(1) 
+        exit(1) # Force redeploy - Thu Jul 31 19:36:41 AST 2025
