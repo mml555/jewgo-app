@@ -115,8 +115,7 @@ export default function EnhancedSearch({
     
     try {
       // 1. Search your database first
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://jewgo.onrender.com';
-      const dbResponse = await fetch(`${backendUrl}/api/restaurants?search=${encodeURIComponent(searchQuery)}&limit=50`);
+      const dbResponse = await fetch(`/api/restaurants?search=${encodeURIComponent(searchQuery)}&limit=50`);
       
       let dbResults: Restaurant[] = [];
       if (dbResponse.ok) {

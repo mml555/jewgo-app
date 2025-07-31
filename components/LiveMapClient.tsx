@@ -214,8 +214,7 @@ export default function LiveMapClient() {
       setLoading(true);
       setError(null);
       
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://jewgo.onrender.com';
-      const apiUrl = `${backendUrl}/api/restaurants`;
+      const apiUrl = '/api/restaurants';
       
       if (userLocation) {
         // If there's a search query, fetch all restaurants to ensure we can find the specific restaurant

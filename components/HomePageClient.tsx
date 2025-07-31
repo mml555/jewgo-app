@@ -214,8 +214,7 @@ export default function HomePageClient() {
   const fetchAllRestaurants = async () => {
     try {
       console.log('Fetching restaurants...');
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://jewgo.onrender.com';
-      const response = await fetch(`${backendUrl}/api/restaurants?limit=1000`);
+      const response = await fetch('/api/restaurants?limit=1000');
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
