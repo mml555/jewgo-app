@@ -904,31 +904,31 @@ def update_database():
         session.commit()
         logger.info(f"Deleted {deleted_count} existing restaurants")
         
-        # Step 2: Run the ORB scraper using subprocess
-        logger.info("Running ORB scraper to fetch real data...")
+        # Step 2: Load ORB data directly
+        logger.info("Loading ORB data into database...")
         
         import subprocess
         
         try:
-            # Run the ORB scraper script
+            # Run the ORB data loader script
             result = subprocess.run(
-                ['python', 'run_orb_scraper.py'],
+                ['python', 'load_orb_data.py'],
                 capture_output=True,
                 text=True,
                 cwd='backend'
             )
             
             if result.returncode == 0:
-                logger.info("ORB scraper completed successfully")
+                logger.info("ORB data loaded successfully")
                 businesses = True
             else:
-                logger.error(f"ORB scraper failed with return code {result.returncode}")
+                logger.error(f"ORB data loader failed with return code {result.returncode}")
                 logger.error(f"STDOUT: {result.stdout}")
                 logger.error(f"STDERR: {result.stderr}")
                 businesses = False
                 
         except Exception as e:
-            logger.error(f"Error running ORB scraper: {e}")
+            logger.error(f"Error loading ORB data: {e}")
             businesses = False
         
         if businesses:  # businesses is now a boolean indicating success
