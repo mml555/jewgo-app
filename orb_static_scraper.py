@@ -254,12 +254,19 @@ class ORBStaticScraper:
     async def scrape_all_categories(self) -> List[Dict]:
         """Scrape all available ORB categories."""
         try:
-            # Define ORB category URLs
+            # Define ORB category URLs - we'll try different kosher type categories
             category_urls = [
-                f"{self.base_url}/category/restaurants/",
-                # Add more categories as needed
-                # f"{self.base_url}/category/catering/",
-                # f"{self.base_url}/category/markets/",
+                f"{self.base_url}/category/restaurants/",  # Dairy (as we confirmed)
+                # Try to find meat and pareve categories
+                f"{self.base_url}/category/restaurants-meat/",
+                f"{self.base_url}/category/restaurants-pareve/",
+                f"{self.base_url}/category/restaurants-fish/",
+                f"{self.base_url}/category/meat-restaurants/",
+                f"{self.base_url}/category/pareve-restaurants/",
+                f"{self.base_url}/category/fish-restaurants/",
+                # Additional categories
+                f"{self.base_url}/category/catering/",
+                f"{self.base_url}/category/markets/",
             ]
             
             all_businesses = []

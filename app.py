@@ -1000,6 +1000,39 @@ def create_app(config_name=None):
                 'timestamp': datetime.utcnow().isoformat()
             }), 500
     
+    @app.route('/deploy/fix-kosher-types', methods=['POST'])
+    @limiter.limit("2 per hour")  # Limit to prevent abuse
+    def deploy_fix_kosher_types():
+        """Manual trigger for fixing kosher types for ORB restaurants."""
+        try:
+            logger.info("Manual kosher type fix triggered")
+            
+            # Import and run the kosher type fix
+            from fix_kosher_types import fix_kosher_types
+            
+            success = fix_kosher_types()
+            
+            if success:
+                return jsonify({
+                    'status': 'success',
+                    'message': 'Kosher types fixed successfully for ORB restaurants',
+                    'timestamp': datetime.utcnow().isoformat()
+                }), 200
+            else:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Failed to fix kosher types',
+                    'timestamp': datetime.utcnow().isoformat()
+                }), 500
+                
+        except Exception as e:
+            logger.error("Manual kosher type fix failed", error=str(e))
+            return jsonify({
+                'status': 'error',
+                'message': f'Kosher type fix failed: {str(e)}',
+                'timestamp': datetime.utcnow().isoformat()
+            }), 500
+    
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
