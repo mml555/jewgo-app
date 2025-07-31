@@ -1007,23 +1007,33 @@ def create_app(config_name=None):
         try:
             logger.info("Manual kosher type fix triggered")
             
-            # Import and run the kosher type fix
-            from fix_kosher_types import fix_kosher_types
+            # Get database manager
+            db_manager = DatabaseManager()
+            session = db_manager.get_session()
             
-            success = fix_kosher_types()
+            # Update all ORB restaurants to have kosher_type = "dairy"
+            orb_restaurants = session.query(db_manager.Restaurant).filter(
+                db_manager.Restaurant.hechsher_details == 'ORB Kosher'
+            ).all()
             
-            if success:
-                return jsonify({
-                    'status': 'success',
-                    'message': 'Kosher types fixed successfully for ORB restaurants',
-                    'timestamp': datetime.utcnow().isoformat()
-                }), 200
-            else:
-                return jsonify({
-                    'status': 'error',
-                    'message': 'Failed to fix kosher types',
-                    'timestamp': datetime.utcnow().isoformat()
-                }), 500
+            updated_count = 0
+            for restaurant in orb_restaurants:
+                if restaurant.kosher_type != "dairy":
+                    restaurant.kosher_type = "dairy"
+                    restaurant.updated_at = datetime.utcnow()
+                    updated_count += 1
+            
+            session.commit()
+            session.close()
+            
+            logger.info(f"Updated {updated_count} ORB restaurants to kosher_type = 'dairy'")
+            
+            return jsonify({
+                'status': 'success',
+                'message': f'Kosher types fixed successfully for {updated_count} ORB restaurants',
+                'updated_count': updated_count,
+                'timestamp': datetime.utcnow().isoformat()
+            }), 200
                 
         except Exception as e:
             logger.error("Manual kosher type fix failed", error=str(e))
