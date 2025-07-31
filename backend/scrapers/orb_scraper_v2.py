@@ -330,8 +330,12 @@ class ORBScraperV2:
             
             # Determine kosher type from URL
             kosher_type = 'unknown'
-            if 'restaurants' in category_url:
-                kosher_type = 'dairy'  # ORB restaurants are dairy
+            if '/restaurants/dairy/' in category_url:
+                kosher_type = 'dairy'  # ORB dairy restaurants
+            elif '/restaurants/meat/' in category_url:
+                kosher_type = 'meat'  # ORB meat restaurants
+            elif '/restaurants/parve/' in category_url:
+                kosher_type = 'pareve'  # ORB parve restaurants
             elif 'fish' in category_url:
                 kosher_type = 'pareve'  # ORB fish are pareve
             
@@ -403,7 +407,9 @@ class ORBScraperV2:
         try:
             # Define ORB category URLs
             category_urls = [
-                f"{self.base_url}/category/restaurants/",  # Dairy (238 restaurants)
+                f"{self.base_url}/restaurants/dairy/",  # Dairy restaurants
+                f"{self.base_url}/restaurants/meat/",  # Meat restaurants
+                f"{self.base_url}/restaurants/parve/",  # Parve restaurants
                 f"{self.base_url}/category/fish/",  # Fish/Pareve (13 businesses)
             ]
             

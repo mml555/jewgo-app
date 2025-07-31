@@ -674,6 +674,219 @@ def fetch_missing_websites():
         logger.error(f"Error in bulk website update: {e}")
         return jsonify({'error': f'Error in bulk website update: {str(e)}'}), 500
 
+def search_google_places_hours(restaurant_name: str, address: str) -> str:
+    """
+    Search Google Places API for a restaurant's opening hours.
+    Returns the formatted hours string if found, empty string otherwise.
+    """
+    try:
+        api_key = os.environ.get('GOOGLE_PLACES_API_KEY')
+        if not api_key:
+            logger.warning("GOOGLE_PLACES_API_KEY not set")
+            return ""
+        
+        # Build search query
+        query = f"{restaurant_name} {address}"
+        
+        # Search for the place
+        search_url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
+        search_params = {
+            'query': query,
+            'key': api_key,
+            'type': 'restaurant'
+        }
+        
+        logger.info(f"Searching Google Places for hours: {query}")
+        response = requests.get(search_url, params=search_params, timeout=10)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        if data['status'] == 'OK' and data['results']:
+            place_id = data['results'][0]['place_id']
+            
+            # Get place details
+            details_url = "https://maps.googleapis.com/maps/api/place/details/json"
+            details_params = {
+                'place_id': place_id,
+                'fields': 'opening_hours',
+                'key': api_key
+            }
+            
+            logger.info(f"Getting place details for hours, place_id: {place_id}")
+            details_response = requests.get(details_url, params=details_params, timeout=10)
+            details_response.raise_for_status()
+            
+            details_data = details_response.json()
+            
+            if details_data['status'] == 'OK' and 'result' in details_data:
+                opening_hours = details_data['result'].get('opening_hours')
+                if opening_hours and 'weekday_text' in opening_hours:
+                    hours_formatted = format_hours_from_places_api(opening_hours)
+                    if hours_formatted:
+                        logger.info(f"Found hours for {restaurant_name}: {hours_formatted}")
+                        return hours_formatted
+            
+            logger.warning(f"No hours found for {restaurant_name}")
+            return ""
+        else:
+            logger.warning(f"No place found for hours: {query}")
+            return ""
+            
+    except Exception as e:
+        logger.error(f"Error searching Google Places for hours {restaurant_name}: {e}")
+        return ""
+
+def format_hours_from_places_api(opening_hours: dict) -> str:
+    """
+    Format opening hours from Google Places API format to our database format.
+    """
+    if not opening_hours or 'weekday_text' not in opening_hours:
+        return ""
+        
+    # Google Places API provides weekday_text as a list of formatted strings
+    # e.g., ["Monday: 11:00 AM – 10:00 PM", "Tuesday: 11:00 AM – 10:00 PM", ...]
+    weekday_text = opening_hours['weekday_text']
+    
+    # Convert to our format: "Mon 11:00 AM – 10:00 PM, Tue 11:00 AM – 10:00 PM, ..."
+    day_mapping = {
+        'Monday': 'Mon',
+        'Tuesday': 'Tue', 
+        'Wednesday': 'Wed',
+        'Thursday': 'Thu',
+        'Friday': 'Fri',
+        'Saturday': 'Sat',
+        'Sunday': 'Sun'
+    }
+    
+    formatted_hours = []
+    for day_text in weekday_text:
+        # Parse "Monday: 11:00 AM – 10:00 PM"
+        if ': ' in day_text:
+            day, hours = day_text.split(': ', 1)
+            short_day = day_mapping.get(day, day[:3])
+            formatted_hours.append(f"{short_day} {hours}")
+    
+    return ', '.join(formatted_hours)
+
+@app.route('/api/restaurants/<int:restaurant_id>/fetch-hours', methods=['POST'])
+def fetch_restaurant_hours(restaurant_id):
+    """
+    Fetch opening hours for a specific restaurant using Google Places API.
+    This is a backup system when the restaurant doesn't have hours data.
+    """
+    try:
+        if not db_manager:
+            return jsonify({'error': 'Database not connected'}), 500
+        
+        # Get restaurant details
+        session = db_manager.get_session()
+        restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
+        
+        if not restaurant:
+            return jsonify({'error': 'Restaurant not found'}), 404
+        
+        # Check if restaurant already has hours
+        if restaurant.hours_open and len(restaurant.hours_open) > 10:
+            return jsonify({
+                'message': 'Restaurant already has hours data',
+                'hours': restaurant.hours_open
+            }), 200
+        
+        # Search for hours using Google Places API
+        hours_data = search_google_places_hours(restaurant.name, restaurant.address or "")
+        
+        if hours_data:
+            # Update the restaurant with the found hours
+            restaurant.hours_open = hours_data
+            session.commit()
+            
+            logger.info(f"Updated restaurant {restaurant_id} with hours: {hours_data}")
+            
+            return jsonify({
+                'message': 'Hours found and updated',
+                'hours': hours_data,
+                'restaurant_id': restaurant_id,
+                'restaurant_name': restaurant.name
+            }), 200
+        else:
+            return jsonify({
+                'message': 'No hours found for this restaurant',
+                'restaurant_id': restaurant_id,
+                'restaurant_name': restaurant.name
+            }), 404
+            
+    except Exception as e:
+        logger.error(f"Error fetching hours for restaurant {restaurant_id}: {e}")
+        return jsonify({'error': f'Error fetching hours: {str(e)}'}), 500
+
+@app.route('/api/restaurants/fetch-missing-hours', methods=['POST'])
+def fetch_missing_hours():
+    """
+    Fetch opening hours for all restaurants that don't have them.
+    This is a bulk operation that can take some time.
+    """
+    try:
+        if not db_manager:
+            return jsonify({'error': 'Database not connected'}), 500
+        
+        # Get limit from request (default 10 to avoid long-running requests)
+        limit = request.json.get('limit', 10) if request.is_json else 10
+        
+        session = db_manager.get_session()
+        
+        # Get restaurants without hours
+        restaurants_without_hours = session.query(Restaurant).filter(
+            (Restaurant.hours_open.is_(None)) | 
+            (Restaurant.hours_open == '') | 
+            (Restaurant.hours_open == ' ') |
+            (Restaurant.hours_open == 'None')
+        ).limit(limit).all()
+        
+        if not restaurants_without_hours:
+            return jsonify({
+                'message': 'No restaurants found without hours',
+                'updated': 0,
+                'total_checked': 0
+            }), 200
+        
+        updated_count = 0
+        total_checked = len(restaurants_without_hours)
+        
+        for restaurant in restaurants_without_hours:
+            try:
+                # Search for hours using Google Places API
+                hours_data = search_google_places_hours(restaurant.name, restaurant.address or "")
+                
+                if hours_data:
+                    # Update the restaurant with the found hours
+                    restaurant.hours_open = hours_data
+                    updated_count += 1
+                    logger.info(f"Updated restaurant {restaurant.id} with hours: {hours_data}")
+                
+                # Add delay to respect API rate limits
+                time.sleep(0.2)  # 200ms delay between requests
+                
+            except Exception as e:
+                logger.error(f"Error processing restaurant {restaurant.id}: {e}")
+                continue
+        
+        # Commit all changes
+        session.commit()
+        
+        logger.info(f"Bulk hours update completed", updated=updated_count, total=total_checked)
+        
+        return jsonify({
+            'message': 'Bulk hours update completed',
+            'updated': updated_count,
+            'total_checked': total_checked,
+            'limit_used': limit
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error in bulk hours update: {e}")
+        return jsonify({'error': f'Error in bulk hours update: {str(e)}'}), 500
+
 @app.errorhandler(404)
 def not_found(error):
     """Handle 404 errors."""

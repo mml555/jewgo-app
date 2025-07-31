@@ -433,20 +433,44 @@ export default function RestaurantCard({
           {/* Website and Additional Links */}
           <div className="flex items-center justify-between">
             {/* Website Link - Left */}
-            {restaurant.website && (
+            {websiteLink ? (
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
                 </svg>
                 <a 
-                  href={restaurant.website}
+                  href={websiteLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
                   className="text-green-600 hover:text-green-700 underline transition-colors truncate"
                 >
-                  Visit Website
+                  {isFetchingWebsite ? 'Finding Website...' : 'Visit Website'}
                 </a>
+              </div>
+            ) : (
+              // Show fallback options when no website is available
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
+                </svg>
+                {isFetchingWebsite ? (
+                  <span className="text-gray-500 text-sm">Finding website...</span>
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Try to fetch website manually
+                      const fallbackLink = getFallbackWebsiteLink(restaurant);
+                      if (fallbackLink) {
+                        window.open(fallbackLink, '_blank');
+                      }
+                    }}
+                    className="text-gray-500 hover:text-green-600 underline transition-colors text-sm"
+                  >
+                    Find on Google
+                  </button>
+                )}
               </div>
             )}
             
