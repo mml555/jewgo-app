@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Restaurant } from '@/types/restaurant';
 import { cn } from '@/utils/cn';
+import { ensureRestaurantWebsite, getFallbackWebsiteLink } from '@/utils/websiteBackup';
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -26,6 +27,8 @@ export default function RestaurantCard({
   const [imageError, setImageError] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [websiteLink, setWebsiteLink] = useState<string | null>(restaurant.website || null);
+  const [isFetchingWebsite, setIsFetchingWebsite] = useState(false);
 
   const handleCardClick = () => {
     if (onSelect) {
@@ -37,6 +40,35 @@ export default function RestaurantCard({
 
   const handleTouchStart = () => setIsPressed(true);
   const handleTouchEnd = () => setIsPressed(false);
+
+  // Auto-fetch website if missing
+  useEffect(() => {
+    const fetchWebsiteIfNeeded = async () => {
+      // If we already have a website link, don't fetch
+      if (websiteLink && websiteLink.length > 10) {
+        return;
+      }
+
+      // If we're already fetching, don't start another request
+      if (isFetchingWebsite) {
+        return;
+      }
+
+      setIsFetchingWebsite(true);
+      try {
+        const fetchedWebsite = await ensureRestaurantWebsite(restaurant);
+        if (fetchedWebsite) {
+          setWebsiteLink(fetchedWebsite);
+        }
+      } catch (error) {
+        console.error('Error fetching website:', error);
+      } finally {
+        setIsFetchingWebsite(false);
+      }
+    };
+
+    fetchWebsiteIfNeeded();
+  }, [restaurant.id, websiteLink, isFetchingWebsite]);
 
   const getAgencyBadgeClass = (agency: string) => {
     const agencyLower = agency.toLowerCase();
