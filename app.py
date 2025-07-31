@@ -20,6 +20,16 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
 # Import and run the Flask app from backend
 from app import app
 
+# Initialize database on startup
+with app.app_context():
+    try:
+        from database.database_manager_v3 import EnhancedDatabaseManager
+        db_manager = EnhancedDatabaseManager()
+        db_manager.connect()
+        print("✅ Database connection established")
+    except Exception as e:
+        print(f"⚠️  Database connection failed: {e}")
+
 if __name__ == '__main__':
     app.run(
         host='0.0.0.0',

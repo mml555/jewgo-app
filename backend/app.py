@@ -64,9 +64,8 @@ def init_database():
         logger.error(f"Database connection failed: {e}")
         return False
 
-@app.before_first_request
-def before_first_request():
-    """Initialize database before first request."""
+# Initialize database on app startup
+with app.app_context():
     init_database()
 
 @app.route('/health', methods=['GET'])
