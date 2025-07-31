@@ -890,8 +890,11 @@ def fetch_missing_hours():
 
 @app.route('/api/update-database', methods=['POST'])
 def update_database():
-    """Update database with correct ORB data."""
+    """Update database with real ORB data."""
     try:
+        import asyncio
+        from scrapers.orb_scraper_v2 import ORBScraperV2
+        
         session = db_manager.get_session()
         from database.database_manager_v3 import Restaurant
         
@@ -901,103 +904,92 @@ def update_database():
         session.commit()
         logger.info(f"Deleted {deleted_count} existing restaurants")
         
-        # Step 2: Add sample data with correct categorization
-        # This is a simplified approach - in production, you'd want to use the scraper
-        sample_restaurants = [
-            {
-                'name': 'Sample Dairy Restaurant 1',
-                'address': '123 Dairy St',
-                'city': 'Miami',
-                'state': 'FL',
-                'zip_code': '33101',
-                'phone': '(305) 555-0101',
-                'website': 'https://example.com',
-                'kosher_type': 'dairy',
-                'is_cholov_yisroel': True,
-                'is_pas_yisroel': False,
-                'certifying_agency': 'ORB',
-                'short_description': 'Sample dairy restaurant'
-            },
-            {
-                'name': 'Sample Meat Restaurant 1',
-                'address': '456 Meat Ave',
-                'city': 'Miami',
-                'state': 'FL',
-                'zip_code': '33102',
-                'phone': '(305) 555-0202',
-                'website': 'https://example.com',
-                'kosher_type': 'meat',
-                'is_cholov_yisroel': False,
-                'is_pas_yisroel': False,
-                'certifying_agency': 'ORB',
-                'short_description': 'Sample meat restaurant'
-            },
-            {
-                'name': 'Sample Pareve Restaurant 1',
-                'address': '789 Pareve Blvd',
-                'city': 'Miami',
-                'state': 'FL',
-                'zip_code': '33103',
-                'phone': '(305) 555-0303',
-                'website': 'https://example.com',
-                'kosher_type': 'pareve',
-                'is_cholov_yisroel': False,
-                'is_pas_yisroel': True,
-                'certifying_agency': 'ORB',
-                'short_description': 'Sample pareve restaurant'
-            }
-        ]
+        # Step 2: Run the ORB scraper
+        logger.info("Running ORB scraper to fetch real data...")
         
-        # Step 3: Save sample data to database
-        logger.info(f"Saving {len(sample_restaurants)} sample restaurants...")
+        # Create event loop for async operations
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            async def run_scraper():
+                scraper = ORBScraperV2()
+                
+                if not await scraper.setup_playwright():
+                    logger.error("Failed to setup Playwright")
+                    return None
+                
+                businesses = await scraper.scrape_all_categories()
+                await scraper.cleanup()
+                return businesses
+            
+            businesses = loop.run_until_complete(run_scraper())
+        except Exception as e:
+            logger.error(f"Error in async scraper execution: {e}")
+            businesses = None
+        finally:
+            if 'loop' in locals():
+                loop.close()
         
-        success_count = 0
-        for restaurant_data in sample_restaurants:
-            try:
-                success = db_manager.add_restaurant(restaurant_data)
-                if success:
-                    success_count += 1
-                    logger.info(f"Added: {restaurant_data['name']} ({restaurant_data['kosher_type']})")
-            except Exception as e:
-                logger.error(f"Error saving restaurant {restaurant_data['name']}: {e}")
-        
-        logger.info(f"Successfully saved {success_count} restaurants")
-        
-        # Step 4: Verify the data
-        final_count = session.query(Restaurant).count()
-        logger.info(f"Final restaurant count: {final_count}")
-        
-        # Show final statistics
-        from sqlalchemy import func
-        kosher_types = session.query(
-            Restaurant.kosher_type,
-            func.count(Restaurant.kosher_type)
-        ).group_by(Restaurant.kosher_type).all()
-        
-        # Show Chalav Yisroel statistics
-        chalav_yisroel_count = session.query(Restaurant).filter(
-            Restaurant.is_cholov_yisroel == True
-        ).count()
-        
-        chalav_stam_count = session.query(Restaurant).filter(
-            Restaurant.is_cholov_yisroel == False,
-            Restaurant.kosher_type == 'dairy'
-        ).count()
-        
-        pas_yisroel_count = session.query(Restaurant).filter(
-            Restaurant.is_pas_yisroel == True
-        ).count()
-        
-        return jsonify({
-            'message': f'Successfully updated database with {success_count} sample restaurants',
-            'deleted_count': deleted_count,
-            'saved_count': success_count,
-            'final_count': final_count,
-            'kosher_types': dict(kosher_types),
-            'chalav_yisroel': chalav_yisroel_count,
-            'chalav_stam': chalav_stam_count,
-            'pas_yisroel': pas_yisroel_count
-        }), 200
+        if businesses:
+            logger.info(f"ORB scraper returned {len(businesses)} businesses")
+            
+            # Step 3: Save real ORB data to database
+            logger.info(f"Saving {len(businesses)} ORB restaurants to database...")
+            
+            success_count = 0
+            for business in businesses:
+                try:
+                    success = db_manager.add_restaurant(business)
+                    if success:
+                        success_count += 1
+                        logger.info(f"Added: {business['name']} ({business.get('kosher_type', 'unknown')})")
+                except Exception as e:
+                    logger.error(f"Error saving business {business.get('name', 'Unknown')}: {e}")
+            
+            logger.info(f"Successfully saved {success_count} ORB restaurants")
+            
+            # Step 4: Verify the data
+            final_count = session.query(Restaurant).count()
+            logger.info(f"Final restaurant count: {final_count}")
+            
+            # Show final statistics
+            from sqlalchemy import func
+            kosher_types = session.query(
+                Restaurant.kosher_type,
+                func.count(Restaurant.kosher_type)
+            ).group_by(Restaurant.kosher_type).all()
+            
+            # Show Chalav Yisroel statistics
+            chalav_yisroel_count = session.query(Restaurant).filter(
+                Restaurant.is_cholov_yisroel == True
+            ).count()
+            
+            chalav_stam_count = session.query(Restaurant).filter(
+                Restaurant.is_cholov_yisroel == False,
+                Restaurant.kosher_type == 'dairy'
+            ).count()
+            
+            pas_yisroel_count = session.query(Restaurant).filter(
+                Restaurant.is_pas_yisroel == True
+            ).count()
+            
+            return jsonify({
+                'message': f'Successfully updated database with {success_count} ORB restaurants',
+                'deleted_count': deleted_count,
+                'saved_count': success_count,
+                'final_count': final_count,
+                'kosher_types': dict(kosher_types),
+                'chalav_yisroel': chalav_yisroel_count,
+                'chalav_stam': chalav_stam_count,
+                'pas_yisroel': pas_yisroel_count
+            }), 200
+        else:
+            logger.error("ORB scraper returned no businesses")
+            return jsonify({
+                'error': 'No businesses were scraped from ORB',
+                'message': 'ORB scraper returned no data - check logs for details'
+            }), 500
         
     except Exception as e:
         logger.error(f"Error updating database: {e}")
