@@ -53,6 +53,18 @@ export default function RestaurantCard({
     return 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
+  const getKosherTypeBadgeClass = (kosherType: string) => {
+    const typeLower = kosherType.toLowerCase();
+    if (typeLower === 'dairy') {
+      return 'bg-blue-500 text-white border-blue-600';
+    } else if (typeLower === 'meat') {
+      return 'bg-red-500 text-white border-red-600';
+    } else if (typeLower === 'pareve') {
+      return 'bg-green-500 text-white border-green-600';
+    }
+    return 'bg-gray-500 text-white border-gray-600';
+  };
+
   const getKosherBadgeClass = (category: string) => {
     const categoryLower = category.toLowerCase();
     if (categoryLower.includes('glatt')) {
@@ -154,17 +166,46 @@ export default function RestaurantCard({
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
         
-        {/* Distance Badge */}
-        {showDistance && distance !== undefined && (
-          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-800 px-2 py-1 rounded-full text-xs font-medium shadow-sm">
-            {formatDistance(distance)}
+        {/* Top View More Button */}
+        <div className="absolute top-3 left-1/2 transform -translate-x-1/2">
+          <button
+            className="bg-green-500 text-white py-1 px-3 rounded-md text-xs font-medium hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCardClick();
+            }}
+          >
+            View More
+          </button>
+        </div>
+        
+        {/* Kosher Type Badge (Top Right) */}
+        {restaurant.kosher_category && (
+          <div className="absolute top-3 right-3">
+            <span className={cn(
+              "inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold border shadow-sm",
+              getKosherTypeBadgeClass(restaurant.kosher_category)
+            )}>
+              {restaurant.kosher_category.charAt(0).toUpperCase() + restaurant.kosher_category.slice(1)}
+            </span>
           </div>
         )}
         
-        {/* Category Icon */}
-        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-full shadow-sm">
-          {getCategoryIcon(restaurant.listing_type || 'restaurant')}
-        </div>
+        {/* Certification Badge (Top Left) */}
+        {restaurant.certifying_agency && (
+          <div className="absolute top-3 left-3">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-500 text-white border border-blue-600 shadow-sm">
+              {restaurant.certifying_agency}
+            </span>
+          </div>
+        )}
+        
+        {/* Distance Badge (if needed) */}
+        {showDistance && distance !== undefined && (
+          <div className="absolute top-12 right-3 bg-white/90 backdrop-blur-sm text-gray-800 px-2 py-1 rounded-full text-xs font-medium shadow-sm">
+            {formatDistance(distance)}
+          </div>
+        )}
         
         {/* Quick Action Buttons */}
         <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -203,6 +244,43 @@ export default function RestaurantCard({
             {restaurant.name}
           </h3>
           
+          {/* Rating and Description */}
+          <div className="text-sm text-gray-600 mb-2">
+            {restaurant.google_rating ? (
+              <span>Rated {restaurant.google_rating}/5 stars on Google. </span>
+            ) : restaurant.rating ? (
+              <span>Rated {restaurant.rating}/5 stars. </span>
+            ) : null}
+            {restaurant.price_range && (
+              <span className="capitalize">{restaurant.price_range} pricing. </span>
+            )}
+            {restaurant.short_description ? (
+              <span>{restaurant.short_description}</span>
+            ) : (
+              <span>Specializes in {restaurant.listing_type || 'Restaurant'}.</span>
+            )}
+          </div>
+          
+          {/* Open/Closed Status */}
+          <div className="mb-2">
+            {restaurant.hours_open ? (
+              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                Open • {restaurant.hours_open}
+              </span>
+            ) : restaurant.hours_of_operation ? (
+              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                <span className="w-2 h-2 bg-red-500 rounded-full mr-1"></span>
+                Closed now • {restaurant.hours_of_operation}
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                <span className="w-2 h-2 bg-gray-500 rounded-full mr-1"></span>
+                Hours not available
+              </span>
+            )}
+          </div>
+          
           {/* Address */}
           <div className="flex items-start gap-2 text-sm text-gray-600 mb-3">
             <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -213,36 +291,42 @@ export default function RestaurantCard({
               {restaurant.address}, {restaurant.city}, {restaurant.state}
             </span>
           </div>
+          
+          {/* Maps Button */}
+          <div className="flex items-center gap-2 mb-3">
+            <button
+              className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs font-medium hover:bg-gray-200 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                const address = `${restaurant.address}, ${restaurant.city}, ${restaurant.state}`;
+                const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+                window.open(mapsUrl, '_blank');
+              }}
+            >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              Maps
+            </button>
+          </div>
         </div>
 
-        {/* Badges */}
+        {/* Additional Badges */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {/* Certifying Agency */}
-          {restaurant.certifying_agency && (
-            <span className={cn(
-              "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border",
-              getAgencyBadgeClass(restaurant.certifying_agency)
-            )}>
-              {restaurant.certifying_agency}
-            </span>
-          )}
-          
-          {/* Kosher Category */}
-          {restaurant.kosher_category && (
-            <span className={cn(
-              "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border",
-              getKosherBadgeClass(restaurant.kosher_category)
-            )}>
-              {restaurant.kosher_category}
-            </span>
-          )}
-          
           {/* Listing Type */}
           {restaurant.listing_type && (
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
               {restaurant.listing_type}
             </span>
           )}
+          
+          {/* Verified Badge */}
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-black text-white border border-gray-800">
+            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+            Verified
+          </span>
         </div>
 
         {/* Additional Info */}
@@ -291,8 +375,19 @@ export default function RestaurantCard({
               handleCardClick();
             }}
           >
-            View Details
+            View More
           </button>
+        </div>
+        
+        {/* Repeated Address */}
+        <div className="mt-3 flex items-start gap-2 text-sm text-gray-600">
+          <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span className="line-clamp-2">
+            {restaurant.address}, {restaurant.city}, {restaurant.state}
+          </span>
         </div>
       </div>
 
