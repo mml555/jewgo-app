@@ -79,8 +79,8 @@ export default function HomePageClient() {
     // Apply kosher type filter
     if (activeFilters.kosherType && activeFilters.kosherType !== 'all') {
       filtered = filtered.filter(restaurant => {
-        const kosherCategory = restaurant.kosher_category?.toLowerCase() || restaurant.kosher_type?.toLowerCase() || '';
-        return kosherCategory === activeFilters.kosherType.toLowerCase();
+        const kosherCategory = restaurant.kosher_category?.toLowerCase() || '';
+        return kosherCategory === activeFilters.kosherType!.toLowerCase();
       });
     }
     
@@ -91,18 +91,6 @@ export default function HomePageClient() {
     
     if (activeFilters.is_pas_yisroel) {
       filtered = filtered.filter(restaurant => restaurant.is_pas_yisroel === true);
-    }
-    
-    if (activeFilters.is_glatt) {
-      filtered = filtered.filter(restaurant => restaurant.is_glatt === true);
-    }
-    
-    if (activeFilters.is_mehadrin) {
-      filtered = filtered.filter(restaurant => restaurant.is_mehadrin === true);
-    }
-    
-    if (activeFilters.is_bishul_yisroel) {
-      filtered = filtered.filter(restaurant => restaurant.is_bishul_yisroel === true);
     }
     
     // Apply category filter

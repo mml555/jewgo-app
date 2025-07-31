@@ -6,6 +6,6 @@
   "installCommand": "cd frontend && npm install",
   "framework": "nextjs",
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://jewgo.onrender.com"
+    "NEXT_PUBLIC_BACKEND_URL": "https://jewgo.onrender.com"
   }
 } 
