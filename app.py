@@ -316,18 +316,18 @@ def create_app(config_name=None):
                         return jsonify({'error': 'Invalid coordinates'}), 400
                     
                     # For now, use the old method for location-based search
-                    # TODO: Implement location-based search for kosher_places
+                    # TODO: Implement location-based search for consolidated restaurants table
                     restaurants = g.db_manager.search_restaurants_near_location(
                         lat=lat, lng=lng, radius=radius,
                         query=query, category=category,
                         limit=limit, offset=offset
                     )
                     
-                    # Convert to unified format
+                    # Convert to unified format using database manager's method
                     restaurants_data = []
                     for restaurant in restaurants:
                         try:
-                            restaurant_dict = restaurant_to_dict(restaurant)
+                            restaurant_dict = g.db_manager._restaurant_to_unified_dict(restaurant)
                             if restaurant_dict:
                                 restaurant_dict['source'] = 'legacy'
                                 restaurants_data.append(restaurant_dict)
