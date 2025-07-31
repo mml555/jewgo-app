@@ -54,7 +54,7 @@ def init_database():
             cursor.execute("""
                 INSERT INTO restaurants (
                     name, address, city, state, zip_code, phone, website,
-                    hechsher_details, cuisine_type, hours_of_operation, description,
+                    cuisine_type, hours_of_operation, description,
                     price_range, image_url, latitude, longitude, rating, review_count,
                     google_rating, google_review_count, google_reviews, created_at, updated_at
                 ) VALUES (
@@ -68,7 +68,6 @@ def init_database():
                 restaurant['zip_code'],
                 restaurant['phone'],
                 restaurant['website'],
-                restaurant['hechsher_details'],
                 restaurant['cuisine_type'],
                 restaurant['hours_of_operation'],
                 restaurant['description'],

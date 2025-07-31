@@ -42,8 +42,8 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
-# Import database manager
-from database.database_manager_v3 import EnhancedDatabaseManager
+# Import database manager and Restaurant model
+from database.database_manager_v3 import EnhancedDatabaseManager, Restaurant
 
 # Initialize Flask app
 app = Flask(__name__)
