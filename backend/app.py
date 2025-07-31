@@ -74,8 +74,9 @@ def health_check():
     try:
         if db_manager:
             # Test database connection
+            from database.database_manager_v3 import Restaurant
             session = db_manager.get_session()
-            total_restaurants = session.query(db_manager.Restaurant).count()
+            total_restaurants = session.query(Restaurant).count()
             session.close()
             
             return jsonify({
