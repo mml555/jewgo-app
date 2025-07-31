@@ -1,36 +1,150 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
+import ImageUpload from '@/components/ImageUpload';
+
+interface FormData {
+  // Basic Info
+  name: string;
+  short_description: string;
+  description: string;
+  certifying_agency: string;
+  kosher_category: 'meat' | 'dairy' | 'pareve' | '';
+  
+  // Kosher Info
+  is_cholov_yisroel?: boolean;
+  is_pas_yisroel?: boolean;
+  kosher_cert_link: string;
+  
+  // Contact & Location
+  phone: string;
+  email: string;
+  address: string;
+  website: string;
+  google_listing_url: string;
+  
+  // Business Info
+  hours_open: string;
+  price_range: string;
+  
+  // Images
+  image_url: string;
+  
+  // Owner Info
+  owner_name: string;
+  owner_email: string;
+  owner_phone: string;
+}
+
+interface FormErrors {
+  [key: string]: string;
+}
 
 export default function AddEateryPage() {
+  const router = useRouter();
   const [userType, setUserType] = useState<'owner' | 'community' | ''>('');
-  const [formData, setFormData] = useState({
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+  
+  const [formData, setFormData] = useState<FormData>({
     name: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    phone: '',
-    website: '',
-    certifyingAgency: '',
-    kosherType: '',
-    kosherCategory: '',
+    short_description: '',
     description: '',
-    ownerName: '',
-    ownerEmail: '',
-    ownerPhone: ''
+    certifying_agency: '',
+    kosher_category: '',
+    kosher_cert_link: '',
+    phone: '',
+    email: '',
+    address: '',
+    website: '',
+    google_listing_url: '',
+    hours_open: '',
+    price_range: '',
+    image_url: '',
+    owner_name: '',
+    owner_email: '',
+    owner_phone: ''
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    const { name, value, type } = e.target;
+    
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData(prev => ({
+        ...prev,
+        [name]: checked
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Required fields
+    if (!formData.name.trim()) newErrors.name = 'Restaurant name is required';
+    if (!formData.short_description.trim()) newErrors.short_description = 'Short description is required';
+    if (formData.short_description.length > 80) newErrors.short_description = 'Short description must be 80 characters or less';
+    if (!formData.certifying_agency) newErrors.certifying_agency = 'Certifying agency is required';
+    if (!formData.kosher_category) newErrors.kosher_category = 'Kosher category is required';
+    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+    if (!formData.address.trim()) newErrors.address = 'Address is required';
+    if (!formData.hours_open.trim()) newErrors.hours_open = 'Hours are required';
+    if (!formData.image_url) newErrors.image_url = 'Restaurant image is required';
+
+    // Conditional validation
+    if (formData.kosher_category === 'dairy' && formData.is_cholov_yisroel === undefined) {
+      newErrors.is_cholov_yisroel = 'Please specify if this is Chalav Yisrael or Chalav Stam';
+    }
+    if (['meat', 'pareve'].includes(formData.kosher_category) && formData.is_pas_yisroel === undefined) {
+      newErrors.is_pas_yisroel = 'Please specify if this is Pas Yisroel';
+    }
+
+    // Owner info validation
+    if (userType === 'owner') {
+      if (!formData.owner_name.trim()) newErrors.owner_name = 'Owner name is required';
+      if (!formData.owner_email.trim()) newErrors.owner_email = 'Owner email is required';
+      if (!formData.owner_phone.trim()) newErrors.owner_phone = 'Owner phone is required';
+    }
+
+    // URL validation
+    if (formData.website && !isValidUrl(formData.website)) {
+      newErrors.website = 'Please enter a valid website URL';
+    }
+    if (formData.google_listing_url && !isValidUrl(formData.google_listing_url)) {
+      newErrors.google_listing_url = 'Please enter a valid Google Maps URL';
+    }
+    if (formData.kosher_cert_link && !isValidUrl(formData.kosher_cert_link)) {
+      newErrors.kosher_cert_link = 'Please enter a valid certification URL';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const isValidUrl = (url: string): boolean => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,18 +155,65 @@ export default function AddEateryPage() {
       return;
     }
     
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSubmitting(false);
-    
-    if (userType === 'owner') {
-      alert('Thank you! Your establishment has been submitted for review. We will contact you soon to verify your ownership and complete the listing process.');
-    } else {
-      alert('Thank you! Your submission has been received and will be reviewed by our team. We will verify the information before adding it to the directory.');
+    try {
+      const submissionData = {
+        ...formData,
+        user_type: userType,
+        category: 'restaurant',
+        owner_info: userType === 'owner' ? {
+          name: formData.owner_name,
+          email: formData.owner_email,
+          phone: formData.owner_phone
+        } : undefined
+      };
+
+      const response = await fetch('/api/restaurants', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Show success message
+        alert(userType === 'owner' 
+          ? 'Thank you! Your establishment has been submitted for review. We will contact you soon to verify your ownership and complete the listing process.'
+          : 'Thank you! Your submission has been received and will be reviewed by our team. We will verify the information before adding it to the directory.'
+        );
+        
+        // Redirect to home page
+        router.push('/');
+      } else {
+        // Handle validation errors from API
+        if (result.errors) {
+          const apiErrors: FormErrors = {};
+          result.errors.forEach((error: any) => {
+            apiErrors[error.path[0]] = error.message;
+          });
+          setErrors(apiErrors);
+        } else {
+          alert('Failed to submit restaurant. Please try again.');
+        }
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert('An error occurred while submitting. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const getErrorClass = (fieldName: string) => {
+    return errors[fieldName] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-jewgo-primary';
   };
 
   return (
@@ -149,13 +310,13 @@ export default function AddEateryPage() {
                       </label>
                       <input
                         type="text"
-                        name="ownerName"
-                        value={formData.ownerName}
+                        name="owner_name"
+                        value={formData.owner_name}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('owner_name')}`}
                         placeholder="Your full name"
                       />
+                      {errors.owner_name && <p className="text-red-500 text-sm mt-1">{errors.owner_name}</p>}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -163,13 +324,13 @@ export default function AddEateryPage() {
                       </label>
                       <input
                         type="email"
-                        name="ownerEmail"
-                        value={formData.ownerEmail}
+                        name="owner_email"
+                        value={formData.owner_email}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('owner_email')}`}
                         placeholder="your@email.com"
                       />
+                      {errors.owner_email && <p className="text-red-500 text-sm mt-1">{errors.owner_email}</p>}
                     </div>
                   </div>
                   <div>
@@ -178,17 +339,24 @@ export default function AddEateryPage() {
                     </label>
                     <input
                       type="tel"
-                      name="ownerPhone"
-                      value={formData.ownerPhone}
+                      name="owner_phone"
+                      value={formData.owner_phone}
                       onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('owner_phone')}`}
                       placeholder="(555) 123-4567"
                     />
+                    {errors.owner_phone && <p className="text-red-500 text-sm mt-1">{errors.owner_phone}</p>}
                   </div>
                 </div>
               </div>
             )}
+
+            {/* Image Upload */}
+            <ImageUpload
+              onImageUpload={(imageUrl) => setFormData(prev => ({ ...prev, image_url: imageUrl }))}
+              currentImageUrl={formData.image_url}
+            />
+            {errors.image_url && <p className="text-red-500 text-sm mt-1">{errors.image_url}</p>}
 
             {/* Basic Information */}
             <div>
@@ -203,9 +371,42 @@ export default function AddEateryPage() {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('name')}`}
                     placeholder="Enter restaurant name"
+                  />
+                  {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Short Description * (max 80 characters)
+                  </label>
+                  <input
+                    type="text"
+                    name="short_description"
+                    value={formData.short_description}
+                    onChange={handleInputChange}
+                    maxLength={80}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('short_description')}`}
+                    placeholder="Brief description for mobile display"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>{errors.short_description}</span>
+                    <span>{formData.short_description.length}/80</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Full Description (optional)
+                  </label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
+                    placeholder="Tell us about this establishment..."
                   />
                 </div>
 
@@ -218,73 +419,93 @@ export default function AddEateryPage() {
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
-                    placeholder="Street address"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('address')}`}
+                    placeholder="Full street address"
                   />
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
-                      placeholder="City"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
-                    <input
-                      type="text"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
-                      placeholder="State"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code *</label>
-                    <input
-                      type="text"
-                      name="zipCode"
-                      value={formData.zipCode}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
-                      placeholder="ZIP"
-                    />
-                  </div>
+                  {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('phone')}`}
                       placeholder="(555) 123-4567"
                     />
+                    {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email (optional)</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('email')}`}
+                      placeholder="contact@restaurant.com"
+                    />
+                    {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Website (optional)</label>
                     <input
                       type="url"
                       name="website"
                       value={formData.website}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('website')}`}
                       placeholder="https://example.com"
                     />
+                    {errors.website && <p className="text-red-500 text-sm mt-1">{errors.website}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Google Maps Link (optional)</label>
+                    <input
+                      type="url"
+                      name="google_listing_url"
+                      value={formData.google_listing_url}
+                      onChange={handleInputChange}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('google_listing_url')}`}
+                      placeholder="https://maps.google.com/..."
+                    />
+                    {errors.google_listing_url && <p className="text-red-500 text-sm mt-1">{errors.google_listing_url}</p>}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Hours Open *</label>
+                    <input
+                      type="text"
+                      name="hours_open"
+                      value={formData.hours_open}
+                      onChange={handleInputChange}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('hours_open')}`}
+                      placeholder="Mon-Fri 11AM-10PM, Sat-Sun 12PM-11PM"
+                    />
+                    {errors.hours_open && <p className="text-red-500 text-sm mt-1">{errors.hours_open}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Price Range (optional)</label>
+                    <select
+                      name="price_range"
+                      value={formData.price_range}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
+                    >
+                      <option value="">Select price range</option>
+                      <option value="$">$ (Under $15)</option>
+                      <option value="$$">$$ ($15-$30)</option>
+                      <option value="$$$">$$$ ($30-$60)</option>
+                      <option value="$$$$">$$$$ (Over $60)</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -299,11 +520,10 @@ export default function AddEateryPage() {
                     Certifying Agency *
                   </label>
                   <select
-                    name="certifyingAgency"
-                    value={formData.certifyingAgency}
+                    name="certifying_agency"
+                    value={formData.certifying_agency}
                     onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('certifying_agency')}`}
                   >
                     <option value="">Select certifying agency</option>
                     <option value="ORB">ORB</option>
@@ -313,52 +533,107 @@ export default function AddEateryPage() {
                     <option value="OU">OU</option>
                     <option value="Other">Other</option>
                   </select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Kosher Type</label>
-                    <select
-                      name="kosherType"
-                      value={formData.kosherType}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
-                    >
-                      <option value="">Select type</option>
-                      <option value="restaurant">Restaurant</option>
-                      <option value="bakery">Bakery</option>
-                      <option value="catering">Catering</option>
-                      <option value="grocery">Grocery</option>
-                      <option value="ice_cream">Ice Cream</option>
-                      <option value="cafe">Cafe</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Dietary Category</label>
-                    <select
-                      name="kosherCategory"
-                      value={formData.kosherCategory}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
-                    >
-                      <option value="">Select category</option>
-                      <option value="meat">Meat</option>
-                      <option value="dairy">Dairy</option>
-                      <option value="pareve">Pareve</option>
-                    </select>
-                  </div>
+                  {errors.certifying_agency && <p className="text-red-500 text-sm mt-1">{errors.certifying_agency}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Kosher Category *
+                  </label>
+                  <select
+                    name="kosher_category"
+                    value={formData.kosher_category}
                     onChange={handleInputChange}
-                    rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jewgo-primary focus:border-transparent"
-                    placeholder="Tell us about this establishment..."
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('kosher_category')}`}
+                  >
+                    <option value="">Select category</option>
+                    <option value="meat">Meat</option>
+                    <option value="dairy">Dairy</option>
+                    <option value="pareve">Pareve</option>
+                  </select>
+                  {errors.kosher_category && <p className="text-red-500 text-sm mt-1">{errors.kosher_category}</p>}
+                </div>
+
+                {/* Conditional Kosher Fields */}
+                {formData.kosher_category === 'dairy' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Dairy Type *
+                    </label>
+                    <div className="space-y-2">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="is_cholov_yisroel"
+                          value="true"
+                          checked={formData.is_cholov_yisroel === true}
+                          onChange={handleInputChange}
+                          className="mr-2 text-jewgo-primary focus:ring-jewgo-primary"
+                        />
+                        Chalav Yisrael (Supervised milking)
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="is_cholov_yisroel"
+                          value="false"
+                          checked={formData.is_cholov_yisroel === false}
+                          onChange={handleInputChange}
+                          className="mr-2 text-jewgo-primary focus:ring-jewgo-primary"
+                        />
+                        Chalav Stam (Regular supervision)
+                      </label>
+                    </div>
+                    {errors.is_cholov_yisroel && <p className="text-red-500 text-sm mt-1">{errors.is_cholov_yisroel}</p>}
+                  </div>
+                )}
+
+                {['meat', 'pareve'].includes(formData.kosher_category) && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Pas Yisroel *
+                    </label>
+                    <div className="space-y-2">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="is_pas_yisroel"
+                          value="true"
+                          checked={formData.is_pas_yisroel === true}
+                          onChange={handleInputChange}
+                          className="mr-2 text-jewgo-primary focus:ring-jewgo-primary"
+                        />
+                        Yes - Pas Yisroel (Jewish-owned bakery)
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="is_pas_yisroel"
+                          value="false"
+                          checked={formData.is_pas_yisroel === false}
+                          onChange={handleInputChange}
+                          className="mr-2 text-jewgo-primary focus:ring-jewgo-primary"
+                        />
+                        No - Regular supervision
+                      </label>
+                    </div>
+                    {errors.is_pas_yisroel && <p className="text-red-500 text-sm mt-1">{errors.is_pas_yisroel}</p>}
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Certification Link (optional)
+                  </label>
+                  <input
+                    type="url"
+                    name="kosher_cert_link"
+                    value={formData.kosher_cert_link}
+                    onChange={handleInputChange}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${getErrorClass('kosher_cert_link')}`}
+                    placeholder="https://example.com/certification.pdf"
                   />
+                  {errors.kosher_cert_link && <p className="text-red-500 text-sm mt-1">{errors.kosher_cert_link}</p>}
                 </div>
               </div>
             </div>

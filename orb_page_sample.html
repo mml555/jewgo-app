@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "//www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />	<title>orbonline.org South Florida Israeli Jewish Directory</title>
+    <meta name="description" content="Find Kosher Restaurants in South Florida" />
+    <meta name="keywords" content="Kosher Restaurants" />
+    <meta name="robots" content="index,follow" />
+    
+    <meta property="og:title"  content="" />
+    <meta property="og:description" content="" />
+    <meta property="og:image" content="" />
+	
+
+	
+    <link href="/img/favicon.png" type="image/x-icon" rel="icon" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+	
+	<link rel="stylesheet" type="text/css" href="/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap-theme.min.css" />
+	<link rel="stylesheet" type="text/css" href="/js/fancybox/jquery.fancybox.css" />
+
+	<script type="text/javascript" src="/js/jquery-1.11.2.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.carouFredSel-6.2.0-packed.js"></script>
+	<script type="text/javascript" src="/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.bxslider.js"></script>
+	<script type="text/javascript" src="/js/jquery.maskedinput.js"></script>
+	<script type="text/javascript" src="/js/fancybox/jquery.fancybox.js"></script>
+	<script type="text/javascript" src="/js/fancybox/jquery.fancybox.pack.js"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<script>
+
+
+$(document).ready(function() {
+	
+	
+	
+	$('.slider').bxSlider({
+		mode: 'fade',
+		controls: false,
+		pager: false
+	});	
+
+	$("#viewmap").fancybox({
+		maxWidth	: 800,
+		minHeight	: 600,
+		fitToView	: false,
+		width		: '70%',
+		height		: '70%',
+		autoSize	: false,
+		closeClick	: true,
+		openEffect	: 'none',
+		closeEffect	: 'none'
+	});
+});
+
+
+function copiedData(text){
+	
+	var textField = document.createElement('textarea');
+    textField.innerText = text;
+    document.body.appendChild(textField);
+    textField.select();
+    document.execCommand('copy');
+    textField.remove();
+	
+}
+
+$(window).load(function() {
+	
+	  
+	$('.hm_ser_slide').carouFredSel({
+		responsive: true,
+		width: '100%',
+		scroll: 1,
+		items: {
+			visible: {
+				min: 1,
+				max: 8
+			}
+		},
+		swipe: {
+			onMouse: true,
+			onTouch: true
+		},
+		 scroll : {
+            items           : 1,
+            duration        : 800,
+			timeoutDuration : 6000                    
+        },
+		prev: '#prev',
+		next: '#next',
+	});
+	});
+</script>
+<script type="text/javascript">
+
+var lastWidth = 0;
+	function setIPhoneMenu(){
+		lastWidth = jQuery(window).width();
+		
+		jQuery('.subItem').remove();
+		jQuery(".iphonNav").css("display", "none");
+		jQuery(".iphonNav").addClass("iphon_navigation");
+				jQuery(".iphonNav").removeClass("top-nav");
+				jQuery(".iphonNav > ul").attr("id","");
+				jQuery(".menuImage").css("display","block");
+				jQuery(".iphonNav ul li").each(function(){
+					if(jQuery(this).children(".sub-menu").length >0)
+					{
+						jQuery(this).addClass("parentMenu");
+						jQuery(this).prepend("<div class='subItem'></div>");
+						jQuery(this).children(".sub-menu").addClass("subMenu");
+					}
+				});
+				jQuery(".subMenu").css("display","none");
+				jQuery(".menuImage .container2").unbind("click");
+				jQuery(".menuImage .container2").click(function(){
+					jQuery(".iphonNav").slideToggle(300, function(){
+						if(!jQuery(this).is(":visible")){
+							jQuery(this).find(".subMenu").each(function(){
+								jQuery(this).css("display","none");
+								jQuery(this).parent().removeClass("parentMenuActive");
+							});
+						}
+					});
+				});
+				jQuery(".subItem").unbind("click");
+				jQuery(".subItem").click(function(e){
+					jQuery(this).parent().children(".subMenu").slideToggle(300, function(){
+						if(jQuery(this).is(":visible")){
+								jQuery(this).parent().parent().children(".parentMenuActive").find(".subMenu").each(function(){
+										jQuery(this).slideUp(300);
+										jQuery(this).css("display","none");
+										jQuery(this).parent().removeClass("parentMenuActive");
+									});
+								jQuery(this).parent().parent().children(".parentMenuActive").removeClass("parentMenuActive");
+							jQuery(this).parent().addClass("parentMenuActive");
+							
+						}else{
+							jQuery(this).parent().removeClass("parentMenuActive");
+							jQuery(this).find(".subMenu").each(function(){
+								jQuery(this).css("display","none");
+								jQuery(this).parent().removeClass("parentMenuActive");
+								
+							});
+						}
+					});
+					
+					e.stopPropagation();
+				});
+	}
+	function setDesktopMenu(){
+		jQuery(".iphonNav ul li").find(".subMenu").each(fun
