@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
-import SearchBar from '@/components/SearchBar';
+import EnhancedSearch from '@/components/EnhancedSearch';
 import ActionButtons from '@/components/ActionButtons';
 import RestaurantGrid from '@/components/RestaurantGrid';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -245,6 +245,13 @@ export default function HomePageClient() {
     setCurrentPage(1);
   };
 
+  const handleResultsUpdate = (results: Restaurant[]) => {
+    console.log('Enhanced search results:', results.length, 'restaurants');
+    // Update the displayed restaurants with the enhanced results
+    setDisplayedRestaurants(results.slice(0, itemsPerPage));
+    setAllRestaurants(results);
+  };
+
   const handleFilterChange = (key: string, value: any) => {
     setActiveFilters(prev => ({ ...prev, [key]: value }));
     setCurrentPage(1);
@@ -380,7 +387,7 @@ export default function HomePageClient() {
         <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
           {/* Search Bar */}
           <div className="px-4 py-3 sm:px-6">
-            <SearchBar onSearch={handleSearch} />
+            <EnhancedSearch onSearch={handleSearch} onResultsUpdate={handleResultsUpdate} />
           </div>
 
           {/* Navigation Tabs */}

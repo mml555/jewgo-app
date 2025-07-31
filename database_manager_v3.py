@@ -114,7 +114,9 @@ class EnhancedDatabaseManager:
             
             # Test the connection
             with self.engine.connect() as conn:
-                result = conn.execute("SELECT 1")
+                from sqlalchemy import text
+                result = conn.execute(text("SELECT 1"))
+                result.fetchone()  # Consume the result
                 logger.info("Database connection successful")
             
             # Create session factory
