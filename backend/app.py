@@ -341,9 +341,9 @@ def fix_database():
         engine = db_manager.engine
         added_columns = []
         
-        with engine.connect() as conn:
-            for column_name, column_type in columns_to_add:
-                try:
+        for column_name, column_type in columns_to_add:
+            try:
+                with engine.connect() as conn:
                     # Check if column exists
                     result = conn.execute(text(f"""
                         SELECT column_name 
@@ -362,11 +362,11 @@ def fix_database():
                     else:
                         logger.info(f"Column {column_name} already exists, skipping")
                         
-                except Exception as e:
-                    logger.error(f"Error adding column {column_name}: {e}")
-                    return jsonify({
-                        'error': f'Failed to add column {column_name}: {str(e)}'
-                    }), 500
+            except Exception as e:
+                logger.error(f"Error adding column {column_name}: {e}")
+                return jsonify({
+                    'error': f'Failed to add column {column_name}: {str(e)}'
+                }), 500
         
         return jsonify({
             'success': True,
