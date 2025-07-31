@@ -202,19 +202,19 @@ export default function InteractiveMap({ restaurants, onRestaurantSelect, userLo
         <h4 className="font-semibold text-sm mb-2">Certification</h4>
         <div className="space-y-1 text-xs">
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#ADD8E6' }}></div>
             <span>ORB</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded-full bg-green-600"></div>
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FCC0C5' }}></div>
             <span>KM</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded-full bg-yellow-600"></div>
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#BBBBBB' }}></div>
             <span>KDM</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded-full bg-purple-600"></div>
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#8b5cf6' }}></div>
             <span>Diamond K</span>
           </div>
         </div>
@@ -251,10 +251,10 @@ export default function InteractiveMap({ restaurants, onRestaurantSelect, userLo
           <div className="flex items-center space-x-2 mb-3">
             {selectedRestaurant.certifying_agency && (
               <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                selectedRestaurant.certifying_agency === 'ORB' ? 'bg-blue-100 text-blue-800' :
-                selectedRestaurant.certifying_agency === 'KM' ? 'bg-green-100 text-green-800' :
-                selectedRestaurant.certifying_agency === 'KDM' ? 'bg-yellow-100 text-yellow-800' :
-                selectedRestaurant.certifying_agency === 'Diamond K' ? 'bg-purple-100 text-purple-800' :
+                selectedRestaurant.certifying_agency === 'ORB' ? 'bg-sky-100 text-sky-800 border border-sky-200' :
+                selectedRestaurant.certifying_agency === 'KM' ? 'bg-pink-100 text-pink-800 border border-pink-200' :
+                selectedRestaurant.certifying_agency === 'KDM' ? 'bg-gray-100 text-gray-800 border border-gray-200' :
+                selectedRestaurant.certifying_agency === 'Diamond K' ? 'bg-purple-100 text-purple-800 border border-purple-200' :
                 'bg-gray-100 text-gray-800'
               }`}>
                 {selectedRestaurant.certifying_agency}

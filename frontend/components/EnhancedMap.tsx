@@ -489,15 +489,15 @@ export default function EnhancedMap({
           <h4 className="font-semibold text-sm mb-3">Kosher Types</h4>
           <div className="space-y-2 text-xs">
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#A70000' }}></div>
               <span>Meat</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#ADD8E6' }}></div>
               <span>Dairy</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FFCE6D' }}></div>
               <span>Pareve</span>
             </div>
           </div>
@@ -547,9 +547,9 @@ export default function EnhancedMap({
             )}
             {selectedRestaurant.kosher_category && (
               <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                selectedRestaurant.kosher_category === 'meat' ? 'bg-red-100 text-red-800' :
-                selectedRestaurant.kosher_category === 'dairy' ? 'bg-blue-100 text-blue-800' :
-                selectedRestaurant.kosher_category === 'pareve' ? 'bg-green-100 text-green-800' :
+                selectedRestaurant.kosher_category === 'meat' ? 'bg-red-50 text-red-900 border border-red-200' :
+                selectedRestaurant.kosher_category === 'dairy' ? 'bg-blue-50 text-blue-900 border border-blue-200' :
+                selectedRestaurant.kosher_category === 'pareve' ? 'bg-yellow-50 text-yellow-900 border border-yellow-200' :
                 'bg-gray-100 text-gray-800'
               }`}>
                 {selectedRestaurant.kosher_category}

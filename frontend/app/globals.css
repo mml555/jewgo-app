@@ -44,26 +44,26 @@
   --accent-orange-dark: #EA580C;
   
   /* Kosher Category Colors */
-  --kosher-meat: #ef4444;
+  --kosher-meat: #A70000;
   --kosher-meat-light: #fef2f2;
-  --kosher-meat-dark: #dc2626;
-  --kosher-dairy: #3b82f6;
-  --kosher-dairy-light: #eff6ff;
-  --kosher-dairy-dark: #2563eb;
-  --kosher-pareve: #f59e0b;
-  --kosher-pareve-light: #fffbeb;
-  --kosher-pareve-dark: #d97706;
+  --kosher-meat-dark: #8B0000;
+  --kosher-dairy: #ADD8E6;
+  --kosher-dairy-light: #f0f8ff;
+  --kosher-dairy-dark: #87CEEB;
+  --kosher-pareve: #FFCE6D;
+  --kosher-pareve-light: #fffbf0;
+  --kosher-pareve-dark: #FFB347;
   --kosher-unknown: #6b7280;
   --kosher-unknown-light: #f9fafb;
   --kosher-unknown-dark: #374151;
   
   /* Certification Agency Colors */
-  --agency-orb: #1e40af;
-  --agency-orb-light: #dbeafe;
-  --agency-km: #10b981;
-  --agency-km-light: #d1fae5;
-  --agency-kdm: #f59e0b;
-  --agency-kdm-light: #fef3c7;
+  --agency-orb: #ADD8E6;
+  --agency-orb-light: #f0f8ff;
+  --agency-km: #FCC0C5;
+  --agency-km-light: #fef7f7;
+  --agency-kdm: #BBBBBB;
+  --agency-kdm-light: #f5f5f5;
   --agency-diamond-k: #8b5cf6;
   --agency-diamond-k-light: #ede9fe;
   

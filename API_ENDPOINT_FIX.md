@@ -1,105 +1,116 @@
-# 🔧 API Endpoint Fix
+# API Endpoint Fix Summary
 
-## ✅ **ISSUE IDENTIFIED AND FIXED**
+## Problem
+The frontend was experiencing a 405 Method Not Allowed error when trying to call the `/api/restaurants/787/fetch-website` endpoint. This was happening because the frontend Next.js application was trying to call backend endpoints directly, but the corresponding Next.js API routes didn't exist.
 
-### **Problem**:
-```
-TypeError: e is not iterable
-Restaurants fetched: 0
-Pagination: Page 1, showing 0 restaurants (0-20 of 0)
-```
+## Root Cause
+The backend Flask API had several endpoints that were missing their corresponding frontend Next.js API routes:
 
-### **Root Cause**:
-The frontend was trying to fetch from `/api/restaurants` (relative URL) instead of the backend API at `https://jewgo.onrender.com/api/restaurants`.
+1. **`POST /api/restaurants/{id}/fetch-website`** - Fetch website for specific restaurant
+2. **`POST /api/restaurants/fetch-missing-websites`** - Bulk fetch websites
+3. **`POST /api/restaurants/{id}/fetch-hours`** - Fetch hours for specific restaurant
+4. **`POST /api/restaurants/fetch-missing-hours`** - Bulk fetch hours
+5. **`GET /api/restaurants/search`** - Search restaurants
+6. **`GET /api/restaurants/{id}`** - Get individual restaurant
+7. **`PUT /api/restaurants/{id}`** - Update restaurant
+8. **`DELETE /api/restaurants/{id}`** - Delete restaurant
+9. **`GET /api/statistics`** - Get statistics
+10. **`GET /api/kosher-types`** - Get kosher types
+11. **`POST /api/remove-duplicates`** - Remove duplicates
+12. **`GET /api/migrate`** - Get migration status
+13. **`POST /api/migrate`** - Run migrations
+14. **`POST /api/update-database`** - Update database
 
-## 🔧 **Solution Implemented**
+## Solution
+Created comprehensive Next.js API routes that act as proxies to the backend Flask API. Each route:
 
-### **Fixed in frontend/components/HomePageClient.tsx**:
+1. **Validates input parameters** - Ensures proper data types and formats
+2. **Forwards requests to backend** - Uses the correct backend URL from environment variables
+3. **Handles errors gracefully** - Provides consistent error responses
+4. **Returns backend responses** - Maintains the same status codes and data structure
+
+## Files Created/Modified
+
+### New API Routes Created:
+- `frontend/app/api/restaurants/[id]/fetch-website/route.ts`
+- `frontend/app/api/restaurants/fetch-missing-websites/route.ts`
+- `frontend/app/api/restaurants/[id]/fetch-hours/route.ts`
+- `frontend/app/api/restaurants/fetch-missing-hours/route.ts`
+- `frontend/app/api/restaurants/search/route.ts`
+- `frontend/app/api/restaurants/[id]/route.ts`
+- `frontend/app/api/statistics/route.ts`
+- `frontend/app/api/kosher-types/route.ts`
+- `frontend/app/api/remove-duplicates/route.ts`
+- `frontend/app/api/migrate/route.ts`
+- `frontend/app/api/update-database/route.ts`
+
+### Documentation Created:
+- `docs/api/API_ENDPOINTS_SUMMARY.md` - Comprehensive API documentation
+- `API_ENDPOINT_FIX.md` - This summary document
+
+## Environment Configuration
+All API routes use the `NEXT_PUBLIC_BACKEND_URL` environment variable with a fallback to `https://jewgo.onrender.com`. This ensures consistency with the existing frontend configuration.
+
+## Architecture Pattern
+All new API routes follow a consistent pattern:
+
 ```typescript
-// OLD (incorrect - relative URL):
-const response = await fetch('/api/restaurants?limit=1000');
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    // 1. Validate input
+    const restaurantId = params.id;
+    if (!restaurantId || isNaN(Number(restaurantId))) {
+      return NextResponse.json(
+        { error: 'Invalid restaurant ID' },
+        { status: 400 }
+      );
+    }
 
-// NEW (correct - backend URL):
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://jewgo.onrender.com';
-const response = await fetch(`${backendUrl}/api/restaurants?limit=1000`);
+    // 2. Get backend URL from environment
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://jewgo.onrender.com';
+    
+    // 3. Forward request to backend
+    const backendResponse = await fetch(
+      `${backendUrl}/api/restaurants/${restaurantId}/fetch-website`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      }
+    );
+
+    const data = await backendResponse.json();
+
+    // 4. Return backend response
+    return NextResponse.json(data, { status: backendResponse.status });
+
+  } catch (error) {
+    // 5. Handle errors
+    console.error('Error in API route:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
 ```
 
-## 🎯 **Why This Fix Works**
+## Testing
+The fix resolves the 405 Method Not Allowed error by providing proper Next.js API routes that can handle the requests and forward them to the backend. The website backup functionality should now work correctly.
 
-### **1. Correct API Endpoint**
-- ✅ **Backend URL** - Points to Render backend instead of Next.js API route
-- ✅ **Environment variable** - Uses `NEXT_PUBLIC_BACKEND_URL` if set
-- ✅ **Fallback URL** - Defaults to `https://jewgo.onrender.com`
+## Impact
+- ✅ Resolves 405 Method Not Allowed error
+- ✅ Enables website backup functionality
+- ✅ Enables hours backup functionality
+- ✅ Provides complete API coverage for all backend endpoints
+- ✅ Maintains consistent error handling and response formats
+- ✅ Follows established patterns for maintainability
 
-### **2. Data Flow**
-- ✅ **Frontend** → **Backend API** → **Database**
-- ✅ **Restaurants data** - Fetched from correct source
-- ✅ **Filtering** - Works with actual restaurant data
-
-### **3. Error Resolution**
-- ✅ **No more "e is not iterable"** - Data is properly fetched
-- ✅ **Restaurants display** - Should show all 107 restaurants
-- ✅ **Pagination works** - Proper restaurant count
-
-## 🚀 **Expected Result**
-
-The next Vercel deployment should now:
-1. ✅ **Fetch restaurants** - From backend API correctly
-2. ✅ **Display restaurants** - All 107 ORB-certified restaurants
-3. ✅ **Pagination works** - Proper page counts
-4. ✅ **Filtering works** - All filters functional
-
-## 📊 **Verification Steps**
-
-### **1. Check Frontend**:
-```bash
-# Visit your Vercel URL
-https://jewgo-app.vercel.app
-
-# Expected: Should show restaurants immediately
-# Console should show: "Restaurants fetched: 107"
-```
-
-### **2. Check Console Logs**:
-```
-✅ Fetching restaurants...
-✅ Restaurants fetched: 107
-✅ Pagination: Page 1, showing 20 restaurants (0-20 of 107)
-✅ Total pages calculation: 107 restaurants, 20 per page = 6 pages
-```
-
-### **3. Test Functionality**:
-- **Restaurants display** - Should see restaurant cards
-- **Pagination** - Should show multiple pages
-- **Search** - Should filter restaurants
-- **Kosher filters** - Should work correctly
-
-## 🎉 **Status**
-
-**✅ FIXED**: API endpoint now points to correct backend
-**✅ CONFIGURED**: Uses environment variable with fallback
-**✅ FUNCTIONAL**: Should fetch and display restaurants
-**✅ PUSHED**: Changes committed and pushed to GitHub
-**🚀 READY**: Next Vercel deployment should work correctly
-
-## 📋 **Next Steps**
-
-1. **Monitor Vercel deployment** - Should now fetch restaurants
-2. **Verify restaurant display** - Should show all 107 restaurants
-3. **Test all features** - Search, filtering, pagination
-4. **Check console logs** - Should show successful data fetching
-
-## 🔧 **Complete Fix Summary**
-
-### **All Issues Resolved**:
-1. ✅ **Flask Compatibility** - Removed deprecated decorator
-2. ✅ **Vercel Directory Structure** - Fixed package.json location
-3. ✅ **Environment Variables** - Removed non-existent secret references
-4. ✅ **Functions Configuration** - Removed problematic patterns
-5. ✅ **TypeScript Compilation** - Replaced spread operators
-6. ✅ **Webpack Dependencies** - Removed missing terser-webpack-plugin
-7. ✅ **TypeScript Array Types** - Added explicit type annotations
-8. ✅ **TypeScript Property Types** - Fixed non-existent property references
-9. ✅ **API Endpoint** - Fixed to use correct backend URL
-
-The API endpoint issue has been completely resolved! 🚀 
+## Next Steps
+1. Test the website backup functionality to ensure it works correctly
+2. Monitor for any other missing API endpoints
+3. Consider adding automated tests for the new API routes
+4. Update any frontend components that might be calling these endpoints directly 

@@ -72,7 +72,15 @@ export default function RestaurantCard({
 
   const getAgencyBadgeClass = (agency: string) => {
     const agencyLower = agency.toLowerCase();
-    if (agencyLower.includes('ou') || agencyLower.includes('orthodox union')) {
+    if (agencyLower.includes('orb')) {
+      return 'bg-sky-100 text-sky-800 border-sky-200';
+    } else if (agencyLower.includes('km')) {
+      return 'bg-pink-100 text-pink-800 border-pink-200';
+    } else if (agencyLower.includes('kdm')) {
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+    } else if (agencyLower.includes('diamond k')) {
+      return 'bg-purple-100 text-purple-800 border-purple-200';
+    } else if (agencyLower.includes('ou') || agencyLower.includes('orthodox union')) {
       return 'bg-blue-100 text-blue-800 border-blue-200';
     } else if (agencyLower.includes('ok') || agencyLower.includes('ok kosher')) {
       return 'bg-green-100 text-green-800 border-green-200';
@@ -89,11 +97,11 @@ export default function RestaurantCard({
   const getKosherTypeBadgeClass = (kosherType: string) => {
     const typeLower = kosherType.toLowerCase();
     if (typeLower === 'dairy') {
-      return 'bg-blue-500 text-white border-blue-600';
+      return 'bg-sky-300 text-sky-900 border-sky-400';
     } else if (typeLower === 'meat') {
-      return 'bg-red-500 text-white border-red-600';
+      return 'bg-red-700 text-white border-red-800';
     } else if (typeLower === 'pareve') {
-      return 'bg-green-500 text-white border-green-600';
+      return 'bg-yellow-300 text-yellow-900 border-yellow-400';
     }
     return 'bg-gray-500 text-white border-gray-600';
   };
@@ -107,7 +115,7 @@ export default function RestaurantCard({
     } else if (categoryLower.includes('mehadrin')) {
       return 'bg-amber-100 text-amber-800 border-amber-200';
     } else if (categoryLower.includes('chalav yisrael') || categoryLower.includes('chalav yisroel')) {
-      return 'bg-cyan-100 text-cyan-800 border-cyan-200';
+      return 'bg-pink-100 text-pink-800 border-pink-200';
     }
     return 'bg-gray-100 text-gray-800 border-gray-200';
   };
@@ -298,8 +306,8 @@ export default function RestaurantCard({
             <span className={cn(
               "inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold border shadow-sm",
               restaurant.is_cholov_yisroel 
-                ? "bg-cyan-100 text-cyan-800 border-cyan-200" 
-                : "bg-orange-100 text-orange-800 border-orange-200"
+                ? "bg-pink-100 text-pink-800 border-pink-200" 
+                : "bg-gray-100 text-gray-800 border-gray-200"
             )}>
               {restaurant.is_cholov_yisroel ? "Chalav Yisrael" : "Chalav Stam"}
             </span>

@@ -80,9 +80,9 @@ export default function SimpleMap({ restaurants, onRestaurantSelect }: SimpleMap
       const position = { lat: restaurant.latitude, lng: restaurant.longitude };
       
       // Create custom marker icon based on kosher category
-      const markerColor = restaurant.kosher_category === 'meat' ? '#ef4444' :
-                         restaurant.kosher_category === 'dairy' ? '#3b82f6' :
-                         restaurant.kosher_category === 'pareve' ? '#10b981' : '#6b7280';
+        const markerColor = restaurant.kosher_category === 'meat' ? '#A70000' :
+                     restaurant.kosher_category === 'dairy' ? '#ADD8E6' :
+                     restaurant.kosher_category === 'pareve' ? '#FFCE6D' : '#6b7280';
       
       const markerLabel = restaurant.kosher_category === 'meat' ? 'M' :
                          restaurant.kosher_category === 'dairy' ? 'D' :

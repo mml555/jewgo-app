@@ -54,15 +54,15 @@ module.exports = {
         
         // Kosher Category Colors (Semantic)
         kosher: {
-          meat: '#ef4444',      // Red for meat
+          meat: '#A70000',      // Dark red for meat
           'meat-light': '#fef2f2',
-          'meat-dark': '#dc2626',
-          dairy: '#3b82f6',     // Blue for dairy
-          'dairy-light': '#eff6ff',
-          'dairy-dark': '#2563eb',
-          pareve: '#f59e0b',    // Yellow for pareve
-          'pareve-light': '#fffbeb',
-          'pareve-dark': '#d97706',
+          'meat-dark': '#8B0000',
+          dairy: '#ADD8E6',     // Light blue for dairy
+          'dairy-light': '#f0f8ff',
+          'dairy-dark': '#87CEEB',
+          pareve: '#FFCE6D',    // Yellow for pareve
+          'pareve-light': '#fffbf0',
+          'pareve-dark': '#FFB347',
           unknown: '#6b7280',   // Gray for unknown
           'unknown-light': '#f9fafb',
           'unknown-dark': '#374151',
@@ -70,12 +70,12 @@ module.exports = {
         
         // Certification Agency Colors
         agency: {
-          orb: '#1e40af',       // ORB blue
-          'orb-light': '#dbeafe',
-          km: '#10b981',        // KM green
-          'km-light': '#d1fae5',
-          kdm: '#f59e0b',       // KDM yellow
-          'kdm-light': '#fef3c7',
+          orb: '#ADD8E6',       // ORB light blue
+          'orb-light': '#f0f8ff',
+          km: '#FCC0C5',        // KM light pink (Chalav Yisroel)
+          'km-light': '#fef7f7',
+          kdm: '#BBBBBB',       // KDM gray (Chalav Stam)
+          'kdm-light': '#f5f5f5',
           'diamond-k': '#8b5cf6', // Diamond K purple
           'diamond-k-light': '#ede9fe',
         },

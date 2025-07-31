@@ -542,7 +542,7 @@ export default function InteractiveRestaurantMap({
               </span>
             ` : ''}
             ${restaurant.kosher_category ? `
-              <span class="inline-block ${restaurant.kosher_category === 'meat' ? 'bg-red-100 text-red-800' : restaurant.kosher_category === 'dairy' ? 'bg-blue-100 text-blue-800' : restaurant.kosher_category === 'pareve' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'} text-xs px-2 py-1 rounded-full mb-1">
+              <span class="inline-block ${restaurant.kosher_category === 'meat' ? 'bg-red-50 text-red-900 border border-red-200' : restaurant.kosher_category === 'dairy' ? 'bg-blue-50 text-blue-900 border border-blue-200' : restaurant.kosher_category === 'pareve' ? 'bg-yellow-50 text-yellow-900 border border-yellow-200' : 'bg-gray-100 text-gray-800'} text-xs px-2 py-1 rounded-full mb-1">
                 ${restaurant.kosher_category}
               </span>
             ` : ''}

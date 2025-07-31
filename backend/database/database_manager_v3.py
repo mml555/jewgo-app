@@ -75,7 +75,7 @@ Base = declarative_base()
 
 class Restaurant(Base):
     """
-    Restaurant model for SQLAlchemy (consolidated table).
+    Optimized Restaurant model for SQLAlchemy (consolidated table).
     
     This model represents the main restaurants table in the JewGo database.
     It contains all kosher restaurant information including contact details,
@@ -95,54 +95,52 @@ class Restaurant(Base):
     """
     __tablename__ = 'restaurants'
     
-    # Primary key
+    # 🔒 System-Generated / Controlled
     id = Column(Integer, primary_key=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    current_time_local = Column(DateTime)  # System-generated (local time snapshot)
+    hours_parsed = Column(Boolean, default=False)  # Internal flag — OK to keep
+    timezone = Column(String(50))  # Based on geolocation or ORB data
     
-    # Core restaurant information
+    # 🧾 Required (updated via ORB scrape every 3 weeks)
     name = Column(String(255), nullable=False)  # Restaurant name (required)
-    address = Column(String(500))               # Street address
-    city = Column(String(100))                  # City name
-    state = Column(String(50))                  # State abbreviation
-    zip_code = Column(String(20))               # ZIP code
+    address = Column(String(500), nullable=False)  # Street address
+    city = Column(String(100), nullable=False)  # City name
+    state = Column(String(50), nullable=False)  # State abbreviation
+    zip_code = Column(String(20), nullable=False)  # ZIP code
+    phone_number = Column(String(50), nullable=False)  # Phone number
+    website = Column(String(500))  # Website URL
+    certifying_agency = Column(String(100), default='ORB', nullable=False)  # Auto-filled = "ORB"
+    kosher_category = Column(String(20), nullable=False)  # ENUM('meat', 'dairy', 'pareve')
+    listing_type = Column(String(100), nullable=False)  # Business category
     
-    # Contact information
-    phone = Column(String(50))                  # Phone number
-    website = Column(String(500))               # Website URL
-    email = Column(String(255))                 # Email address
+    # 📍 Enriched via Google Places API (on creation or scheduled)
+    google_listing_url = Column(String(500))  # Optional (1-time fetch)
+    price_range = Column(String(20))  # Optional
+    short_description = Column(Text)  # Optional (e.g. from GMB or internal AI)
+    hours_of_operation = Column(Text)  # Optional (check every 7 days)
+    latitude = Column(Float)  # Based on geocoded address
+    longitude = Column(Float)  # Based on geocoded address
     
-    # Business details
-    price_range = Column(String(20))            # Price range (e.g., "$", "$$", "$$$")
-    image_url = Column(String(500))             # Restaurant image URL
-    hours_open = Column(Text)                   # Operating hours
-    category = Column(String(100), default='restaurant')  # Business category
-    status = Column(String(50), default='approved')       # Business status
+    # 🧼 Kosher Details Source ORB data
+    is_cholov_yisroel = Column(Boolean)  # Optional (only if dairy)
+    is_pas_yisroel = Column(Boolean)  # Optional (only if meat/pareve)
     
-    # Kosher supervision flags
-  
-    is_cholov_yisroel = Column(Boolean, default=False)   # Chalav Yisroel status
-    is_pas_yisroel = Column(Boolean, default=False)      # Pas Yisroel status
+    # 🖼️ Display/UX
+    image_url = Column(String(500))  # Optional — fallback to placeholder
+    specials = Column(Text)  # JSONB[] or child table - Admin-managed only, frontend only
     
-    # Kosher categorization
-    kosher_type = Column(String(100))           # dairy, meat, pareve
-    cuisine_type = Column(String(100))          # cuisine type
-   
-    # ORB certification information
-    kosher_cert_link = Column(String(500))      # Link to kosher certificate
-    certifying_agency = Column(String(100))     # Certifying agency (ORB, OU, etc.)
-    detail_url = Column(String(500))            # ORB detail page URL
-    short_description = Column(Text)             # Restaurant description
-    google_listing_url = Column(String(500))    # Google Maps listing URL
+    # 🗑️ Removed Fields (commented out for reference)
+    # detail_url = Column(String(500))  # ❌ delete
+    # email = Column(String(255))  # ❌ delete
+    # kosher_cert_link = Column(String(500))  # ❌ delete
+    # next_open_time = Column(DateTime)  # ❌ delete (calculate in logic)
+    # is_open = Column(Boolean)  # ❌ move to function, not DB
+    # status_reason = Column(String(255))  # ❌ internal only, not DB
     
-    # Location and rating information
-    latitude = Column(Float)                     # Latitude coordinate
-    longitude = Column(Float)                    # Longitude coordinate
-    
-    # Additional hours field
-    hours = Column(Text)                         # Alternative hours field
-    
-    # Audit trail
-    created_at = Column(DateTime, default=datetime.utcnow)           # Creation timestamp
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # Update timestamp
+    # ❓ Field Needing Clarification
+    # status = Column(String(50), default='approved')  # Should be enum: ["pending", "approved", "rejected"] or remove if unused
 
 class EnhancedDatabaseManager:
     """Enhanced database manager with SQLAlchemy 1.4 support for consolidated restaurants table."""
@@ -385,7 +383,7 @@ class EnhancedDatabaseManager:
                 session.close()
     
     def _restaurant_to_unified_dict(self, restaurant: Restaurant) -> Dict[str, Any]:
-        """Convert Restaurant object to unified dictionary format with dynamic status calculation."""
+        """Convert restaurant object to unified dictionary format."""
         # Create base restaurant data dictionary
         restaurant_data = {
             'id': restaurant.id,
@@ -394,28 +392,26 @@ class EnhancedDatabaseManager:
             'city': restaurant.city,
             'state': restaurant.state,
             'zip_code': restaurant.zip_code,
-            'phone_number': restaurant.phone,
+            'phone_number': restaurant.phone_number,
             'website': restaurant.website,
-            'kosher_category': restaurant.kosher_type or restaurant.cuisine_type or 'restaurant',
-            'listing_type': restaurant.category or 'restaurant',
-            'hours_of_operation': restaurant.hours_open or restaurant.hours,
-            'hours_open': restaurant.hours_open or restaurant.hours,
+            'kosher_category': restaurant.kosher_category,
+            'listing_type': restaurant.listing_type,
+            'hours_of_operation': restaurant.hours_of_operation,
             'short_description': restaurant.short_description,
             'price_range': restaurant.price_range,
             'image_url': restaurant.image_url,
             'latitude': restaurant.latitude,
             'longitude': restaurant.longitude,
-            'specials': [],
+            'specials': restaurant.specials or [],
             'is_cholov_yisroel': restaurant.is_cholov_yisroel,
             'is_pas_yisroel': restaurant.is_pas_yisroel,
-            'kosher_type': restaurant.kosher_type,
-            'kosher_cert_link': restaurant.kosher_cert_link,
             'certifying_agency': restaurant.certifying_agency,
-            'detail_url': restaurant.detail_url,
-            'email': restaurant.email,
             'google_listing_url': restaurant.google_listing_url,
             'created_at': restaurant.created_at.isoformat() if restaurant.created_at else None,
-            'updated_at': restaurant.updated_at.isoformat() if restaurant.updated_at else None
+            'updated_at': restaurant.updated_at.isoformat() if restaurant.updated_at else None,
+            'current_time_local': restaurant.current_time_local.isoformat() if restaurant.current_time_local else None,
+            'timezone': restaurant.timezone,
+            'hours_parsed': restaurant.hours_parsed
         }
         
         # Calculate dynamic status based on business hours and current time
@@ -434,7 +430,7 @@ class EnhancedDatabaseManager:
             logger.error(f"Error calculating dynamic status for restaurant {restaurant.name}: {e}")
             # Fallback to stored status if dynamic calculation fails
             restaurant_data.update({
-                'status': restaurant.status or 'unknown',
+                'status': 'unknown',
                 'is_open': False,
                 'status_reason': f'Dynamic status calculation failed: {str(e)}',
                 'next_open_time': None,
@@ -443,7 +439,7 @@ class EnhancedDatabaseManager:
                 'hours_parsed': False
             })
         
-        return restaurant_data 
+        return restaurant_data
     
     def get_restaurant_by_name(self, name: str) -> Optional[Dict[str, Any]]:
         """Get restaurant by name."""
@@ -498,7 +494,7 @@ class EnhancedDatabaseManager:
             restaurant = Restaurant(
                 name=name,
                 address=address,
-                phone=phone_number,
+                phone_number=phone_number,
                 kosher_type=kosher_type,
             )
             
