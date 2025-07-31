@@ -19,10 +19,5 @@
   ],
   "env": {
     "NEXT_PUBLIC_API_URL": "https://jewgo.onrender.com"
-  },
-  "functions": {
-    "app/**/*.ts": {
-      "maxDuration": 30
-    }
   }
 } 

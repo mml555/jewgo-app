@@ -7,10 +7,5 @@
   "framework": "nextjs",
   "env": {
     "NEXT_PUBLIC_API_URL": "https://jewgo.onrender.com"
-  },
-  "functions": {
-    "frontend/app/**/*.ts": {
-      "maxDuration": 30
-    }
   }
 } 
