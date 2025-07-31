@@ -1008,6 +1008,7 @@ def create_app(config_name=None):
             logger.info("Manual kosher type fix triggered")
             
             # Get database manager
+            from database_manager_v3 import EnhancedDatabaseManager as DatabaseManager
             db_manager = DatabaseManager()
             session = db_manager.get_session()
             
