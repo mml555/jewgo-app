@@ -1,0 +1,1 @@
+web: cd backend && gunicorn --config config/gunicorn.conf.py app:app 
