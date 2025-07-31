@@ -79,7 +79,7 @@ def reset_restaurant_ids():
         # Show first few restaurants with their new IDs
         logger.info("First 10 restaurants with new IDs:")
         for i, restaurant in enumerate(final_restaurants[:10]):
-            logger.info(f"  {restaurant.id}. {restaurant.name} ({restaurant.kosher_type})")
+            logger.info(f"  {restaurant.id}. {restaurant.name} ({restaurant.kosher_category})")
         
         session.close()
         db_manager.disconnect()

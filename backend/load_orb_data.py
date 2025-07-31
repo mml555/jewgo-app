@@ -415,9 +415,9 @@ def load_orb_data():
         # Show kosher type statistics
         from sqlalchemy import func
         kosher_types = session.query(
-            Restaurant.kosher_type,
-            func.count(Restaurant.kosher_type)
-        ).group_by(Restaurant.kosher_type).all()
+            Restaurant.kosher_category,
+            func.count(Restaurant.kosher_category)
+        ).group_by(Restaurant.kosher_category).all()
         
         logger.info("Kosher Type Distribution:")
         for kosher_type, count in kosher_types:
@@ -430,7 +430,7 @@ def load_orb_data():
         
         chalav_stam_count = session.query(Restaurant).filter(
             Restaurant.is_cholov_yisroel == False,
-            Restaurant.kosher_type == 'dairy'
+            Restaurant.kosher_category == 'dairy'
         ).count()
         
         pas_yisroel_count = session.query(Restaurant).filter(

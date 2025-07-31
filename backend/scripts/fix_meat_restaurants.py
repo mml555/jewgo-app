@@ -74,8 +74,7 @@ def fix_meat_restaurants():
                 
                 if restaurant:
                     # Update kosher type and category
-                    old_type = restaurant.kosher_type
-                    restaurant.kosher_type = 'meat'
+                    old_type = restaurant.kosher_category
                     restaurant.kosher_category = 'meat'
                     restaurant.updated_at = datetime.utcnow()
                     
@@ -94,9 +93,9 @@ def fix_meat_restaurants():
         
         # Show final statistics
         kosher_types = session.query(
-            Restaurant.kosher_type,
-            db_manager.db.func.count(Restaurant.kosher_type)
-        ).group_by(Restaurant.kosher_type).all()
+            Restaurant.kosher_category,
+            db_manager.db.func.count(Restaurant.kosher_category)
+        ).group_by(Restaurant.kosher_category).all()
         
         logger.info("Final Kosher Type Distribution:")
         for kosher_type, count in kosher_types:

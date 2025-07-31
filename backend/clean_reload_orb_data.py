@@ -425,14 +425,14 @@ def clean_reload_orb_data():
         # Show first few restaurants with their new IDs
         logger.info("First 10 restaurants with sequential IDs:")
         for restaurant in final_restaurants[:10]:
-            logger.info(f"  {restaurant.id}. {restaurant.name} ({restaurant.kosher_type})")
+            logger.info(f"  {restaurant.id}. {restaurant.name} ({restaurant.kosher_category})")
         
         # Show kosher type statistics
         from sqlalchemy import func
         kosher_types = session.query(
-            Restaurant.kosher_type,
-            func.count(Restaurant.kosher_type)
-        ).group_by(Restaurant.kosher_type).all()
+            Restaurant.kosher_category,
+            func.count(Restaurant.kosher_category)
+        ).group_by(Restaurant.kosher_category).all()
         
         logger.info("Kosher Type Distribution:")
         for kosher_type, count in kosher_types:
