@@ -1,0 +1,527 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import 'leaflet/dist/leaflet.css';
+
+/* Design System CSS Variables */
+:root {
+  /* Primary JewGo Brand Colors */
+  --jewgo-50: #f0fdf4;
+  --jewgo-100: #dcfce7;
+  --jewgo-200: #bbf7d0;
+  --jewgo-300: #86efac;
+  --jewgo-400: #4ade80;
+  --jewgo-500: #22c55e;
+  --jewgo-600: #16a34a;
+  --jewgo-700: #15803d;
+  --jewgo-800: #166534;
+  --jewgo-900: #14532d;
+  --jewgo-950: #052e16;
+  
+  /* Neutral Colors */
+  --neutral-50: #fafafa;
+  --neutral-100: #f5f5f5;
+  --neutral-200: #e5e5e5;
+  --neutral-300: #d4d4d4;
+  --neutral-400: #a3a3a3;
+  --neutral-500: #737373;
+  --neutral-600: #525252;
+  --neutral-700: #404040;
+  --neutral-800: #262626;
+  --neutral-900: #171717;
+  --neutral-950: #0a0a0a;
+  
+  /* Accent Colors */
+  --accent-blue: #3B82F6;
+  --accent-blue-dark: #2563EB;
+  --accent-green: #10B981;
+  --accent-green-dark: #059669;
+  --accent-yellow: #F59E0B;
+  --accent-yellow-dark: #D97706;
+  --accent-purple: #8B5CF6;
+  --accent-purple-dark: #7C3AED;
+  --accent-orange: #F97316;
+  --accent-orange-dark: #EA580C;
+  
+  /* Kosher Category Colors */
+  --kosher-meat: #ef4444;
+  --kosher-meat-light: #fef2f2;
+  --kosher-meat-dark: #dc2626;
+  --kosher-dairy: #3b82f6;
+  --kosher-dairy-light: #eff6ff;
+  --kosher-dairy-dark: #2563eb;
+  --kosher-pareve: #f59e0b;
+  --kosher-pareve-light: #fffbeb;
+  --kosher-pareve-dark: #d97706;
+  --kosher-unknown: #6b7280;
+  --kosher-unknown-light: #f9fafb;
+  --kosher-unknown-dark: #374151;
+  
+  /* Certification Agency Colors */
+  --agency-orb: #1e40af;
+  --agency-orb-light: #dbeafe;
+  --agency-km: #10b981;
+  --agency-km-light: #d1fae5;
+  --agency-kdm: #f59e0b;
+  --agency-kdm-light: #fef3c7;
+  --agency-diamond-k: #8b5cf6;
+  --agency-diamond-k-light: #ede9fe;
+  
+  /* Status Colors */
+  --status-success: #10b981;
+  --status-success-light: #d1fae5;
+  --status-warning: #f59e0b;
+  --status-warning-light: #fef3c7;
+  --status-error: #ef4444;
+  --status-error-light: #fef2f2;
+  --status-info: #3b82f6;
+  --status-info-light: #dbeafe;
+  
+  /* Legacy aliases for backward compatibility */
+  --jewgo-primary: var(--jewgo-400);
+  --jewgo-primary-dark: var(--jewgo-600);
+  --jewgo-secondary: var(--neutral-700);
+  --jewgo-accent: var(--accent-green);
+  --jewgo-purple: var(--accent-purple);
+  --jewgo-gray: var(--neutral-500);
+  --jewgo-light: var(--jewgo-50);
+  --jewgo-dark: var(--neutral-800);
+  --mint-green: #A8E6CF;
+}
+
+/* Leaflet Map Customizations */
+.leaflet-container {
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  padding: 0;
+}
+
+.leaflet-popup-tip {
+  background: white;
+}
+
+.custom-marker {
+  background: transparent;
+  border: none;
+}
+
+/* Kosher Badge Styles - Updated with new color system */
+.kosher-badge {
+  @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.bg-kosher-orb {
+  @apply bg-agency-orb-light text-agency-orb;
+}
+
+.bg-kosher-km {
+  @apply bg-agency-km-light text-agency-km;
+}
+
+.bg-kosher-kdm {
+  @apply bg-agency-kdm-light text-agency-kdm;
+}
+
+.bg-kosher-diamond-k {
+  @apply bg-agency-diamond-k-light text-agency-diamond-k;
+}
+
+.bg-kosher-unknown {
+  @apply bg-kosher-unknown-light text-kosher-unknown;
+}
+
+/* Restaurant Card Styles - Updated with new color system */
+.restaurant-card {
+  @apply bg-white rounded-xl shadow-soft border border-neutral-200 overflow-hidden transition-all duration-300;
+}
+
+.restaurant-card:hover {
+  @apply shadow-medium border-jewgo-400/20 scale-[1.02];
+}
+
+/* Search Bar Styles - Updated with new color system */
+.search-bar {
+  @apply w-full px-4 py-3 rounded-xl bg-white border border-neutral-300 focus:border-jewgo-400 focus:ring-jewgo-400/20 focus:outline-none transition-all duration-200 shadow-soft;
+}
+
+/* Filter Button Styles - Updated with new color system */
+.filter-button {
+  @apply px-2 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-soft flex flex-col items-center justify-center gap-1 min-h-[50px];
+}
+
+.filter-button.active {
+  @apply bg-gradient-jewgo text-white shadow-medium;
+}
+
+.filter-button:not(.active) {
+  @apply bg-white text-neutral-700 hover:bg-neutral-50 hover:shadow-soft;
+}
+
+/* Action Button Styles - Updated with new color system */
+.action-button {
+  @apply bg-gradient-jewgo text-white px-6 py-3 rounded-xl font-medium hover:bg-jewgo-600 transition-colors shadow-soft hover:shadow-medium;
+}
+
+/* Loading Spinner - Updated with new color system */
+.loading-spinner {
+  @apply animate-spin rounded-full border-2 border-neutral-300 border-t-jewgo-400;
+}
+
+/* Skeleton Loading - Updated with new color system */
+.skeleton {
+  @apply animate-pulse bg-neutral-200 rounded;
+}
+
+/* Pagination Button - Updated with new color system */
+.pagination-button {
+  @apply px-3 py-2 rounded-lg text-sm font-medium transition-colors;
+}
+
+.pagination-button.active {
+  @apply bg-gradient-jewgo text-white;
+}
+
+.pagination-button:not(.active) {
+  @apply bg-white text-neutral-700 hover:bg-neutral-50 border border-neutral-200;
+}
+
+/* Agency Badge Colors - Updated with new color system */
+.agency-badge-orb {
+  @apply bg-agency-orb-light text-agency-orb;
+}
+
+.agency-badge-km {
+  @apply bg-agency-km-light text-agency-km;
+}
+
+.agency-badge-kdm {
+  @apply bg-agency-kdm-light text-agency-kdm;
+}
+
+.agency-badge-diamond-k {
+  @apply bg-agency-diamond-k-light text-agency-diamond-k;
+}
+
+/* Header Gradient - Updated with new color system */
+.header-gradient {
+  @apply bg-gradient-jewgo;
+}
+
+/* Bottom Navigation - Updated with new color system */
+.bottom-nav {
+  @apply fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 shadow-medium;
+}
+
+.bottom-nav-button {
+  @apply flex flex-col items-center justify-center py-2 px-3 text-xs font-medium transition-colors;
+}
+
+.bottom-nav-button.active {
+  @apply text-jewgo-400;
+}
+
+.bottom-nav-button:not(.active) {
+  @apply text-neutral-500 hover:text-neutral-700;
+}
+
+/* Tooltip - Updated with new color system */
+.tooltip {
+  @apply absolute z-10 px-2 py-1 text-xs text-white bg-neutral-900 rounded opacity-0 pointer-events-none transition-opacity;
+}
+
+.tooltip.show {
+  @apply opacity-100;
+}
+
+/* Focus Ring - Updated with new color system */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-jewgo-400/20 focus:ring-offset-2;
+}
+
+/* Smooth Transitions */
+.smooth-transition {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+/* Shadow Utilities - Updated with new color system */
+.shadow-soft {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-medium {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-strong {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Gradient Utilities - Updated with new color system */
+.gradient-primary {
+  background: linear-gradient(135deg, var(--jewgo-400), var(--jewgo-600));
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark));
+}
+
+/* Text Gradient - Updated with new color system */
+.text-gradient {
+  background: linear-gradient(135deg, var(--jewgo-400), var(--accent-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes filterPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.animate-filter-pulse {
+  animation: filterPulse 0.3s ease-in-out;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+  .restaurant-card {
+    @apply rounded-lg;
+  }
+  
+  .search-bar {
+    @apply rounded-lg px-3 py-2.5 text-base;
+  }
+  
+  .filter-button {
+    @apply px-2 py-2 text-xs min-h-[44px];
+  }
+
+  /* Improve touch targets on mobile */
+  button, a {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Better spacing for mobile */
+  .container {
+    @apply px-4;
+  }
+
+  /* Optimize text sizes for mobile */
+  h1 {
+    @apply text-xl;
+  }
+
+  h2 {
+    @apply text-lg;
+  }
+
+  h3 {
+    @apply text-base;
+  }
+
+  /* Improve mobile navigation */
+  .bottom-nav {
+    @apply px-2 py-1;
+  }
+
+  .bottom-nav-button {
+    @apply py-2 px-2 min-h-[44px];
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .restaurant-card {
+    @apply rounded-lg;
+  }
+  
+  .search-bar {
+    @apply rounded-lg px-4 py-3;
+  }
+  
+  .filter-button {
+    @apply px-3 py-2 text-sm min-h-[48px];
+  }
+}
+
+/* Desktop optimizations */
+@media (min-width: 1025px) {
+  .restaurant-card {
+    @apply rounded-xl;
+  }
+  
+  .search-bar {
+    @apply rounded-xl px-4 py-3;
+  }
+  
+  .filter-button {
+    @apply px-4 py-3 text-sm min-h-[52px];
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .smooth-transition,
+  .restaurant-card,
+  .filter-button,
+  .action-button {
+    transition: none;
+  }
+  
+  .animate-fade-in-up,
+  .animate-slide-in-right,
+  .animate-filter-pulse {
+    animation: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .restaurant-card {
+    @apply border-2 border-neutral-800;
+  }
+  
+  .filter-button:not(.active) {
+    @apply border-2 border-neutral-800;
+  }
+} 
+
+/* Range Slider Styles - Updated with new color system */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-track {
+  background: var(--neutral-200);
+  height: 8px;
+  border-radius: 4px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--jewgo-400);
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: var(--jewgo-600);
+  transform: scale(1.1);
+}
+
+.slider::-moz-range-track {
+  background: var(--neutral-200);
+  height: 8px;
+  border-radius: 4px;
+  border: none;
+}
+
+.slider::-moz-range-thumb {
+  background: var(--jewgo-400);
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.slider::-moz-range-thumb:hover {
+  background: var(--jewgo-600);
+  transform: scale(1.1);
+} 
+
+/* Line Clamp Utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Enhanced line-clamp for better browser support */
+.line-clamp-2-enhanced {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+  max-height: 2.8rem;
+}
+
+/* Hide scrollbar for horizontal scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+} 
