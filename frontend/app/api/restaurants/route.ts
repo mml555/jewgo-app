@@ -187,8 +187,8 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
-      data: data.data || data,
-      total: data.total || (data.data ? data.data.length : 0),
+      data: data.restaurants || data.data || data,
+      total: data.total || (data.restaurants ? data.restaurants.length : (data.data ? data.data.length : 0)),
       limit,
       offset
     });

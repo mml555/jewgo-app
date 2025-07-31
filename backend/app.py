@@ -254,6 +254,97 @@ def get_kosher_types():
             'message': str(e)
         }), 500
 
+@app.route('/api/remove-duplicates', methods=['POST'])
+def remove_duplicates():
+    """Remove duplicate restaurants from the database."""
+    try:
+        session = db_manager.get_session()
+        
+        # Find duplicates using SQL
+        from sqlalchemy import text
+        
+        duplicate_query = text("""
+            WITH duplicates AS (
+                SELECT 
+                    name,
+                    MIN(id) as keep_id,
+                    COUNT(*) as count
+                FROM restaurants 
+                GROUP BY name 
+                HAVING COUNT(*) > 1
+            )
+            SELECT 
+                d.name,
+                d.keep_id,
+                d.count,
+                array_agg(r.id ORDER BY r.id) as all_ids
+            FROM duplicates d
+            JOIN restaurants r ON r.name = d.name
+            GROUP BY d.name, d.keep_id, d.count
+            ORDER BY d.name
+        """)
+        
+        result = session.execute(duplicate_query)
+        duplicates = result.fetchall()
+        
+        if not duplicates:
+            return jsonify({
+                'message': 'No duplicates found in database',
+                'removed_count': 0
+            }), 200
+        
+        total_removed = 0
+        removed_details = []
+        
+        for duplicate in duplicates:
+            name = duplicate.name
+            keep_id = duplicate.keep_id
+            count = duplicate.count
+            all_ids = duplicate.all_ids
+            
+            # Remove all except the oldest (lowest ID)
+            ids_to_remove = [id for id in all_ids if id != keep_id]
+            
+            # Delete the duplicates
+            delete_query = text("DELETE FROM restaurants WHERE id = ANY(:ids)")
+            session.execute(delete_query, {"ids": ids_to_remove})
+            
+            total_removed += len(ids_to_remove)
+            
+            removed_details.append({
+                'name': name,
+                'kept_id': keep_id,
+                'removed_ids': ids_to_remove,
+                'total_duplicates': count
+            })
+        
+        # Commit the changes
+        session.commit()
+        
+        # Get updated count
+        verify_query = text("SELECT COUNT(*) as total FROM restaurants")
+        result = session.execute(verify_query)
+        total_restaurants = result.fetchone().total
+        
+        session.close()
+        
+        return jsonify({
+            'message': f'Successfully removed {total_removed} duplicate restaurants',
+            'removed_count': total_removed,
+            'total_restaurants_after': total_restaurants,
+            'removed_details': removed_details
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error removing duplicates: {e}")
+        if 'session' in locals():
+            session.rollback()
+            session.close()
+        return jsonify({
+            'error': 'Failed to remove duplicates',
+            'message': str(e)
+        }), 500
+
 @app.route('/api/migrate', methods=['GET', 'POST'])
 def run_migration():
     """Run database migration to add missing columns."""

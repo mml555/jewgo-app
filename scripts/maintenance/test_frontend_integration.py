@@ -66,9 +66,12 @@ def test_frontend_integration():
             print(f"   Keys: {list(data.keys()) if isinstance(data, dict) else 'N/A'}")
             
             if isinstance(data, dict):
-                if 'data' in data:
+                if 'data' in data and isinstance(data['data'], dict) and 'restaurants' in data['data']:
+                    restaurants = data['data']['restaurants']
+                    print(f"   Data.restaurants count: {len(restaurants) if isinstance(restaurants, list) else 'N/A'}")
+                elif 'data' in data and isinstance(data['data'], list):
                     restaurants = data['data']
-                    print(f"   Data count: {len(restaurants) if isinstance(restaurants, list) else 'N/A'}")
+                    print(f"   Data count: {len(restaurants)}")
                 elif 'restaurants' in data:
                     restaurants = data['restaurants']
                     print(f"   Restaurants count: {len(restaurants) if isinstance(restaurants, list) else 'N/A'}")

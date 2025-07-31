@@ -128,6 +128,7 @@ class Restaurant(Base):
    
     # ORB certification information
     kosher_cert_link = Column(String(500))      # Link to kosher certificate
+    certifying_agency = Column(String(100))     # Certifying agency (ORB, OU, etc.)
     detail_url = Column(String(500))            # ORB detail page URL
     short_description = Column(Text)             # Restaurant description
     google_listing_url = Column(String(500))    # Google Maps listing URL

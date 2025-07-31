@@ -246,10 +246,10 @@ export default function HomePageClient() {
       }
       
       const data = await response.json();
-      console.log('Restaurants fetched:', data.restaurants?.length || 0);
+      console.log('Restaurants fetched:', data.data?.restaurants?.length || 0);
       
-      if (data.restaurants) {
-        setAllRestaurants(data.restaurants);
+      if (data.data?.restaurants) {
+        setAllRestaurants(data.data.restaurants);
         // Removed setDisplayedRestaurants since we now use memoized displayedRestaurants
       } else {
         setApiError('No restaurants data received');

@@ -106,8 +106,7 @@ class RestaurantStatusCalculator:
             }
             
         except Exception as e:
-            logger.error(f"Error calculating restaurant status: {e}", 
-                        restaurant_name=restaurant_data.get('name', 'Unknown'))
+            logger.error(f"Error calculating restaurant status: {e}")
             return {
                 'is_open': False,
                 'status': 'unknown',
@@ -139,7 +138,7 @@ class RestaurantStatusCalculator:
                 'NY': 'America/New_York',
                 'CA': 'America/Los_Angeles',
                 'TX': 'America/Chicago',
-                'FL': 'America/New_York',
+                'FL': 'America/New_York',  # Most of Florida is Eastern Time
                 'IL': 'America/Chicago',
                 'PA': 'America/New_York',
                 'OH': 'America/New_York',
@@ -229,6 +228,8 @@ class RestaurantStatusCalculator:
         try:
             # Common patterns for business hours
             patterns = [
+                # Pattern: "Daily: 24 hours" or "24 hours" (check this first)
+                r'(Daily|24\s*hours?|Open\s*24\s*hours?)',
                 # Pattern: "Monday: 9:00 AM - 10:00 PM"
                 r'(\w+):\s*(\d{1,2}):(\d{2})\s*(AM|PM)\s*-\s*(\d{1,2}):(\d{2})\s*(AM|PM)',
                 # Pattern: "Mon 9AM-10PM"
@@ -241,11 +242,16 @@ class RestaurantStatusCalculator:
             
             parsed_hours = []
             
-            for pattern in patterns:
+            for i, pattern in enumerate(patterns):
                 matches = re.findall(pattern, hours_data, re.IGNORECASE)
                 if matches:
                     for match in matches:
-                        day_info = self._parse_day_hours(match, pattern)
+                        # Handle 24-hour pattern separately
+                        if i == 0:  # First pattern is 24-hour pattern
+                            day_info = [{'day': 'daily', 'start': time(0, 0), 'end': time(23, 59)}]
+                        else:
+                            day_info = self._parse_day_hours(match, pattern)
+                        
                         if day_info:
                             parsed_hours.extend(day_info)
             
@@ -256,7 +262,7 @@ class RestaurantStatusCalculator:
             return self._fallback_hours_parsing(hours_data)
             
         except Exception as e:
-            logger.error(f"Error parsing business hours: {e}", hours_data=hours_data)
+            logger.error(f"Error parsing business hours: {e}")
             return False, []
     
     def _parse_day_hours(self, match: tuple, pattern: str) -> List[Dict]:
@@ -289,7 +295,7 @@ class RestaurantStatusCalculator:
                 end_time = time(int(end_hour), int(end_min))
                 return [{'day': day.lower(), 'start': start_time, 'end': end_time}]
                 
-            elif len(match) == 5:  # Pattern 4: "Mon-Fri 9AM-5PM"
+            elif len(match) == 6:  # Pattern 4: "Mon-Fri 9AM-5PM"
                 start_day, end_day, start_hour, start_ampm, end_hour, end_ampm = match
                 start_time = self._time_from_components(start_hour, '00', start_ampm)
                 end_time = self._time_from_components(end_hour, '00', end_ampm)
@@ -298,8 +304,12 @@ class RestaurantStatusCalculator:
                 days = self._get_days_between(start_day, end_day)
                 return [{'day': day, 'start': start_time, 'end': end_time} for day in days]
                 
+            elif len(match) == 1:  # Pattern 5: "Daily: 24 hours"
+                # 24-hour restaurant
+                return [{'day': 'daily', 'start': time(0, 0), 'end': time(23, 59)}]
+                
         except Exception as e:
-            logger.error(f"Error parsing day hours: {e}", match=match)
+            logger.error(f"Error parsing day hours: {e}")
             
         return []
     

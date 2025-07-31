@@ -120,7 +120,7 @@ export default function EnhancedSearch({
       let dbResults: Restaurant[] = [];
       if (dbResponse.ok) {
         const dbData = await dbResponse.json();
-        dbResults = dbData.restaurants || dbData.data || [];
+        dbResults = dbData.data?.restaurants || dbData.restaurants || dbData.data || [];
       }
 
       // 2. Search Google Places API for additional restaurants
