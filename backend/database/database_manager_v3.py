@@ -51,18 +51,7 @@ class Restaurant(Base):
     zip_code = Column(String(20))
     phone = Column(String(50))
     website = Column(String(500))
-    cuisine_type = Column(String(100))
     price_range = Column(String(20))
-    rating = Column(Float)
-    review_count = Column(Integer)
-    # Google Reviews fields
-    google_rating = Column(Float)
-    google_review_count = Column(Integer)
-    google_reviews = Column(Text)  # JSON string of review data
-    latitude = Column(Float)
-    longitude = Column(Float)
-    hours = Column(Text)
-    description = Column(Text)
     image_url = Column(String(500))
     is_kosher = Column(Boolean, default=False)
     is_glatt = Column(Boolean, default=False)
@@ -71,7 +60,6 @@ class Restaurant(Base):
     is_bishul_yisroel = Column(Boolean, default=False)
     is_mehadrin = Column(Boolean, default=False)
     is_hechsher = Column(Boolean, default=False)
-    hechsher_details = Column(String(500))
     kosher_type = Column(String(100))  # dairy, meat, pareve
     # Consolidated fields from kosher_places
     kosher_cert_link = Column(String(500))
