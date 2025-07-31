@@ -250,13 +250,18 @@ class EnhancedDatabaseManager:
             # Filter by distance (simplified - in production you'd use PostGIS or similar)
             nearby_restaurants = []
             for restaurant in restaurants:
-                if restaurant.latitude and restaurant.longitude:
+                if restaurant.latitude is not None and restaurant.longitude is not None:
                     # Simple distance calculation (Haversine formula would be better)
                     distance = ((restaurant.latitude - lat) ** 2 + (restaurant.longitude - lng) ** 2) ** 0.5
                     if distance <= radius / 69:  # Rough conversion: 1 degree ≈ 69 miles
                         nearby_restaurants.append(restaurant)
                         if len(nearby_restaurants) >= limit:
                             break
+                else:
+                    # If no coordinates, include the restaurant anyway (fallback behavior)
+                    nearby_restaurants.append(restaurant)
+                    if len(nearby_restaurants) >= limit:
+                        break
             
             return nearby_restaurants[:limit]
             
