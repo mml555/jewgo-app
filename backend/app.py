@@ -133,7 +133,7 @@ def get_restaurants():
         limit = request.args.get('limit', 100, type=int)
         offset = request.args.get('offset', 0, type=int)
         # Support both kosher_type and kosher_category parameters for frontend compatibility
-        kosher_type = request.args.get('kosher_type') or request.args.get('kosher_category')
+        kosher_category = request.args.get('kosher_category')
         state = request.args.get('state')
         
         # Get restaurants from database
@@ -143,8 +143,8 @@ def get_restaurants():
         )
         
         # Apply filters
-        if kosher_type:
-            restaurants = [r for r in restaurants if r.get('kosher_category') == kosher_type]
+        if kosher_category:
+            restaurants = [r for r in restaurants if r.get('kosher_category') == kosher_category]
         
         if state:
             restaurants = [r for r in restaurants if r.get('state') == state]
