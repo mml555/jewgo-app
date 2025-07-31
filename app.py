@@ -1013,8 +1013,9 @@ def create_app(config_name=None):
             session = db_manager.get_session()
             
             # Update all ORB restaurants to have kosher_type = "dairy"
-            orb_restaurants = session.query(db_manager.Restaurant).filter(
-                db_manager.Restaurant.hechsher_details == 'ORB Kosher'
+            from database_manager_v3 import Restaurant
+            orb_restaurants = session.query(Restaurant).filter(
+                Restaurant.hechsher_details == 'ORB Kosher'
             ).all()
             
             updated_count = 0
