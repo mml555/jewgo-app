@@ -144,7 +144,7 @@ def get_restaurants():
         
         # Apply filters
         if kosher_type:
-            restaurants = [r for r in restaurants if r.get('kosher_type') == kosher_type]
+            restaurants = [r for r in restaurants if r.get('kosher_category') == kosher_type]
         
         if state:
             restaurants = [r for r in restaurants if r.get('state') == state]
@@ -247,9 +247,9 @@ def get_kosher_types():
         from sqlalchemy import func
         
         kosher_types = session.query(
-            Restaurant.kosher_type,
-            func.count(Restaurant.kosher_type)
-        ).group_by(Restaurant.kosher_type).all()
+            Restaurant.kosher_category,
+            func.count(Restaurant.kosher_category)
+        ).group_by(Restaurant.kosher_category).all()
         
         # Get Chalav Yisroel/Stam counts
         chalav_yisroel_count = session.query(Restaurant).filter(
@@ -258,7 +258,7 @@ def get_kosher_types():
         
         chalav_stam_count = session.query(Restaurant).filter(
             Restaurant.is_cholov_yisroel == False,
-            Restaurant.kosher_type == 'dairy'
+            Restaurant.kosher_category == 'dairy'
         ).count()
         
         # Get Pas Yisroel count
@@ -933,9 +933,9 @@ def update_database():
             # Show final statistics
             from sqlalchemy import func
             kosher_types = session.query(
-                Restaurant.kosher_type,
-                func.count(Restaurant.kosher_type)
-            ).group_by(Restaurant.kosher_type).all()
+                Restaurant.kosher_category,
+                func.count(Restaurant.kosher_category)
+            ).group_by(Restaurant.kosher_category).all()
             
             # Show Chalav Yisroel statistics
             chalav_yisroel_count = session.query(Restaurant).filter(
@@ -944,7 +944,7 @@ def update_database():
             
             chalav_stam_count = session.query(Restaurant).filter(
                 Restaurant.is_cholov_yisroel == False,
-                Restaurant.kosher_type == 'dairy'
+                Restaurant.kosher_category == 'dairy'
             ).count()
             
             pas_yisroel_count = session.query(Restaurant).filter(
