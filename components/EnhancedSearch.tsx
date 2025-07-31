@@ -190,7 +190,7 @@ export default function EnhancedSearch({
         : '',
       google_listing_url: `https://maps.google.com/?cid=${place.place_id}`,
       certifying_agency: 'Unknown', // Will need to be determined
-      kosher_category: 'unknown',
+      kosher_category: 'pareve', // Default to pareve for external restaurants
       is_cholov_yisroel: null,
       is_pas_yisroel: null,
       listing_type: 'restaurant',
