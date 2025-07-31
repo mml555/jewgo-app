@@ -318,6 +318,70 @@ def run_migration():
             'error': f'Migration failed: {str(e)}'
         }), 500
 
+@app.route('/fix', methods=['GET'])
+def fix_database():
+    """Simple endpoint to fix database schema."""
+    try:
+        from sqlalchemy import text
+        
+        # Define the columns to add
+        columns_to_add = [
+            ("cuisine_type", "VARCHAR(100)"),
+            ("hechsher_details", "VARCHAR(500)"),
+            ("description", "TEXT"),
+            ("latitude", "FLOAT"),
+            ("longitude", "FLOAT"),
+            ("rating", "FLOAT"),
+            ("review_count", "INTEGER"),
+            ("google_rating", "FLOAT"),
+            ("google_review_count", "INTEGER"),
+            ("google_reviews", "TEXT"),
+            ("hours", "TEXT")
+        ]
+        
+        engine = db_manager.engine
+        added_columns = []
+        
+        with engine.connect() as conn:
+            for column_name, column_type in columns_to_add:
+                try:
+                    # Check if column exists
+                    result = conn.execute(text(f"""
+                        SELECT column_name 
+                        FROM information_schema.columns 
+                        WHERE table_name = 'restaurants' 
+                        AND column_name = '{column_name}'
+                    """))
+                    
+                    if not result.fetchone():
+                        # Column doesn't exist, add it
+                        logger.info(f"Adding column {column_name} to restaurants table")
+                        conn.execute(text(f"ALTER TABLE restaurants ADD COLUMN {column_name} {column_type}"))
+                        conn.commit()
+                        added_columns.append(column_name)
+                        logger.info(f"Successfully added column {column_name}")
+                    else:
+                        logger.info(f"Column {column_name} already exists, skipping")
+                        
+                except Exception as e:
+                    logger.error(f"Error adding column {column_name}: {e}")
+                    conn.rollback()
+                    return jsonify({
+                        'error': f'Failed to add column {column_name}: {str(e)}'
+                    }), 500
+        
+        return jsonify({
+            'success': True,
+            'message': 'Database fix completed successfully',
+            'added_columns': added_columns
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Database fix failed: {e}")
+        return jsonify({
+            'error': f'Database fix failed: {str(e)}'
+        }), 500
+
 @app.errorhandler(404)
 def not_found(error):
     """Handle 404 errors."""
