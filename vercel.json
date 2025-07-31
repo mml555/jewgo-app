@@ -1,7 +1,7 @@
 {
   "version": 2,
   "name": "jewgo-app",
-  "buildCommand": "cd frontend && npm install && npm run build",
+  "buildCommand": "cd frontend && npm install && npm run validate-env && npm run build",
   "outputDirectory": "frontend/.next",
   "installCommand": "cd frontend && npm install",
   "framework": "nextjs",
