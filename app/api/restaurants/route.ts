@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
     const min_rating = searchParams.get('min_rating');
     const has_reviews = searchParams.get('has_reviews');
     const open_now = searchParams.get('open_now');
-    const status = searchParams.get('status') || 'approved';
+    const status = searchParams.get('status') || 'active';
     
     // Location-based filtering
     const lat = searchParams.get('lat');
