@@ -45,6 +45,10 @@ logger = structlog.get_logger()
 # Import database manager and Restaurant model
 from database.database_manager_v3 import EnhancedDatabaseManager, Restaurant
 
+# Import Google Places functionality
+import requests
+import time
+
 # Initialize Flask app
 app = Flask(__name__)
 
