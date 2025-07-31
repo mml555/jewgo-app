@@ -1,5 +1,7 @@
 export interface Restaurant {
   id: number;
+  created_at?: string;
+  updated_at?: string;
   name: string;
   address: string;
   city: string;
@@ -16,8 +18,16 @@ export interface Restaurant {
   is_pas_yisroel?: boolean;
   listing_type: string;
   status: string;
+  status_reason?: string;
+  is_open?: boolean;
+  next_open_time?: string;
   hours_of_operation?: string;
   hours_open?: string;
+  hours_json?: string;
+  hours_last_updated?: string;
+  timezone?: string;
+  current_time_local?: string;
+  hours_parsed?: boolean;
   short_description?: string;
   price_range?: string;
   avg_price?: string;
