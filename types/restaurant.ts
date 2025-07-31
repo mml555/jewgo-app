@@ -11,6 +11,7 @@ export interface Restaurant {
   image_url?: string;
   certifying_agency: string;
   kosher_category: 'meat' | 'dairy' | 'pareve';
+  is_cholov_yisroel?: boolean;
   listing_type: string;
   status: string;
   hours_of_operation?: string;
