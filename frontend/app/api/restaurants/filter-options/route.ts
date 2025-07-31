@@ -11,12 +11,12 @@ export async function GET(request: NextRequest) {
     const restaurants = restaurantsData.restaurants || restaurantsData.data || [];
     
     // Extract unique values from actual data
-    const cities = [...new Set(restaurants.map((r: any) => r.city).filter(Boolean))].sort();
-    const states = [...new Set(restaurants.map((r: any) => r.state).filter(Boolean))].sort();
-    const agencies = [...new Set(restaurants.map((r: any) => r.certifying_agency).filter(Boolean))].sort();
-    const listingTypes = [...new Set(restaurants.map((r: any) => r.listing_type || r.category).filter(Boolean))].sort();
-    const kosherCategories = [...new Set(restaurants.map((r: any) => r.kosher_category || r.kosher_type).filter(Boolean))].sort();
-    const priceRanges = [...new Set(restaurants.map((r: any) => r.price_range).filter(Boolean))].sort();
+    const cities = Array.from(new Set(restaurants.map((r: any) => r.city).filter(Boolean))).sort();
+    const states = Array.from(new Set(restaurants.map((r: any) => r.state).filter(Boolean))).sort();
+    const agencies = Array.from(new Set(restaurants.map((r: any) => r.certifying_agency).filter(Boolean))).sort();
+    const listingTypes = Array.from(new Set(restaurants.map((r: any) => r.listing_type || r.category).filter(Boolean))).sort();
+    const kosherCategories = Array.from(new Set(restaurants.map((r: any) => r.kosher_category || r.kosher_type).filter(Boolean))).sort();
+    const priceRanges = Array.from(new Set(restaurants.map((r: any) => r.price_range).filter(Boolean))).sort();
     
     const filterOptions = {
       cities,

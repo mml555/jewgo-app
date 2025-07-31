@@ -1,153 +1,258 @@
-# 🗄️ Database Cleanup and Organization Summary
+# Data Cleanup & Management
 
-## ✅ Database Cleanup Completed
+## Overview
 
-Successfully cleaned and organized the database by removing unused columns and optimizing the schema.
+This guide covers data cleanup procedures, restaurant data updates, and data quality management for the JewGo application.
 
-## 📊 Database Analysis Results
+## 🧹 Data Cleanup Procedures
 
-### Initial State
-- **Total columns**: 39
-- **Total restaurants**: 107
-- **Data quality**: Excellent (no missing critical data, no duplicates, no test data)
+### Automated Cleanup Scripts
+```bash
+# Find data issues
+python scripts/maintenance/find_data_issues.py
 
-### Cleanup Actions Taken
+# Comprehensive database fix
+python scripts/maintenance/comprehensive_database_fix.py
 
-#### 1. **Removed 11 Unused Columns**
-The following columns were completely unused (0 values) and were safely removed:
-
-1. `cuisine_type` - No cuisine type data
-2. `rating` - No rating data
-3. `review_count` - No review count data
-4. `google_rating` - No Google rating data
-5. `google_review_count` - No Google review count data
-6. `google_reviews` - No Google reviews data
-7. `latitude` - No latitude coordinates
-8. `longitude` - No longitude coordinates
-9. `hours` - No hours data
-10. `description` - No description data
-11. `hechsher_details` - No hechsher details data
-
-#### 2. **Updated Database Schema**
-- **Remaining columns**: 28 (down from 39)
-- **Schema optimization**: 28% reduction in column count
-- **Performance improvement**: Faster queries due to smaller table size
-
-#### 3. **Updated Code**
-- **Updated `database_manager_v3.py`**: Removed unused column definitions from Restaurant model
-- **Maintained compatibility**: All existing functionality preserved
-
-## 📋 Current Database Schema
-
-### Core Fields (28 columns)
-```
-id                      - Primary key
-name                    - Restaurant name (required)
-address                 - Street address
-city                    - City
-state                   - State
-zip_code                - ZIP code
-phone                   - Phone number
-website                 - Website URL
-price_range             - Price range
-image_url               - Image URL
-is_kosher               - Kosher status
-is_glatt                - Glatt kosher status
-is_cholov_yisroel       - Chalav Yisroel status
-is_pas_yisroel          - Pas Yisroel status
-is_bishul_yisroel       - Bishul Yisroel status
-is_mehadrin             - Mehadrin status
-is_hechsher             - Hechsher status
-kosher_type             - Kosher type (dairy/pareve)
-kosher_cert_link        - Kosher certificate link
-detail_url              - Detail page URL
-short_description       - Short description
-email                   - Email address
-google_listing_url      - Google listing URL
-hours_open              - Hours of operation
-category                - Business category
-status                  - Business status
-created_at              - Creation timestamp
-updated_at              - Update timestamp
+# Validate restaurant data
+python scripts/maintenance/validate_restaurant_data.py
 ```
 
-## ✅ Data Quality Verification
+### Data Validation
+- **Restaurant Data**: Verify all required fields are present
+- **Kosher Information**: Validate kosher supervision details
+- **Location Data**: Check coordinate accuracy
+- **Contact Information**: Verify phone and website formats
 
-### After Cleanup
-- **Total restaurants**: 107 ✅
-- **Dairy restaurants**: 99 ✅
-- **Pareve restaurants**: 8 ✅
-- **Chalav Yisroel**: 104 ✅
-- **Chalav Stam**: 3 ✅
-- **Pas Yisroel**: 22 ✅
-- **Missing critical data**: 0 ✅
-- **Duplicates**: 0 ✅
-- **Test data**: 0 ✅
+## 🏪 Restaurant Data Updates
 
-## 🎯 Benefits Achieved
+### Manual Update Procedures
 
-### 1. **Performance Improvements**
-- **28% smaller table size** (39 → 28 columns)
-- **Faster queries** due to reduced column count
-- **Reduced memory usage** for database operations
+#### Website Updates
+```python
+# Update restaurant website
+def update_restaurant_website(restaurant_id, new_website_url):
+    success = db_manager.update_restaurant_orb_data(
+        restaurant_id=restaurant_id,
+        website=new_website_url
+    )
+    return success
 
-### 2. **Maintainability**
-- **Cleaner schema** with only relevant columns
-- **Easier to understand** database structure
-- **Reduced complexity** in code maintenance
+# Example usage
+update_restaurant_website(207, 'https://barakehshawarma.com')
+```
 
-### 3. **Data Integrity**
-- **No data loss** - only unused columns removed
-- **All critical data preserved** - restaurants, kosher status, contact info
-- **Schema consistency** - model matches actual database
+#### Hours Updates
+```python
+# Update restaurant hours
+def update_restaurant_hours(restaurant_id, new_hours):
+    success = db_manager.update_restaurant_orb_data(
+        restaurant_id=restaurant_id,
+        hours_open=new_hours
+    )
+    return success
 
-### 4. **Storage Optimization**
-- **Reduced storage requirements** for database
-- **Faster backups** due to smaller table size
-- **Better indexing** on relevant columns only
+# Example usage
+update_restaurant_hours(45, 'Mon-Fri: 11AM-9PM, Sat: 12PM-10PM')
+```
 
-## 🔧 Technical Details
+### Google Places Integration
 
-### Database Operations
-- **Column removal**: Used `ALTER TABLE DROP COLUMN` statements
-- **Transaction safety**: Each column removal was wrapped in transactions
-- **Verification**: Confirmed all operations completed successfully
-- **Rollback capability**: Database can be restored from backup if needed
+#### Address Updates
+```bash
+# Update addresses using Google Places
+python scripts/maintenance/google_places_address_updater.py
+```
 
-### Code Updates
-- **Model synchronization**: Updated Restaurant model to match database
-- **No breaking changes**: All existing functionality preserved
-- **Backward compatibility**: Existing queries continue to work
+#### Hours Updates
+```bash
+# Update hours using Google Places
+python scripts/maintenance/google_places_hours_updater.py
+```
 
-## 🚀 Current State
+#### Description Updates
+```bash
+# Update descriptions using Google Places
+python scripts/maintenance/google_places_description_updater.py
+```
 
-The database is now:
-- ✅ **Optimized** - Only relevant columns remain
-- ✅ **Clean** - No unused or redundant data
-- ✅ **Fast** - Improved query performance
-- ✅ **Maintainable** - Clear, simple schema
-- ✅ **Reliable** - All critical data preserved
+#### Image Updates
+```bash
+# Update images using Google Places
+python scripts/maintenance/google_places_image_updater.py
+```
 
-## 📈 Performance Metrics
+## 📊 Data Quality Standards
 
-### Before Cleanup
-- **Columns**: 39
-- **Schema complexity**: High
-- **Query performance**: Standard
+### Required Fields
+- **Name**: Restaurant name (required)
+- **Address**: Complete address (required)
+- **City**: City name (required)
+- **State**: State abbreviation (required)
+- **Kosher Type**: dairy, meat, pareve (required)
+- **Certifying Agency**: ORB, KM, Star-K, etc. (required)
 
-### After Cleanup
-- **Columns**: 28 (28% reduction)
-- **Schema complexity**: Low
-- **Query performance**: Improved
+### Optional Fields
+- **Phone**: Valid phone number format
+- **Website**: Valid URL format
+- **Email**: Valid email format
+- **Hours**: Business hours format
+- **Price Range**: $, $$, $$$, $$$$
+- **Image URL**: Valid image URL
 
-## 🎉 Summary
+### Data Validation Rules
+```python
+# Validation examples
+def validate_restaurant_data(data):
+    errors = []
+    
+    # Required fields
+    if not data.get('name'):
+        errors.append('Restaurant name is required')
+    
+    if not data.get('address'):
+        errors.append('Address is required')
+    
+    # Format validation
+    if data.get('phone') and not is_valid_phone(data['phone']):
+        errors.append('Invalid phone number format')
+    
+    if data.get('website') and not is_valid_url(data['website']):
+        errors.append('Invalid website URL')
+    
+    return errors
+```
 
-The database cleanup and organization was a complete success! We achieved:
+## 🔄 Update Workflows
 
-1. **28% reduction** in database schema complexity
-2. **Zero data loss** - all critical information preserved
-3. **Improved performance** - faster queries and operations
-4. **Better maintainability** - cleaner, simpler codebase
-5. **Enhanced reliability** - optimized database structure
+### New Restaurant Submission
+1. **Data Collection**: Gather restaurant information
+2. **Validation**: Check data quality and completeness
+3. **Submission**: Submit to database
+4. **Review**: Admin review and approval
+5. **Publication**: Make restaurant visible to users
 
-The ORB system database is now clean, organized, and optimized for production use! 🚀 
+### Existing Restaurant Updates
+1. **Data Verification**: Verify current data accuracy
+2. **Update Collection**: Gather updated information
+3. **Validation**: Validate new data
+4. **Database Update**: Update restaurant record
+5. **Verification**: Confirm update success
+
+### Bulk Updates
+```bash
+# Update multiple restaurants
+python scripts/maintenance/batch_update_remaining.py
+
+# Update specific fields
+python scripts/maintenance/perform_updates.py
+```
+
+## 📋 Data Quality Checklist
+
+### Before Updates
+- [ ] Verify data source accuracy
+- [ ] Check data format compliance
+- [ ] Validate required fields
+- [ ] Test update procedures
+
+### During Updates
+- [ ] Monitor update progress
+- [ ] Check for errors
+- [ ] Verify data integrity
+- [ ] Backup before major changes
+
+### After Updates
+- [ ] Verify update success
+- [ ] Test data accessibility
+- [ ] Check user experience
+- [ ] Update documentation
+
+## 🚨 Common Data Issues
+
+### Missing Information
+- **Hours**: 90 restaurants missing hours
+- **Websites**: Some restaurants have invalid websites
+- **Phone Numbers**: Missing or invalid phone numbers
+- **Images**: Missing restaurant images
+
+### Data Inconsistencies
+- **Address Format**: Inconsistent address formatting
+- **Phone Format**: Mixed phone number formats
+- **Hours Format**: Inconsistent hours formatting
+- **Kosher Information**: Missing kosher details
+
+### Resolution Procedures
+1. **Identify Issue**: Use data validation scripts
+2. **Research Data**: Use Google Places API
+3. **Update Database**: Use appropriate update scripts
+4. **Verify Changes**: Test data accessibility
+5. **Document Changes**: Update maintenance logs
+
+## 🔧 Maintenance Scripts
+
+### Data Validation Scripts
+```bash
+# Find data issues
+python scripts/maintenance/find_data_issues.py
+
+# Validate restaurant data
+python scripts/maintenance/validate_restaurant_data.py
+
+# Check data integrity
+python scripts/maintenance/check_data_integrity.py
+```
+
+### Update Scripts
+```bash
+# Update restaurant information
+python scripts/maintenance/update_restaurant_data.py
+
+# Google Places integration
+python scripts/maintenance/google_places_address_updater.py
+python scripts/maintenance/google_places_hours_updater.py
+python scripts/maintenance/google_places_description_updater.py
+python scripts/maintenance/google_places_image_updater.py
+```
+
+### Cleanup Scripts
+```bash
+# Comprehensive cleanup
+python scripts/maintenance/comprehensive_database_fix.py
+
+# Data organization
+python scripts/maintenance/comprehensive_final_report.py
+```
+
+## 📈 Data Quality Metrics
+
+### Current Statistics
+- **Total Restaurants**: 107
+- **Complete Data**: 85%
+- **Missing Hours**: 90 restaurants
+- **Invalid Websites**: 1 restaurant
+- **Missing Phone**: 15 restaurants
+
+### Quality Targets
+- **Data Completeness**: >95%
+- **Data Accuracy**: >98%
+- **Update Frequency**: Weekly
+- **Validation Coverage**: 100%
+
+## 🔐 Data Security
+
+### Access Control
+- **Admin Access**: Limited to authorized users
+- **Update Logging**: All changes logged
+- **Backup Procedures**: Regular data backups
+- **Audit Trail**: Complete change history
+
+### Data Protection
+- **Encryption**: Sensitive data encrypted
+- **Access Logs**: Monitor data access
+- **Backup Security**: Secure backup storage
+- **Compliance**: Follow data protection regulations
+
+---
+
+*For detailed update procedures, see the individual script documentation.* 
