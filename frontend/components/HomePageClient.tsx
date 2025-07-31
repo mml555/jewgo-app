@@ -246,11 +246,14 @@ export default function HomePageClient() {
       }
       
       const data = await response.json();
-      console.log('Restaurants fetched:', data.restaurants?.length || 0);
+      console.log('Restaurants fetched:', data.restaurants?.length || data.data?.length || 0);
       
       if (data.restaurants) {
         setAllRestaurants(data.restaurants);
         // Removed setDisplayedRestaurants since we now use memoized displayedRestaurants
+      } else if (data.data) {
+        // Handle case where frontend API route returns data in different format
+        setAllRestaurants(data.data);
       } else {
         setApiError('No restaurants data received');
       }

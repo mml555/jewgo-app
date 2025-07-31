@@ -496,6 +496,184 @@ def fix_database():
             'error': f'Database fix failed: {str(e)}'
         }), 500
 
+def search_google_places(restaurant_name: str, address: str) -> str:
+    """
+    Search Google Places API for a restaurant's website.
+    Returns the website URL if found, empty string otherwise.
+    """
+    try:
+        api_key = os.environ.get('GOOGLE_PLACES_API_KEY')
+        if not api_key:
+            logger.warning("GOOGLE_PLACES_API_KEY not set")
+            return ""
+        
+        # Build search query
+        query = f"{restaurant_name} {address}"
+        
+        # Search for the place
+        search_url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
+        search_params = {
+            'query': query,
+            'key': api_key,
+            'type': 'restaurant'
+        }
+        
+        logger.info(f"Searching Google Places for: {query}")
+        response = requests.get(search_url, params=search_params, timeout=10)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        if data['status'] == 'OK' and data['results']:
+            place_id = data['results'][0]['place_id']
+            
+            # Get place details
+            details_url = "https://maps.googleapis.com/maps/api/place/details/json"
+            details_params = {
+                'place_id': place_id,
+                'fields': 'website',
+                'key': api_key
+            }
+            
+            logger.info(f"Getting place details for place_id: {place_id}")
+            details_response = requests.get(details_url, params=details_params, timeout=10)
+            details_response.raise_for_status()
+            
+            details_data = details_response.json()
+            
+            if details_data['status'] == 'OK' and 'result' in details_data:
+                website = details_data['result'].get('website', '')
+                if website:
+                    logger.info(f"Found website for {restaurant_name}: {website}")
+                    return website
+            
+            logger.warning(f"No website found for {restaurant_name}")
+            return ""
+        else:
+            logger.warning(f"No place found for: {query}")
+            return ""
+            
+    except Exception as e:
+        logger.error(f"Error searching Google Places for {restaurant_name}: {e}")
+        return ""
+
+@app.route('/api/restaurants/<int:restaurant_id>/fetch-website', methods=['POST'])
+def fetch_restaurant_website(restaurant_id):
+    """
+    Fetch website link for a specific restaurant using Google Places API.
+    This is a backup system when the restaurant doesn't have a website link.
+    """
+    try:
+        if not db_manager:
+            return jsonify({'error': 'Database not connected'}), 500
+        
+        # Get restaurant details
+        session = db_manager.get_session()
+        restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
+        
+        if not restaurant:
+            return jsonify({'error': 'Restaurant not found'}), 404
+        
+        # Check if restaurant already has a website
+        if restaurant.website and len(restaurant.website) > 10:
+            return jsonify({
+                'message': 'Restaurant already has a website',
+                'website': restaurant.website
+            }), 200
+        
+        # Search for website using Google Places API
+        website_url = search_google_places(restaurant.name, restaurant.address or "")
+        
+        if website_url:
+            # Update the restaurant with the found website
+            restaurant.website = website_url
+            session.commit()
+            
+            logger.info(f"Updated restaurant {restaurant_id} with website: {website_url}")
+            
+            return jsonify({
+                'message': 'Website found and updated',
+                'website': website_url,
+                'restaurant_id': restaurant_id,
+                'restaurant_name': restaurant.name
+            }), 200
+        else:
+            return jsonify({
+                'message': 'No website found for this restaurant',
+                'restaurant_id': restaurant_id,
+                'restaurant_name': restaurant.name
+            }), 404
+            
+    except Exception as e:
+        logger.error(f"Error fetching website for restaurant {restaurant_id}: {e}")
+        return jsonify({'error': f'Error fetching website: {str(e)}'}), 500
+
+@app.route('/api/restaurants/fetch-missing-websites', methods=['POST'])
+def fetch_missing_websites():
+    """
+    Fetch website links for all restaurants that don't have them.
+    This is a bulk operation that can take some time.
+    """
+    try:
+        if not db_manager:
+            return jsonify({'error': 'Database not connected'}), 500
+        
+        # Get limit from request (default 10 to avoid long-running requests)
+        limit = request.json.get('limit', 10) if request.is_json else 10
+        
+        session = db_manager.get_session()
+        
+        # Get restaurants without websites
+        restaurants_without_websites = session.query(Restaurant).filter(
+            (Restaurant.website.is_(None)) | 
+            (Restaurant.website == '') | 
+            (Restaurant.website == ' ')
+        ).limit(limit).all()
+        
+        if not restaurants_without_websites:
+            return jsonify({
+                'message': 'No restaurants found without websites',
+                'updated': 0,
+                'total_checked': 0
+            }), 200
+        
+        updated_count = 0
+        total_checked = len(restaurants_without_websites)
+        
+        for restaurant in restaurants_without_websites:
+            try:
+                # Search for website using Google Places API
+                website_url = search_google_places(restaurant.name, restaurant.address or "")
+                
+                if website_url:
+                    # Update the restaurant with the found website
+                    restaurant.website = website_url
+                    updated_count += 1
+                    logger.info(f"Updated restaurant {restaurant.id} with website: {website_url}")
+                
+                # Add delay to respect API rate limits
+                time.sleep(0.2)  # 200ms delay between requests
+                
+            except Exception as e:
+                logger.error(f"Error processing restaurant {restaurant.id}: {e}")
+                continue
+        
+        # Commit all changes
+        session.commit()
+        
+        logger.info(f"Bulk website update completed", updated=updated_count, total=total_checked)
+        
+        return jsonify({
+            'message': 'Bulk website update completed',
+            'updated': updated_count,
+            'total_checked': total_checked,
+            'limit_used': limit
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error in bulk website update: {e}")
+        return jsonify({'error': f'Error in bulk website update: {str(e)}'}), 500
+
 @app.errorhandler(404)
 def not_found(error):
     """Handle 404 errors."""
