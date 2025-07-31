@@ -907,23 +907,31 @@ def update_database():
         logger.info("Running updated ORB scraper...")
         
         # Create event loop for async operations
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        
-        async def run_scraper():
-            scraper = ORBScraperV2()
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
             
-            if not await scraper.setup_playwright():
-                return None
+            async def run_scraper():
+                scraper = ORBScraperV2()
+                
+                if not await scraper.setup_playwright():
+                    logger.error("Failed to setup Playwright")
+                    return None
+                
+                businesses = await scraper.scrape_all_categories()
+                await scraper.cleanup()
+                return businesses
             
-            businesses = await scraper.scrape_all_categories()
-            await scraper.cleanup()
-            return businesses
-        
-        businesses = loop.run_until_complete(run_scraper())
-        loop.close()
+            businesses = loop.run_until_complete(run_scraper())
+        except Exception as e:
+            logger.error(f"Error in async scraper execution: {e}")
+            businesses = None
+        finally:
+            if 'loop' in locals():
+                loop.close()
         
         if businesses:
+            logger.info(f"Scraper returned {len(businesses)} businesses")
             # Step 3: Save new data to database
             logger.info(f"Saving {len(businesses)} businesses to database...")
             
@@ -973,9 +981,10 @@ def update_database():
                 'pas_yisroel': pas_yisroel_count
             }), 200
         else:
+            logger.error("Scraper returned no businesses")
             return jsonify({
                 'error': 'No businesses were scraped',
-                'message': 'Scraper returned no data'
+                'message': 'Scraper returned no data - check logs for details'
             }), 500
         
     except Exception as e:
