@@ -921,6 +921,39 @@ def create_app(config_name=None):
                 'timestamp': datetime.utcnow().isoformat()
             }), 500
     
+    @app.route('/deploy/update-cholov-yisroel', methods=['POST'])
+    @limiter.limit("5 per hour")  # Limit to prevent abuse
+    def deploy_update_cholov_yisroel():
+        """Manual trigger for updating Cholov Yisroel information."""
+        try:
+            logger.info("Manual Cholov Yisroel update triggered")
+            
+            # Import the Cholov Yisroel update logic
+            from update_cholov_yisroel import update_cholov_yisroel
+            
+            success = update_cholov_yisroel()
+            
+            if success:
+                return jsonify({
+                    'status': 'success',
+                    'message': 'Cholov Yisroel information updated successfully',
+                    'timestamp': datetime.utcnow().isoformat()
+                }), 200
+            else:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Cholov Yisroel update failed',
+                    'timestamp': datetime.utcnow().isoformat()
+                }), 500
+                
+        except Exception as e:
+            logger.error("Manual Cholov Yisroel update failed", error=str(e))
+            return jsonify({
+                'status': 'error',
+                'message': f'Cholov Yisroel update failed: {str(e)}',
+                'timestamp': datetime.utcnow().isoformat()
+            }), 500
+    
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
