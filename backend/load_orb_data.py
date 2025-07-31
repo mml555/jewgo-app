@@ -413,9 +413,10 @@ def load_orb_data():
         logger.info(f"Final restaurant count: {final_count}")
         
         # Show kosher type statistics
+        from sqlalchemy import func
         kosher_types = session.query(
             Restaurant.kosher_type,
-            db_manager.db.func.count(Restaurant.kosher_type)
+            func.count(Restaurant.kosher_type)
         ).group_by(Restaurant.kosher_type).all()
         
         logger.info("Kosher Type Distribution:")
