@@ -9,6 +9,7 @@ export interface Restaurant {
   website?: string;
   certificate_link?: string;
   image_url?: string;
+  google_listing_url?: string;
   certifying_agency: string;
   kosher_category: 'meat' | 'dairy' | 'pareve';
   is_cholov_yisroel?: boolean;

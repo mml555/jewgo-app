@@ -188,8 +188,8 @@ export default function RestaurantCard({
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
         
-        {/* Heart/Share Buttons - Top Left */}
-        <div className="absolute top-3 left-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        {/* Heart/Share Buttons - Top Right */}
+        <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <button
             className={cn(
               "p-1.5 rounded-full shadow-sm transition-colors border",
@@ -231,8 +231,8 @@ export default function RestaurantCard({
           </button>
         </div>
         
-        {/* Bottom Badges - Moved from top right */}
-        <div className="absolute bottom-3 right-3 flex flex-col gap-2">
+        {/* Bottom Badges - Single horizontal line */}
+        <div className="absolute bottom-3 left-3 flex flex-row gap-2">
           {/* Certification Badge */}
           {restaurant.certifying_agency && (
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-transparent text-white border border-white shadow-sm hover:bg-white hover:text-gray-900 transition-colors duration-200">
@@ -328,24 +328,42 @@ export default function RestaurantCard({
             )}
           </div>
           
-          {/* Address with Maps Button - Fixed spacing */}
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-start gap-2 text-sm text-gray-600 flex-1 min-w-0">
-              <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span className="line-clamp-2">
-                {formatAddress(restaurant.address, restaurant.city, restaurant.state)}
-              </span>
-            </div>
+          {/* Address */}
+          <div className="flex items-start gap-2 text-sm text-gray-600 mb-3">
+            <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span className="line-clamp-2">
+              {formatAddress(restaurant.address, restaurant.city, restaurant.state)}
+            </span>
+          </div>
+          
+          {/* Action Buttons - Below Address */}
+          <div className="flex gap-2 mb-4">
             <button
-              className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs font-medium hover:bg-gray-200 transition-colors ml-2 flex-shrink-0"
+              className="flex-1 bg-transparent text-green-600 py-2 px-4 rounded-full font-semibold border-2 border-green-300 hover:bg-green-100 hover:border-green-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 touch-manipulation shadow-sm"
               onClick={(e) => {
                 e.stopPropagation();
-                const address = formatAddress(restaurant.address, restaurant.city, restaurant.state);
-                const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
-                window.open(mapsUrl, '_blank');
+                handleCardClick();
+              }}
+            >
+              View More
+            </button>
+            
+            {/* Maps Button - Small */}
+            <button
+              className="inline-flex items-center gap-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-xs font-medium hover:bg-gray-200 transition-colors flex-shrink-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (restaurant.google_listing_url) {
+                  window.open(restaurant.google_listing_url, '_blank');
+                } else {
+                  // Fallback to Google Maps search
+                  const address = formatAddress(restaurant.address, restaurant.city, restaurant.state);
+                  const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+                  window.open(mapsUrl, '_blank');
+                }
               }}
             >
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -414,18 +432,7 @@ export default function RestaurantCard({
           )}
         </div>
 
-        {/* Action Button */}
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          <button
-            className="w-full bg-transparent text-green-600 py-3 px-6 rounded-full font-semibold border-2 border-green-300 hover:bg-green-100 hover:border-green-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 touch-manipulation shadow-sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCardClick();
-            }}
-          >
-            View More
-          </button>
-        </div>
+
       </div>
 
       {/* Hover Effect Overlay */}
