@@ -29,6 +29,7 @@ MANIFEST
 
 # Virtual Environment
 venv/
+scraper_env/
 env/
 ENV/
 env.bak/

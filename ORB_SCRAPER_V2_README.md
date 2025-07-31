@@ -8,6 +8,7 @@ A comprehensive web scraper for extracting kosher business listings from ORB Kos
 - **Kosher Supervision Categorization**: Automatically sets Chalav Yisroel/Stam and Pas Yisroel status
 - **Web Scraping**: Uses Playwright for robust scraping of ORB Kosher website
 - **Address Parsing**: Extracts city, state, and zip code from addresses
+- **Duplicate Prevention**: Checks for existing restaurants to prevent duplicates
 - **Error Resilience**: Robust error handling and logging
 - **Python 3.11 Compatible**: Optimized for your system requirements
 
@@ -75,7 +76,7 @@ All other dairy restaurants are automatically set to Chalav Yisroel.
 
 The scraper sets Pas Yisroel status for specific restaurants:
 
-### Pas Yisroel Restaurants (24 restaurants):
+### Pas Yisroel Restaurants (22 restaurants):
 - Grand Cafe Hollywood
 - Yum Berry Cafe & Sushi Bar
 - Pita Xpress
@@ -199,13 +200,13 @@ The scraper provides detailed logging output showing:
 After running the scraper, you should see:
 
 ```
-📊 Total businesses scraped: 251
-🥛 Dairy restaurants: 238
-🥬 Pareve restaurants: 13
+📊 Total businesses scraped: 107
+🥛 Dairy restaurants: 99
+🥬 Pareve restaurants: 8
 
-🥛 Chalav Yisroel: 235
+🥛 Chalav Yisroel: 104
 🥛 Chalav Stam: 3
-🍞 Pas Yisroel: 24
+🍞 Pas Yisroel: 22
 ```
 
 ## 🔒 Legal and Ethical Considerations

@@ -343,7 +343,17 @@ class ORBScraperV2:
             
             for business in businesses:
                 try:
-                    # Add restaurant (no duplicate checking since we cleaned the database)
+                    # Check if restaurant already exists to prevent duplicates
+                    existing = self.db_manager.search_places(
+                        query=business['name'],
+                        limit=1
+                    )
+                    
+                    if existing:
+                        logger.info(f"Restaurant already exists: {business['name']} - skipping")
+                        continue
+                    
+                    # Add new restaurant
                     success = self.db_manager.add_restaurant(business)
                     if success:
                         success_count += 1
