@@ -904,26 +904,32 @@ def update_database():
         session.commit()
         logger.info(f"Deleted {deleted_count} existing restaurants")
         
-        # Step 2: Run the ORB scraper
+        # Step 2: Run the ORB scraper using subprocess
         logger.info("Running ORB scraper to fetch real data...")
         
-        # Create event loop for async operations
+        import subprocess
+        
         try:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+            # Run the ORB scraper script
+            result = subprocess.run(
+                ['python', 'run_orb_scraper.py'],
+                capture_output=True,
+                text=True,
+                cwd='backend'
+            )
             
-            async def run_scraper():
-                scraper = ORBScraperV2()
-                success = await scraper.run()
-                return success
-            
-            businesses = loop.run_until_complete(run_scraper())
+            if result.returncode == 0:
+                logger.info("ORB scraper completed successfully")
+                businesses = True
+            else:
+                logger.error(f"ORB scraper failed with return code {result.returncode}")
+                logger.error(f"STDOUT: {result.stdout}")
+                logger.error(f"STDERR: {result.stderr}")
+                businesses = False
+                
         except Exception as e:
-            logger.error(f"Error in async scraper execution: {e}")
-            businesses = None
-        finally:
-            if 'loop' in locals():
-                loop.close()
+            logger.error(f"Error running ORB scraper: {e}")
+            businesses = False
         
         if businesses:  # businesses is now a boolean indicating success
             logger.info("ORB scraper completed successfully")
