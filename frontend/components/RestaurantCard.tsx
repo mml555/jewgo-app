@@ -369,7 +369,7 @@ export default function RestaurantCard({
           <div className="mb-3">
             <HoursDisplay 
               hoursOfOperation={restaurant.hours_of_operation}
-              hoursJson={restaurant.hours_json ? JSON.parse(restaurant.hours_json) : undefined}
+              hoursJson={restaurant.hours_json ? (typeof restaurant.hours_json === 'string' ? JSON.parse(restaurant.hours_json) : restaurant.hours_json) : undefined}
               hoursLastUpdated={restaurant.hours_last_updated}
             />
           </div>

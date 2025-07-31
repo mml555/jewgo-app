@@ -40,10 +40,14 @@ const RestaurantDetailPage: React.FC = () => {
         }
         const data = await response.json();
         
+        // Handle both response formats: direct restaurant object or wrapped in success/restaurant
         if (data.success && data.restaurant) {
           setRestaurant(data.restaurant);
         } else if (data.restaurant) {
           setRestaurant(data.restaurant);
+        } else if (data.id) {
+          // Direct restaurant object format (current backend response)
+          setRestaurant(data);
         } else {
           throw new Error('Invalid response format');
         }
@@ -370,7 +374,7 @@ const RestaurantDetailPage: React.FC = () => {
           <div className="max-w-md mx-auto">
             <HoursDisplay 
               hoursOfOperation={restaurant.hours_of_operation}
-              hoursJson={restaurant.hours_json ? JSON.parse(restaurant.hours_json) : undefined}
+              hoursJson={restaurant.hours_json ? (typeof restaurant.hours_json === 'string' ? JSON.parse(restaurant.hours_json) : restaurant.hours_json) : undefined}
               hoursLastUpdated={restaurant.hours_last_updated}
             />
           </div>
