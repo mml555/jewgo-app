@@ -301,7 +301,6 @@ def run_migration():
                         
                 except Exception as e:
                     logger.error(f"Error adding column {column_name}: {e}")
-                    conn.rollback()
                     return jsonify({
                         'error': f'Failed to add column {column_name}: {str(e)}'
                     }), 500
@@ -365,7 +364,6 @@ def fix_database():
                         
                 except Exception as e:
                     logger.error(f"Error adding column {column_name}: {e}")
-                    conn.rollback()
                     return jsonify({
                         'error': f'Failed to add column {column_name}: {str(e)}'
                     }), 500
