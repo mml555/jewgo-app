@@ -246,4 +246,4 @@ For support and questions:
 
 ---
 
-**JewGo** - Making kosher dining discovery easy and reliable! 🍽️✡️ 
+**JewGo** - Making kosher dining discovery easy and reliable! 🍽️✡️ # Force Vercel deployment update

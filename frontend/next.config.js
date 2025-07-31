@@ -27,6 +27,21 @@ const nextConfig = {
       },
     ];
   },
+  // Remove console.log statements in production
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      config.optimization.minimizer.push(
+        new (require('terser-webpack-plugin'))({
+          terserOptions: {
+            compress: {
+              drop_console: true,
+            },
+          },
+        })
+      );
+    }
+    return config;
+  },
 }
 
 module.exports = nextConfig 
