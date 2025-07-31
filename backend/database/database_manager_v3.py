@@ -200,6 +200,24 @@ class EnhancedDatabaseManager:
         try:
             session = self.get_session()
             
+            # Validate required fields
+            required_fields = ['name', 'address', 'city', 'state', 'zip_code', 'phone_number', 'kosher_category', 'listing_type']
+            for field in required_fields:
+                if not restaurant_data.get(field):
+                    logger.error(f"Missing required field: {field}")
+                    return False
+            
+            # Set default values for required fields
+            restaurant_data.setdefault('certifying_agency', 'ORB')
+            restaurant_data.setdefault('created_at', datetime.utcnow())
+            restaurant_data.setdefault('updated_at', datetime.utcnow())
+            restaurant_data.setdefault('hours_parsed', False)
+            
+            # Handle specials field (convert to JSON string if it's a list)
+            if 'specials' in restaurant_data and isinstance(restaurant_data['specials'], list):
+                import json
+                restaurant_data['specials'] = json.dumps(restaurant_data['specials'])
+            
             # Create new restaurant object
             restaurant = Restaurant(**restaurant_data)
             session.add(restaurant)
@@ -263,11 +281,12 @@ class EnhancedDatabaseManager:
             if query:
                 restaurant_query = restaurant_query.filter(Restaurant.name.ilike(f'%{query}%'))
             if category:
-                restaurant_query = restaurant_query.filter(Restaurant.cuisine_type.ilike(f'%{category}%'))
+                restaurant_query = restaurant_query.filter(Restaurant.listing_type.ilike(f'%{category}%'))
             if state:
                 restaurant_query = restaurant_query.filter(Restaurant.state.ilike(f'%{state}%'))
             if is_kosher is not None:
-                restaurant_query = restaurant_query.filter(Restaurant.is_kosher == is_kosher)
+                # All restaurants in our database are kosher, so this filter is not needed
+                pass
             
             restaurants = restaurant_query.limit(limit).offset(offset).all()
             
@@ -455,14 +474,15 @@ class EnhancedDatabaseManager:
         finally:
             session.close()
     
-    def update_restaurant_orb_data(self, restaurant_id: int, address: str, kosher_type: str, certifying_agency: str, extra_kosher_info: str = None) -> bool:
+    def update_restaurant_orb_data(self, restaurant_id: int, address: str, kosher_category: str, certifying_agency: str, extra_kosher_info: str = None) -> bool:
         """Update restaurant with ORB data."""
         try:
             session = self.get_session()
             restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
             if restaurant:
                 restaurant.address = address
-                restaurant.kosher_type = kosher_type
+                restaurant.kosher_category = kosher_category
+                restaurant.certifying_agency = certifying_agency
                 
                 # Update extra kosher information
                 if extra_kosher_info:
@@ -487,37 +507,44 @@ class EnhancedDatabaseManager:
             session.close()
     
     def add_restaurant_simple(self, name: str, address: str = None, phone_number: str = None, 
-                      kosher_type: str = None, certifying_agency: str = None, extra_kosher_info: str = None, source: str = 'orb') -> bool:
+                      kosher_category: str = None, certifying_agency: str = None, extra_kosher_info: str = None, source: str = 'orb') -> bool:
         """Add a new restaurant with basic information (simplified version)."""
         try:
-            session = self.get_session()
-            restaurant = Restaurant(
-                name=name,
-                address=address,
-                phone_number=phone_number,
-                kosher_type=kosher_type,
-            )
+            # Validate required fields
+            if not name:
+                logger.error("Restaurant name is required")
+                return False
+            
+            # Set default values for required fields
+            restaurant_data = {
+                'name': name,
+                'address': address or 'Address not provided',
+                'city': 'City not provided',
+                'state': 'State not provided',
+                'zip_code': 'ZIP not provided',
+                'phone_number': phone_number or 'Phone not provided',
+                'kosher_category': kosher_category or 'pareve',
+                'listing_type': 'restaurant',
+                'certifying_agency': certifying_agency or 'ORB',
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow(),
+                'hours_parsed': False
+            }
             
             # Set extra kosher information
             if extra_kosher_info:
                 extra_info_lower = extra_kosher_info.lower()
-                restaurant.is_cholov_yisroel = 'cholov yisroel' in extra_info_lower
-                restaurant.is_pas_yisroel = 'pas yisroel' in extra_info_lower
-                restaurant.is_bishul_yisroel = 'bishul yisroel' in extra_info_lower
+                restaurant_data['is_cholov_yisroel'] = 'cholov yisroel' in extra_info_lower
+                restaurant_data['is_pas_yisroel'] = 'pas yisroel' in extra_info_lower
                 # Note: Cholov Stam is the default when Cholov Yisroel is not specified
                 if 'cholov stam' in extra_info_lower:
-                    restaurant.is_cholov_yisroel = False
+                    restaurant_data['is_cholov_yisroel'] = False
             
-            session.add(restaurant)
-            session.commit()
-            logger.info(f"Added new restaurant: {name}")
-            return True
+            return self.add_restaurant(restaurant_data)
+            
         except Exception as e:
             logger.error(f"Error adding restaurant {name}: {e}")
-            session.rollback()
             return False
-        finally:
-            session.close()
     
     def disconnect(self):
         """Disconnect from the database."""

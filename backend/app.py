@@ -908,23 +908,17 @@ def update_database():
         logger.info("Loading ORB data into database...")
         
         try:
-            # Import and run the complete ORB data loader
-            from load_complete_orb_data import load_complete_orb_data
-            import asyncio
-            
-            # Run the async function
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            businesses = loop.run_until_complete(load_complete_orb_data())
-            loop.close()
+            # Import and run the ORB data loader function directly
+            from load_orb_data import load_orb_data
+            businesses = load_orb_data()
             
             if businesses:
-                logger.info("Complete ORB data loaded successfully")
+                logger.info("ORB data loaded successfully")
             else:
-                logger.error("Complete ORB data loader failed")
+                logger.error("ORB data loader failed")
                 
         except Exception as e:
-            logger.error(f"Error loading complete ORB data: {e}")
+            logger.error(f"Error loading ORB data: {e}")
             businesses = False
         
         if businesses:  # businesses is now a boolean indicating success
