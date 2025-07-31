@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-def main():
+def main(auto_confirm=False):
     """Main migration runner function."""
     print("🚀 JewGo Database Schema Migration")
     print("=" * 50)
@@ -29,28 +29,31 @@ def main():
     
     print(f"📊 Database: {database_url[:50]}...")
     
-    # Safety check - confirm with user
-    print("\n⚠️  WARNING: This migration will:")
-    print("   - Add new required fields")
-    print("   - Remove deprecated fields")
-    print("   - Update field constraints")
-    print("   - Add performance indexes")
-    print("   - Migrate existing data")
-    
-    confirm = input("\n🤔 Are you sure you want to proceed? (yes/no): ").lower()
-    if confirm not in ['yes', 'y']:
-        print("❌ Migration cancelled by user")
-        return False
-    
-    # Backup confirmation
-    backup_confirm = input("\n💾 Have you backed up your database? (yes/no): ").lower()
-    if backup_confirm not in ['yes', 'y']:
-        print("⚠️  WARNING: No backup confirmed!")
-        print("   It's highly recommended to backup your database before proceeding.")
-        backup_override = input("   Continue anyway? (yes/no): ").lower()
-        if backup_override not in ['yes', 'y']:
-            print("❌ Migration cancelled - backup recommended")
+    # Safety check - confirm with user (unless auto_confirm is True)
+    if not auto_confirm:
+        print("\n⚠️  WARNING: This migration will:")
+        print("   - Add new required fields")
+        print("   - Remove deprecated fields")
+        print("   - Update field constraints")
+        print("   - Add performance indexes")
+        print("   - Migrate existing data")
+        
+        confirm = input("\n🤔 Are you sure you want to proceed? (yes/no): ").lower()
+        if confirm not in ['yes', 'y']:
+            print("❌ Migration cancelled by user")
             return False
+        
+        # Backup confirmation
+        backup_confirm = input("\n💾 Have you backed up your database? (yes/no): ").lower()
+        if backup_confirm not in ['yes', 'y']:
+            print("⚠️  WARNING: No backup confirmed!")
+            print("   It's highly recommended to backup your database before proceeding.")
+            backup_override = input("   Continue anyway? (yes/no): ").lower()
+            if backup_override not in ['yes', 'y']:
+                print("❌ Migration cancelled - backup recommended")
+                return False
+    else:
+        print("🤖 Auto-confirm mode: Proceeding with migration...")
     
     try:
         # Import and run migration
@@ -93,5 +96,7 @@ def main():
         return False
 
 if __name__ == "__main__":
-    success = main()
+    # Check if --auto flag is provided
+    auto_confirm = "--auto" in sys.argv
+    success = main(auto_confirm=auto_confirm)
     sys.exit(0 if success else 1) 

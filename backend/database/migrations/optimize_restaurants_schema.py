@@ -58,7 +58,7 @@ def run_migration():
             try:
                 logger.info("Starting restaurants table schema optimization")
                 
-                # 1. Add new required fields
+                # 1. Add new required fields FIRST
                 new_columns = [
                     ("current_time_local", "TIMESTAMP"),
                     ("hours_parsed", "BOOLEAN DEFAULT FALSE"),
@@ -90,7 +90,147 @@ def run_migration():
                         logger.error(f"Error adding column {column_name}: {e}")
                         raise
                 
-                # 2. Update existing columns to be NOT NULL where required
+                # 2. Migrate data from old column names to new ones BEFORE adding constraints
+                logger.info("Migrating data from old column names to new ones")
+                
+                # Migrate phone to phone_number (only if both columns exist)
+                try:
+                    # Check if both columns exist
+                    result = conn.execute(text("""
+                        SELECT COUNT(*) FROM information_schema.columns 
+                        WHERE table_name = 'restaurants' 
+                        AND column_name IN ('phone', 'phone_number')
+                    """))
+                    if result.fetchone()[0] == 2:
+                        conn.execute(text("""
+                            UPDATE restaurants 
+                            SET phone_number = phone 
+                            WHERE phone_number IS NULL AND phone IS NOT NULL
+                        """))
+                        logger.info("Migrated phone to phone_number")
+                    else:
+                        logger.info("Skipping phone migration - columns not both present")
+                except Exception as e:
+                    logger.warning(f"Could not migrate phone to phone_number: {e}")
+                
+                # Migrate category to listing_type (only if both columns exist)
+                try:
+                    # Check if both columns exist
+                    result = conn.execute(text("""
+                        SELECT COUNT(*) FROM information_schema.columns 
+                        WHERE table_name = 'restaurants' 
+                        AND column_name IN ('category', 'listing_type')
+                    """))
+                    if result.fetchone()[0] == 2:
+                        conn.execute(text("""
+                            UPDATE restaurants 
+                            SET listing_type = category 
+                            WHERE listing_type IS NULL AND category IS NOT NULL
+                        """))
+                        logger.info("Migrated category to listing_type")
+                    else:
+                        logger.info("Skipping category migration - columns not both present")
+                except Exception as e:
+                    logger.warning(f"Could not migrate category to listing_type: {e}")
+                
+                # Migrate hours_open to hours_of_operation (only if both columns exist)
+                try:
+                    # Check if both columns exist
+                    result = conn.execute(text("""
+                        SELECT COUNT(*) FROM information_schema.columns 
+                        WHERE table_name = 'restaurants' 
+                        AND column_name IN ('hours_open', 'hours_of_operation')
+                    """))
+                    if result.fetchone()[0] == 2:
+                        conn.execute(text("""
+                            UPDATE restaurants 
+                            SET hours_of_operation = hours_open 
+                            WHERE hours_of_operation IS NULL AND hours_open IS NOT NULL
+                        """))
+                        logger.info("Migrated hours_open to hours_of_operation")
+                    else:
+                        logger.info("Skipping hours_open migration - columns not both present")
+                except Exception as e:
+                    logger.warning(f"Could not migrate hours_open to hours_of_operation: {e}")
+                
+                # Migrate kosher_type to kosher_category (only if both columns exist)
+                try:
+                    # Check if both columns exist
+                    result = conn.execute(text("""
+                        SELECT COUNT(*) FROM information_schema.columns 
+                        WHERE table_name = 'restaurants' 
+                        AND column_name IN ('kosher_type', 'kosher_category')
+                    """))
+                    if result.fetchone()[0] == 2:
+                        conn.execute(text("""
+                            UPDATE restaurants 
+                            SET kosher_category = kosher_type 
+                            WHERE kosher_category IS NULL AND kosher_type IS NOT NULL
+                        """))
+                        logger.info("Migrated kosher_type to kosher_category")
+                    else:
+                        logger.info("Skipping kosher_type migration - columns not both present")
+                except Exception as e:
+                    logger.warning(f"Could not migrate kosher_type to kosher_category: {e}")
+                
+                # 3. Set default values for certifying_agency
+                logger.info("Setting default value for certifying_agency")
+                conn.execute(text("""
+                    UPDATE restaurants 
+                    SET certifying_agency = 'ORB' 
+                    WHERE certifying_agency IS NULL OR certifying_agency = ''
+                """))
+                
+                # 4. Fill in missing required fields with defaults
+                logger.info("Filling in missing required fields with defaults")
+                
+                # Set defaults for missing required fields (only if columns exist)
+                try:
+                    result = conn.execute(text("""
+                        SELECT column_name FROM information_schema.columns 
+                        WHERE table_name = 'restaurants' AND column_name = 'phone_number'
+                    """))
+                    if result.fetchone():
+                        conn.execute(text("""
+                            UPDATE restaurants 
+                            SET phone_number = 'Phone not provided' 
+                            WHERE phone_number IS NULL
+                        """))
+                        logger.info("Set default for phone_number")
+                except Exception as e:
+                    logger.warning(f"Could not set default for phone_number: {e}")
+                
+                try:
+                    result = conn.execute(text("""
+                        SELECT column_name FROM information_schema.columns 
+                        WHERE table_name = 'restaurants' AND column_name = 'listing_type'
+                    """))
+                    if result.fetchone():
+                        conn.execute(text("""
+                            UPDATE restaurants 
+                            SET listing_type = 'restaurant' 
+                            WHERE listing_type IS NULL
+                        """))
+                        logger.info("Set default for listing_type")
+                except Exception as e:
+                    logger.warning(f"Could not set default for listing_type: {e}")
+                
+                try:
+                    result = conn.execute(text("""
+                        SELECT column_name FROM information_schema.columns 
+                        WHERE table_name = 'restaurants' AND column_name = 'kosher_category'
+                    """))
+                    if result.fetchone():
+                        conn.execute(text("""
+                            UPDATE restaurants 
+                            SET kosher_category = 'pareve' 
+                            WHERE kosher_category IS NULL
+                        """))
+                        logger.info("Set default for kosher_category")
+                except Exception as e:
+                    logger.warning(f"Could not set default for kosher_category: {e}")
+                
+                # 5. Now update existing columns to be NOT NULL where required
                 required_columns = [
                     "name", "address", "city", "state", "zip_code", 
                     "phone_number", "certifying_agency", "kosher_category", "listing_type"
@@ -98,6 +238,15 @@ def run_migration():
                 
                 for column_name in required_columns:
                     try:
+                        # Check if column exists first
+                        result = conn.execute(text(f"""
+                            SELECT column_name FROM information_schema.columns 
+                            WHERE table_name = 'restaurants' AND column_name = '{column_name}'
+                        """))
+                        if not result.fetchone():
+                            logger.warning(f"Column {column_name} does not exist, skipping NOT NULL constraint")
+                            continue
+                        
                         # Check if column can be made NOT NULL (no NULL values)
                         result = conn.execute(text(f"""
                             SELECT COUNT(*) 
@@ -117,46 +266,7 @@ def run_migration():
                         logger.error(f"Error updating column {column_name}: {e}")
                         # Continue with other columns
                 
-                # 3. Set default values for certifying_agency
-                logger.info("Setting default value for certifying_agency")
-                conn.execute(text("""
-                    UPDATE restaurants 
-                    SET certifying_agency = 'ORB' 
-                    WHERE certifying_agency IS NULL OR certifying_agency = ''
-                """))
-                
-                # 4. Migrate data from old column names to new ones
-                logger.info("Migrating data from old column names to new ones")
-                
-                # Migrate phone to phone_number
-                conn.execute(text("""
-                    UPDATE restaurants 
-                    SET phone_number = phone 
-                    WHERE phone_number IS NULL AND phone IS NOT NULL
-                """))
-                
-                # Migrate category to listing_type
-                conn.execute(text("""
-                    UPDATE restaurants 
-                    SET listing_type = category 
-                    WHERE listing_type IS NULL AND category IS NOT NULL
-                """))
-                
-                # Migrate hours_open to hours_of_operation
-                conn.execute(text("""
-                    UPDATE restaurants 
-                    SET hours_of_operation = hours_open 
-                    WHERE hours_of_operation IS NULL AND hours_open IS NOT NULL
-                """))
-                
-                # Migrate kosher_type to kosher_category
-                conn.execute(text("""
-                    UPDATE restaurants 
-                    SET kosher_category = kosher_type 
-                    WHERE kosher_category IS NULL AND kosher_type IS NOT NULL
-                """))
-                
-                # 5. Remove deprecated columns
+                # 6. Remove deprecated columns
                 deprecated_columns = [
                     "detail_url", "email", "kosher_cert_link", "next_open_time", 
                     "is_open", "status_reason", "phone", "category", "hours_open", 
@@ -184,7 +294,7 @@ def run_migration():
                         logger.error(f"Error removing column {column_name}: {e}")
                         # Continue with other columns
                 
-                # 6. Add indexes for better performance
+                # 7. Add indexes for better performance
                 indexes = [
                     ("idx_restaurants_kosher_category", "kosher_category"),
                     ("idx_restaurants_certifying_agency", "certifying_agency"),
@@ -196,6 +306,23 @@ def run_migration():
                 
                 for index_name, columns in indexes:
                     try:
+                        # Check if all columns in the index exist
+                        column_list = [col.strip() for col in columns.split(',')]
+                        all_columns_exist = True
+                        
+                        for column in column_list:
+                            result = conn.execute(text(f"""
+                                SELECT column_name FROM information_schema.columns 
+                                WHERE table_name = 'restaurants' AND column_name = '{column}'
+                            """))
+                            if not result.fetchone():
+                                logger.warning(f"Column {column} does not exist, skipping index {index_name}")
+                                all_columns_exist = False
+                                break
+                        
+                        if not all_columns_exist:
+                            continue
+                        
                         # Check if index exists
                         result = conn.execute(text(f"""
                             SELECT indexname 
@@ -215,7 +342,7 @@ def run_migration():
                         logger.error(f"Error creating index {index_name}: {e}")
                         # Continue with other indexes
                 
-                # 7. Update current_time_local for all existing records
+                # 8. Update current_time_local for all existing records
                 logger.info("Updating current_time_local for existing records")
                 conn.execute(text("""
                     UPDATE restaurants 

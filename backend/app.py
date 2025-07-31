@@ -908,17 +908,17 @@ def update_database():
         logger.info("Loading ORB data into database...")
         
         try:
-            # Import and run the ORB data loader function directly
-            from load_orb_data import load_orb_data
-            businesses = load_orb_data()
+            # Import and run the clean reload ORB data function
+            from clean_reload_orb_data import clean_reload_orb_data
+            businesses = clean_reload_orb_data()
             
             if businesses:
-                logger.info("ORB data loaded successfully")
+                logger.info("Clean reload ORB data completed successfully")
             else:
-                logger.error("ORB data loader failed")
+                logger.error("Clean reload ORB data failed")
                 
         except Exception as e:
-            logger.error(f"Error loading ORB data: {e}")
+            logger.error(f"Error in clean reload ORB data: {e}")
             businesses = False
         
         if businesses:  # businesses is now a boolean indicating success
