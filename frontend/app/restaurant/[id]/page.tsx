@@ -8,6 +8,7 @@ import Logo from '@/components/Logo';
 import Reviews from '@/components/Reviews';
 import BottomNavigation from '@/components/BottomNavigation';
 import { formatWeeklyHoursArray, getHoursStatus } from '@/utils/hours';
+import HoursDisplay from '@/components/HoursDisplay';
 
 const RestaurantDetailPage: React.FC = () => {
   const params = useParams();
@@ -366,55 +367,13 @@ const RestaurantDetailPage: React.FC = () => {
         {/* Hours of Operation Section */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">Hours of Operation</h2>
-          {restaurant.hours_open || restaurant.hours_of_operation ? (
-            <div className="space-y-4">
-              {/* Current Status */}
-              {(() => {
-                const hoursStatus = getHoursStatus(restaurant.hours_open || restaurant.hours_of_operation);
-                return (
-                  <div className="text-center mb-4">
-                    <span 
-                      className={`text-sm font-medium px-3 py-2 rounded-full ${hoursStatus.badge} bg-opacity-10`}
-                      title={hoursStatus.tooltip}
-                    >
-                      {hoursStatus.icon} {hoursStatus.label}
-                    </span>
-                  </div>
-                );
-              })()}
-              
-              {/* Dropdown for Full Weekly Schedule */}
-              {(() => {
-                const weeklyHours = formatWeeklyHoursArray(restaurant.hours_open || restaurant.hours_of_operation);
-                return weeklyHours ? (
-                  <div className="max-w-md mx-auto">
-                    <details className="group">
-                      <summary className="cursor-pointer text-center text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center space-x-1">
-                        <span>View full weekly schedule</span>
-                        <svg className="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                      </summary>
-                      <div className="mt-4 pt-4 border-t border-gray-100">
-                        <div className="grid grid-cols-1 gap-2">
-                          {weeklyHours.map((day, index) => (
-                            <div key={day.day} className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded-lg">
-                              <span className="font-medium text-gray-700">{day.day}</span>
-                              <span className="text-gray-600">{day.hours}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </details>
-                  </div>
-                ) : (
-                  <p className="text-center text-gray-500">Weekly schedule not available</p>
-                );
-              })()}
-            </div>
-          ) : (
-            <p className="text-center text-gray-500">Hours information not available</p>
-          )}
+          <div className="max-w-md mx-auto">
+            <HoursDisplay 
+              hoursOfOperation={restaurant.hours_of_operation}
+              hoursJson={restaurant.hours_json ? JSON.parse(restaurant.hours_json) : undefined}
+              hoursLastUpdated={restaurant.hours_last_updated}
+            />
+          </div>
         </div>
 
         {/* Cost Information Section */}

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Restaurant } from '@/types/restaurant';
 import { cn } from '@/utils/cn';
 import { ensureRestaurantWebsite, getFallbackWebsiteLink } from '@/utils/websiteBackup';
+import HoursDisplay from '@/components/HoursDisplay';
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -364,30 +365,13 @@ export default function RestaurantCard({
             </div>
           </div>
           
-          {/* Open/Closed Status with Icon */}
+          {/* Hours Display */}
           <div className="mb-3">
-            {restaurant.hours_open ? (
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Open • {restaurant.hours_open}
-              </span>
-            ) : restaurant.hours_of_operation ? (
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
-                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Closed now • {restaurant.hours_of_operation}
-              </span>
-            ) : (
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Hours not available
-              </span>
-            )}
+            <HoursDisplay 
+              hoursOfOperation={restaurant.hours_of_operation}
+              hoursJson={restaurant.hours_json ? JSON.parse(restaurant.hours_json) : undefined}
+              hoursLastUpdated={restaurant.hours_last_updated}
+            />
           </div>
           
           {/* Address */}
