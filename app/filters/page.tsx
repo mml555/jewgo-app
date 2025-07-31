@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import EnhancedFilters, { FilterState } from '@/components/EnhancedFilters';
 import RestaurantCard from '@/components/RestaurantCard';
 import { Restaurant } from '@/types/restaurant';
 
-const FiltersPage: React.FC = () => {
+const FiltersPageContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -267,6 +267,19 @@ const FiltersPage: React.FC = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const FiltersPage: React.FC = () => {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-jewgo-primary"></div>
+        <span className="ml-3 text-gray-600">Loading filters...</span>
+      </div>
+    }>
+      <FiltersPageContent />
+    </Suspense>
   );
 };
 
