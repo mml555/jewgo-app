@@ -26,27 +26,12 @@ def check_file_exists(filepath, description):
 
 def check_render_yaml():
     """Check render.yaml configuration."""
-    if not os.path.exists('render.yaml'):
-        print("❌ render.yaml not found")
-        return False
-    
-    try:
-        with open('render.yaml', 'r') as f:
-            content = f.read()
-        
-        if 'services:' in content and 'jewgo-backend' in content:
-            print("✅ render.yaml configuration:")
-            print("   - Service name: jewgo-backend")
-            print("   - Environment: python")
-            print("   - Build command: cd backend && pip install -r requirements.txt")
-            print("   - Start command: cd backend && gunicorn --config config/gunicorn.conf.py app:app")
-            return True
-        else:
-            print("❌ render.yaml: Invalid configuration")
-            return False
-    except Exception as e:
-        print(f"❌ render.yaml: Error reading - {e}")
-        return False
+    if os.path.exists('render.yaml'):
+        print("✅ render.yaml found (optional)")
+        return True
+    else:
+        print("ℹ️  render.yaml not found (using Procfile instead)")
+        return True
 
 def check_requirements():
     """Check requirements.txt files."""

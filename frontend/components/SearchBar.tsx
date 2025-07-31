@@ -96,7 +96,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [query, onSearch]);
+  }, [query]); // Removed onSearch from dependencies since it should be stable
 
   // Debounced Google Places autocomplete
   useEffect(() => {

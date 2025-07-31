@@ -281,7 +281,7 @@ export default function EnhancedSearch({
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [query, onSearch, onResultsUpdate]);
+  }, [query]); // Removed onSearch and onResultsUpdate from dependencies since they're now stable
 
   // Debounced Google Places autocomplete
   useEffect(() => {

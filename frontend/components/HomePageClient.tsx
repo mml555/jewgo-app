@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Header from '@/components/Header';
 import EnhancedSearch from '@/components/EnhancedSearch';
 import ActionButtons from '@/components/ActionButtons';
@@ -260,17 +260,17 @@ export default function HomePageClient() {
     }
   };
 
-  const handleSearch = (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
     setCurrentPage(1); // Reset to first page when searching
-  };
+  }, []);
 
-  const handleResultsUpdate = (results: Restaurant[]) => {
+  const handleResultsUpdate = useCallback((results: Restaurant[]) => {
     console.log('Enhanced search results:', results.length, 'restaurants');
     // Update the all restaurants with the enhanced results
     // The displayed restaurants will be automatically updated via memoization
     setAllRestaurants(results);
-  };
+  }, []);
 
   const handleFilterChange = (key: string, value: any) => {
     setActiveFilters(prev => ({ ...prev, [key]: value }));
