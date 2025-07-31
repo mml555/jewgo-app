@@ -1009,6 +1009,7 @@ def create_app(config_name=None):
             
             # Get database manager
             db_manager = EnhancedDatabaseManager()
+            db_manager.connect()
             session = db_manager.get_session()
             
             # Update all ORB restaurants to have kosher_type = "dairy"
@@ -1025,6 +1026,7 @@ def create_app(config_name=None):
             
             session.commit()
             session.close()
+            db_manager.disconnect()
             
             logger.info(f"Updated {updated_count} ORB restaurants to kosher_type = 'dairy'")
             
