@@ -70,7 +70,8 @@ def check_procfile():
 def check_backend_files():
     """Check essential backend files."""
     files_to_check = [
-        ('backend/app.py', 'Flask application'),
+        ('app.py', 'Root Flask application'),
+        ('backend/app.py', 'Backend Flask application'),
         ('backend/config/gunicorn.conf.py', 'Gunicorn configuration'),
         ('backend/database/database_manager_v3.py', 'Database manager'),
     ]
