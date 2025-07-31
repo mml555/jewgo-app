@@ -43,9 +43,15 @@ backend/
 │   ├── config.py               # Main configuration ✅
 │   ├── gunicorn.conf.py        # Gunicorn server config ✅
 │   └── env.production.example  # Environment variables ✅
-├── requirements.txt            # Python dependencies ✅
+└── requirements.txt            # Python dependencies ✅
+```
+
+### ✅ Root Level Deployment Files
+```
+jewgo-app/
+├── render.yaml                 # Render deployment config ✅
 ├── runtime.txt                 # Python version ✅
-└── render.yaml                 # Render deployment config ✅
+└── [other files...]
 ```
 
 ### ✅ Frontend Structure
@@ -95,8 +101,8 @@ frontend/
 ## 🚀 Deployment Configuration Verification
 
 ### ✅ Backend Deployment (Render)
-- ✅ `backend/render.yaml` - Render deployment configuration
-- ✅ `backend/runtime.txt` - Python version specification
+- ✅ `render.yaml` - Render deployment configuration (root directory)
+- ✅ `runtime.txt` - Python version specification (root directory)
 - ✅ `backend/requirements.txt` - All dependencies included
 - ✅ `backend/app.py` - Complete Flask API server
 - ✅ Health check endpoint (`/health`)

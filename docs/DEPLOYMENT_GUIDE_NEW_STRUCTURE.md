@@ -33,8 +33,8 @@ The backend is configured to deploy to Render with the following files:
 
 - `backend/app.py` - Main Flask application
 - `backend/requirements.txt` - Python dependencies
-- `backend/runtime.txt` - Python version specification
-- `backend/render.yaml` - Render deployment configuration
+- `runtime.txt` - Python version specification (root directory)
+- `render.yaml` - Render deployment configuration (root directory)
 
 ### 2. **Environment Variables**
 
@@ -58,6 +58,7 @@ PYTHON_VERSION=3.11.9
    - **Environment**: `Python`
    - **Build Command**: `cd backend && pip install -r requirements.txt`
    - **Start Command**: `cd backend && gunicorn --config config/gunicorn.conf.py app:app`
+   - **Root Directory**: Leave as default (root of repository)
 
 3. **Environment Variables**:
    - Add `DATABASE_URL` with your PostgreSQL connection string

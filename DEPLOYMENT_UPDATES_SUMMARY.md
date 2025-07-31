@@ -17,14 +17,14 @@ Successfully updated all deployment configurations to work with the new organize
    - ✅ **Error handling** and structured logging
    - ✅ **Database integration** with proper connection management
 
-2. **`backend/render.yaml`** - Render deployment configuration
+2. **`render.yaml`** - Render deployment configuration (root directory)
    - ✅ **Service configuration** for Python web service
    - ✅ **Build command** with correct directory path
    - ✅ **Start command** using gunicorn
    - ✅ **Environment variables** setup
    - ✅ **Health check path** configuration
 
-3. **`backend/runtime.txt`** - Python version specification
+3. **`runtime.txt`** - Python version specification (root directory)
    - ✅ **Python 3.11.9** for compatibility
    - ✅ **Matches requirements** and dependencies
 
@@ -120,9 +120,15 @@ backend/
 │   ├── config.py
 │   ├── gunicorn.conf.py
 │   └── env.production.example
-├── requirements.txt        # Python dependencies
+└── requirements.txt        # Python dependencies
+```
+
+### Root Level Deployment Files
+```
+jewgo-app/
+├── render.yaml             # Render deployment config
 ├── runtime.txt             # Python version
-└── render.yaml             # Render deployment config
+└── [other files...]
 ```
 
 ### Frontend Structure
