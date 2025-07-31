@@ -130,7 +130,7 @@ def get_restaurants():
         # Get query parameters
         limit = request.args.get('limit', 100, type=int)
         offset = request.args.get('offset', 0, type=int)
-        kosher_type = request.args.get('kosher_type')
+        kosher_type = request.args.get('kosher_type') or request.args.get('kosher_category')
         state = request.args.get('state')
         
         # Get restaurants from database
