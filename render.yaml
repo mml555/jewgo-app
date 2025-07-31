@@ -17,4 +17,4 @@ services:
       - key: ENVIRONMENT
         value: production
     healthCheckPath: /health
-    autoDeploy: true 
+    autoDeploy: true # Updated for Render deployment
