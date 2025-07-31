@@ -958,9 +958,10 @@ def update_database():
         logger.info(f"Final restaurant count: {final_count}")
         
         # Show final statistics
+        from sqlalchemy import func
         kosher_types = session.query(
             Restaurant.kosher_type,
-            db_manager.db.func.count(Restaurant.kosher_type)
+            func.count(Restaurant.kosher_type)
         ).group_by(Restaurant.kosher_type).all()
         
         # Show Chalav Yisroel statistics
