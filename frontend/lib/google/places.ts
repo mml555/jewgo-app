@@ -80,7 +80,9 @@ export class ModernGooglePlacesAPI {
       // Use the new Place API for text search
       const request: google.maps.places.TextSearchRequest = {
         query,
-        ...options
+        location: options.location ? new google.maps.LatLng(options.location.lat, options.location.lng) : undefined,
+        radius: options.radius,
+        types: options.types
       };
 
       return new Promise((resolve, reject) => {
@@ -128,7 +130,7 @@ export class ModernGooglePlacesAPI {
       const request: google.maps.places.AutocompletionRequest = {
         input,
         types: options.types || ['establishment'],
-        location: options.location ? new window.google.maps.LatLng(options.location.lat, options.location.lng) : undefined,
+        location: options.location ? new google.maps.LatLng(options.location.lat, options.location.lng) : undefined,
         radius: options.radius,
         componentRestrictions: options.country ? { country: options.country } : undefined
       };
