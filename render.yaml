@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: jewgo-backend
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      playwright install chromium
+    startCommand: cd backend && gunicorn --config config/gunicorn.conf.py app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.8
+      - key: DATABASE_URL
+        sync: false
+      - key: ENVIRONMENT
+        value: production 
