@@ -1,43 +1,13 @@
 #!/usr/bin/env python3
 """
-ORB Kosher Scraper V2
-====================
+ORB Kosher Scraper V2 - Preview Mode
+====================================
 
-This module provides a comprehensive web scraper for extracting kosher restaurant data
-from the ORB Kosher website (https://www.orbkosher.com). The scraper is designed to
-map ORB data directly to the current JewGo database schema with proper kosher
-supervision categorization.
-
-Key Features:
-- Automated scraping of ORB Kosher website
-- Direct mapping to JewGo database schema
-- Chalav Yisroel/Stam categorization
-- Pas Yisroel categorization
-- Duplicate prevention
-- Error handling and logging
-- Playwright-based robust scraping
-
-Data Sources:
-- ORB Kosher dairy restaurants
-- ORB Kosher pareve restaurants
-- Manual curation for Chalav Stam (3 restaurants)
-- Manual curation for Pas Yisroel (22 restaurants)
-
-Expected Results:
-- ~107 total restaurants
-- ~99 dairy restaurants
-- ~8 pareve restaurants
-- 104 Chalav Yisroel, 3 Chalav Stam
-- 22 Pas Yisroel restaurants
-
-Dependencies:
-- Playwright for web scraping
-- SQLAlchemy for database operations
-- structlog for structured logging
-- python-dotenv for environment variables
+This is a preview version that collects data but doesn't save to the database.
+Use this to review the data before committing to the database.
 
 Author: JewGo Development Team
-Version: 2.0
+Version: 2.0 Preview
 Last Updated: 2024
 """
 
@@ -56,18 +26,15 @@ load_dotenv()
 # Add the backend directory to Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database.database_manager_v3 import EnhancedDatabaseManager as DatabaseManager
-
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-class ORBScraperV2:
-    """ORB Kosher scraper that maps to current database schema."""
+class ORBScraperV2Preview:
+    """ORB Kosher scraper preview mode - collects data without saving to database."""
     
     def __init__(self):
         self.base_url = "https://www.orbkosher.com"
-        self.db_manager = DatabaseManager()
         
         # Chalav Stam restaurants (only these 3 should be Chalav Stam)
         self.chalav_stam_restaurants = [
@@ -229,87 +196,76 @@ class ORBScraperV2:
     async def extract_business_data(self, business_element, kosher_type: str, listing_type: str) -> Optional[Dict]:
         """Extract business data from a single .business-listing element."""
         try:
-            # Extract name
-            name_elem = await business_element.query_selector('.logoTitle')
-            name = await name_elem.inner_text() if name_elem else None
-            if name:
-                name = name.strip()
+            # Extract business name
+            name_element = await business_element.query_selector('.logoTitle, .business-name, h3, h4')
+            name = await name_element.text_content() if name_element else "Unknown Business"
+            name = name.strip()
             
-            if not name:
-                logger.warning("No name found for business listing")
-                return None
+            # Extract address
+            address_element = await business_element.query_selector('.address, .business-address')
+            address = await address_element.text_content() if address_element else ""
+            address = address.strip()
             
-            # Extract photo
-            img_elem = await business_element.query_selector('a img')
-            photo = None
-            if img_elem:
-                photo_src = await img_elem.get_attribute('src')
-                photo = self.normalize_url(photo_src) if photo_src else None
+            # Extract phone number
+            phone_element = await business_element.query_selector('.phone, .business-phone')
+            phone = await phone_element.text_content() if phone_element else ""
+            phone = phone.strip()
             
-            # Extract phone
-            phone_elem = await business_element.query_selector('.phone a[href^="tel:"]')
-            phone = None
-            if phone_elem:
-                phone = await phone_elem.inner_text()
-                phone = phone.strip() if phone else None
+            # Extract website URL
+            website_element = await business_element.query_selector('a[href*="http"]')
+            website = await website_element.get_attribute('href') if website_element else ""
             
-            # Extract address (real address, not PDF link)
-            address_elem = await business_element.query_selector('.address a:not([href$=".pdf"])')
-            address = None
-            if address_elem:
-                address = await address_elem.inner_text()
-                address = address.strip() if address else None
-            
-            # Extract website
-            website_elem = await business_element.query_selector('a[href^="http"]')
-            website = None
-            if website_elem:
-                website_href = await website_elem.get_attribute('href')
-                website = website_href if website_href else None
+            # Extract image URL
+            img_element = await business_element.query_selector('img')
+            image_url = await img_element.get_attribute('src') if img_element else ""
+            image_url = self.normalize_url(image_url) if image_url else ""
             
             # Extract kosher certificate link
-            cert_elem = await business_element.query_selector('.address a[href$=".pdf"]')
-            kosher_cert_link = None
-            if cert_elem:
-                cert_href = await cert_elem.get_attribute('href')
-                kosher_cert_link = self.normalize_url(cert_href) if cert_href else None
+            cert_element = await business_element.query_selector('a[href*="pdf"]')
+            kosher_cert_link = await cert_element.get_attribute('href') if cert_element else ""
+            kosher_cert_link = self.normalize_url(kosher_cert_link) if kosher_cert_link else ""
             
-            # Extract address components
+            # Extract detail URL
+            detail_element = await business_element.query_selector('a[href*="/business/"]')
+            detail_url = await detail_element.get_attribute('href') if detail_element else ""
+            detail_url = self.normalize_url(detail_url) if detail_url else ""
+            
+            # Parse address components
             address_components = self.extract_address_components(address)
             
-            # Determine Chalav Yisroel and Pas Yisroel status
-            is_cholov_yisroel = True  # Default to Chalav Yisroel
-            if name in self.chalav_stam_restaurants:
-                is_cholov_yisroel = False
+            # Determine Chalav Yisroel/Stam status
+            is_cholov_yisroel = name not in self.chalav_stam_restaurants
             
-            is_pas_yisroel = False  # Default to not Pas Yisroel
-            if name in self.pas_yisroel_restaurants:
-                is_pas_yisroel = True
+            # Determine Pas Yisroel status
+            is_pas_yisroel = name in self.pas_yisroel_restaurants
             
-            # Map to current database schema
+            # Create business data dictionary
             business_data = {
                 'name': name,
-                'address': address or '',
+                'address': address,
                 'city': address_components.get('city', ''),
-                'state': address_components.get('state', ''),
+                'state': address_components.get('state', 'FL'),
                 'zip_code': address_components.get('zip_code', ''),
-                'phone': phone or '',
-                'website': website or '',
+                'phone_number': phone,
+                'website': website,
+                'image_url': image_url,
                 'kosher_type': kosher_type,
-                'status': 'active',
-                'hours_open': '',
-                'short_description': f"Kosher {kosher_type} restaurant certified by ORB",
-                'price_range': '',
-                'image_url': photo or '',
-                'latitude': None,
-                'longitude': None,
                 'is_cholov_yisroel': is_cholov_yisroel,
                 'is_pas_yisroel': is_pas_yisroel,
-                'kosher_cert_link': kosher_cert_link or '',
-                'detail_url': website or '',
-                'email': '',
-                'google_listing_url': '',
+                'certifying_agency': 'ORB',
+                'kosher_cert_link': kosher_cert_link,
+                'detail_url': detail_url,
+                'short_description': 'Kosher {} restaurant certified by ORB'.format(kosher_type),
+                'google_listing_url': None,
+                'latitude': None,
+                'longitude': None,
+                'hours': None,
+                'hours_open': None,
                 'category': 'restaurant',
+                'listing_type': listing_type,
+                'price_range': '',
+                'email': '',
+                'status': 'active',
                 'created_at': datetime.utcnow(),
                 'updated_at': datetime.utcnow()
             }
@@ -374,6 +330,9 @@ class ORBScraperV2:
     async def scrape_section(self, section_type: str) -> List[Dict]:
         """Scrape a specific section (dairy or meat) from the restaurants page."""
         try:
+            # Look for the section header
+            section_selector = f"h3:has-text('Restaurants » {section_type.capitalize()}')"
+            
             # Find the section and get all business listings within it
             section_elements = await self.page.query_selector_all('.section-col-miami')
             
@@ -408,45 +367,6 @@ class ORBScraperV2:
         except Exception as e:
             logger.error(f"Error scraping {section_type} section: {e}")
             return []
-    
-    def save_businesses_to_database(self, businesses: List[Dict]) -> int:
-        """Save businesses to the database."""
-        try:
-            if not businesses:
-                logger.warning("No businesses to save")
-                return 0
-            
-            success_count = 0
-            
-            for business in businesses:
-                try:
-                    # Check if restaurant already exists to prevent duplicates
-                    existing = self.db_manager.search_places(
-                        query=business['name'],
-                        limit=1
-                    )
-                    
-                    if existing:
-                        logger.info(f"Restaurant already exists: {business['name']} - skipping")
-                        continue
-                    
-                    # Add new restaurant
-                    success = self.db_manager.add_restaurant(business)
-                    if success:
-                        success_count += 1
-                        logger.info(f"Added restaurant: {business['name']}")
-                    else:
-                        logger.error(f"Failed to add restaurant: {business['name']}")
-                    
-                except Exception as e:
-                    logger.error(f"Error saving business {business['name']}: {e}")
-            
-            logger.info(f"Successfully saved {success_count} businesses")
-            return success_count
-            
-        except Exception as e:
-            logger.error(f"Error saving businesses to database: {e}")
-            return 0
     
     async def scrape_all_categories(self) -> List[Dict]:
         """Scrape all available ORB categories."""
@@ -488,12 +408,7 @@ class ORBScraperV2:
     async def run(self):
         """Main execution method."""
         try:
-            logger.info("Starting ORB Scraper V2")
-            
-            # Connect to database
-            if not self.db_manager.connect():
-                logger.error("Failed to connect to database")
-                return False
+            logger.info("Starting ORB Scraper V2 Preview Mode")
             
             # Setup Playwright
             if not await self.setup_playwright():
@@ -503,14 +418,11 @@ class ORBScraperV2:
             businesses = await self.scrape_all_categories()
             
             if businesses:
-                # Save to database
-                saved_count = self.save_businesses_to_database(businesses)
-                
-                logger.info(f"Scraping completed. Saved {saved_count} businesses")
+                logger.info(f"Scraping completed. Found {len(businesses)} businesses")
                 
                 # Show sample results
                 logger.info("Sample scraped businesses:")
-                for i, business in enumerate(businesses[:5]):
+                for i, business in enumerate(businesses[:10]):
                     logger.info(f"{i+1}. {business['name']} - {business['kosher_type']} - {business['address']}")
                 
                 # Show statistics
@@ -532,7 +444,15 @@ class ORBScraperV2:
                 logger.info(f"  - Chalav Yisroel: {chalav_yisroel_count}")
                 logger.info(f"  - Chalav Stam: {chalav_stam_count}")
                 logger.info(f"  - Pas Yisroel: {pas_yisroel_count}")
-            
+                
+                # Show detailed breakdown by category
+                logger.info("\nDetailed Breakdown by Category:")
+                for kosher_type in ['dairy', 'meat', 'pareve']:
+                    type_businesses = [b for b in businesses if b.get('kosher_type') == kosher_type]
+                    logger.info(f"\n{kosher_type.upper()} RESTAURANTS ({len(type_businesses)}):")
+                    for business in type_businesses:
+                        logger.info(f"  - {business['name']}")
+                
             else:
                 logger.warning("No businesses were scraped")
             
@@ -543,19 +463,18 @@ class ORBScraperV2:
             return False
         finally:
             await self.cleanup()
-            self.db_manager.disconnect()
 
 async def main():
     """Main entry point."""
-    scraper = ORBScraperV2()
+    scraper = ORBScraperV2Preview()
     success = await scraper.run()
     
     if success:
-        logger.info("ORB Scraper V2 completed successfully")
+        print("\n✅ Preview scraping completed successfully!")
+        print("Review the data above before deciding to save to database.")
     else:
-        logger.error("ORB Scraper V2 failed")
-    
-    return success
+        print("\n❌ Preview scraping failed!")
+        sys.exit(1)
 
 if __name__ == "__main__":
     asyncio.run(main()) 

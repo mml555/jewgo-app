@@ -885,7 +885,105 @@ def fetch_missing_hours():
         
     except Exception as e:
         logger.error(f"Error in bulk hours update: {e}")
-        return jsonify({'error': f'Error in bulk hours update: {str(e)}'}), 500
+        return jsonify({'error': f'Error in bulk hours update: {str(e)}'        }), 500
+
+@app.route('/api/update-database', methods=['POST'])
+def update_database():
+    """Update database with correct ORB data."""
+    try:
+        import asyncio
+        from scrapers.orb_scraper_v2 import ORBScraperV2
+        
+        session = db_manager.get_session()
+        from database.database_manager_v3 import Restaurant
+        
+        # Step 1: Clear all existing restaurant data
+        logger.info("Clearing all existing restaurant data...")
+        deleted_count = session.query(Restaurant).delete()
+        session.commit()
+        logger.info(f"Deleted {deleted_count} existing restaurants")
+        
+        # Step 2: Run the updated ORB scraper
+        logger.info("Running updated ORB scraper...")
+        
+        # Create event loop for async operations
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        async def run_scraper():
+            scraper = ORBScraperV2()
+            
+            if not await scraper.setup_playwright():
+                return None
+            
+            businesses = await scraper.scrape_all_categories()
+            await scraper.cleanup()
+            return businesses
+        
+        businesses = loop.run_until_complete(run_scraper())
+        loop.close()
+        
+        if businesses:
+            # Step 3: Save new data to database
+            logger.info(f"Saving {len(businesses)} businesses to database...")
+            
+            success_count = 0
+            for business in businesses:
+                try:
+                    success = db_manager.add_restaurant(business)
+                    if success:
+                        success_count += 1
+                except Exception as e:
+                    logger.error(f"Error saving business {business['name']}: {e}")
+            
+            logger.info(f"Successfully saved {success_count} businesses")
+            
+            # Step 4: Verify the data
+            final_count = session.query(Restaurant).count()
+            logger.info(f"Final restaurant count: {final_count}")
+            
+            # Show final statistics
+            kosher_types = session.query(
+                Restaurant.kosher_type,
+                db_manager.db.func.count(Restaurant.kosher_type)
+            ).group_by(Restaurant.kosher_type).all()
+            
+            # Show Chalav Yisroel statistics
+            chalav_yisroel_count = session.query(Restaurant).filter(
+                Restaurant.is_cholov_yisroel == True
+            ).count()
+            
+            chalav_stam_count = session.query(Restaurant).filter(
+                Restaurant.is_cholov_yisroel == False,
+                Restaurant.kosher_type == 'dairy'
+            ).count()
+            
+            pas_yisroel_count = session.query(Restaurant).filter(
+                Restaurant.is_pas_yisroel == True
+            ).count()
+            
+            return jsonify({
+                'message': f'Successfully updated database with {success_count} restaurants',
+                'deleted_count': deleted_count,
+                'saved_count': success_count,
+                'final_count': final_count,
+                'kosher_types': dict(kosher_types),
+                'chalav_yisroel': chalav_yisroel_count,
+                'chalav_stam': chalav_stam_count,
+                'pas_yisroel': pas_yisroel_count
+            }), 200
+        else:
+            return jsonify({
+                'error': 'No businesses were scraped',
+                'message': 'Scraper returned no data'
+            }), 500
+        
+    except Exception as e:
+        logger.error(f"Error updating database: {e}")
+        return jsonify({
+            'error': 'Failed to update database',
+            'message': str(e)
+        }), 500
 
 @app.errorhandler(404)
 def not_found(error):
