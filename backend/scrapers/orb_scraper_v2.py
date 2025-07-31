@@ -128,7 +128,7 @@ class ORBScraperV2:
             logger.error(f"Playwright setup failed: {e}")
             return False
     
-    def extract_listing_and_kosher_type(self, title_text: str) -> Tuple[str, str]:
+    def extract_listing_and_kosher_category(self, title_text: str) -> Tuple[str, str]:
         """Extract listing type and kosher type from title header."""
         try:
             # Parse: "Restaurants » Dairy" -> ("Restaurants", "Dairy")
@@ -136,23 +136,23 @@ class ORBScraperV2:
                 parts = title_text.split("»")
                 if len(parts) >= 2:
                     listing_type = parts[0].strip()
-                    kosher_type = parts[1].strip().lower()  # Convert to lowercase
-                    return listing_type, kosher_type
+                    kosher_category = parts[1].strip().lower()  # Convert to lowercase
+                    return listing_type, kosher_category
             
             # Fallback: try to extract from text
             title_lower = title_text.lower()
             
             # Determine kosher type from keywords
             if 'dairy' in title_lower:
-                kosher_type = 'dairy'
+                kosher_category = 'dairy'
             elif 'meat' in title_lower:
-                kosher_type = 'meat'
+                kosher_category = 'meat'
             elif 'pareve' in title_lower or 'parve' in title_lower:
-                kosher_type = 'pareve'
+                kosher_category = 'pareve'
             elif 'fish' in title_lower:
-                kosher_type = 'pareve'
+                kosher_category = 'pareve'
             else:
-                kosher_type = 'unknown'
+                kosher_category = 'unknown'
             
             # Determine listing type
             if 'restaurant' in title_lower:
@@ -164,7 +164,7 @@ class ORBScraperV2:
             else:
                 listing_type = 'Businesses'
             
-            return listing_type, kosher_type
+            return listing_type, kosher_category
             
         except Exception as e:
             logger.error(f"Error extracting listing and kosher type from '{title_text}': {e}")
@@ -226,7 +226,7 @@ class ORBScraperV2:
         
         return components
     
-    async def extract_business_data(self, business_element, kosher_type: str, listing_type: str) -> Optional[Dict]:
+    async def extract_business_data(self, business_element, kosher_category: str, listing_type: str) -> Optional[Dict]:
         """Extract business data from a single .business-listing element."""
         try:
             # Extract name
@@ -295,10 +295,10 @@ class ORBScraperV2:
                 'zip_code': address_components.get('zip_code', ''),
                 'phone': phone or '',
                 'website': website or '',
-                'kosher_type': kosher_type,
+                'kosher_category': kosher_category,
                 'status': 'active',
                 'hours_open': '',
-                'short_description': f"Kosher {kosher_type} restaurant certified by ORB",
+                'short_description': f"Kosher {kosher_category} restaurant certified by ORB",
                 'price_range': '',
                 'image_url': photo or '',
                 'latitude': None,
@@ -344,12 +344,12 @@ class ORBScraperV2:
                 
             else:
                 # For other pages (like fish), use the original logic
-                kosher_type = 'unknown'
+                kosher_category = 'unknown'
                 if 'fish' in category_url:
-                    kosher_type = 'pareve'  # ORB fish are pareve
+                    kosher_category = 'pareve'  # ORB fish are pareve
                 
                 listing_type = 'Businesses'
-                logger.info(f"Category: {listing_type} » {kosher_type}")
+                logger.info(f"Category: {listing_type} » {kosher_category}")
                 
                 # Find all business listings
                 business_elements = await self.page.query_selector_all('.business-listing')
@@ -357,10 +357,10 @@ class ORBScraperV2:
                 
                 for business_element in business_elements:
                     try:
-                        business_data = await self.extract_business_data(business_element, kosher_type, listing_type)
+                        business_data = await self.extract_business_data(business_element, kosher_category, listing_type)
                         if business_data:
                             businesses.append(business_data)
-                            logger.info(f"Extracted: {business_data['name']} ({kosher_type})")
+                            logger.info(f"Extracted: {business_data['name']} ({kosher_category})")
                     except Exception as e:
                         logger.error(f"Error processing business element: {e}")
                         continue
@@ -378,7 +378,7 @@ class ORBScraperV2:
             section_elements = await self.page.query_selector_all('.section-col-miami')
             
             businesses = []
-            kosher_type = section_type.lower()
+            kosher_category = section_type.lower()
             
             for section in section_elements:
                 # Check if this section contains the right header
@@ -394,10 +394,10 @@ class ORBScraperV2:
                         
                         for business_element in business_elements:
                             try:
-                                business_data = await self.extract_business_data(business_element, kosher_type, 'Restaurants')
+                                business_data = await self.extract_business_data(business_element, kosher_category, 'Restaurants')
                                 if business_data:
                                     businesses.append(business_data)
-                                    logger.info(f"Extracted: {business_data['name']} ({kosher_type})")
+                                    logger.info(f"Extracted: {business_data['name']} ({kosher_category})")
                             except Exception as e:
                                 logger.error(f"Error processing business element: {e}")
                                 continue
@@ -511,17 +511,17 @@ class ORBScraperV2:
                 # Show sample results
                 logger.info("Sample scraped businesses:")
                 for i, business in enumerate(businesses[:5]):
-                    logger.info(f"{i+1}. {business['name']} - {business['kosher_type']} - {business['address']}")
+                    logger.info(f"{i+1}. {business['name']} - {business['kosher_category']} - {business['address']}")
                 
                 # Show statistics
-                kosher_types = {}
+                kosher_categorys = {}
                 for business in businesses:
-                    kosher_type = business.get('kosher_type', 'unknown')
-                    kosher_types[kosher_type] = kosher_types.get(kosher_type, 0) + 1
+                    kosher_category = business.get('kosher_category', 'unknown')
+                    kosher_categorys[kosher_category] = kosher_categorys.get(kosher_category, 0) + 1
                 
                 logger.info("Kosher Type Statistics:")
-                for kosher_type, count in kosher_types.items():
-                    logger.info(f"  - {kosher_type}: {count} restaurants")
+                for kosher_category, count in kosher_categorys.items():
+                    logger.info(f"  - {kosher_category}: {count} restaurants")
                 
                 # Show Chalav Yisroel statistics
                 chalav_yisroel_count = sum(1 for b in businesses if b.get('is_cholov_yisroel', False))

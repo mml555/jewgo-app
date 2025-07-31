@@ -40,7 +40,7 @@ async def test_scraper():
         if businesses:
             print("Sample businesses:")
             for i, business in enumerate(businesses[:3]):
-                print(f"  {i+1}. {business['name']} - {business.get('kosher_type', 'unknown')}")
+                print(f"  {i+1}. {business['name']} - {business.get('kosher_category', 'unknown')}")
         
         # Cleanup
         await scraper.cleanup()

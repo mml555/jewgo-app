@@ -124,21 +124,21 @@ def check_website_data():
             for agency, total, with_website, without_website in result.fetchall():
                 print(f"  {agency or 'NULL'}: {total} total, {with_website} with website ({with_website/total*100:.1f}%), {without_website} without")
             
-            # Check if there's a correlation with kosher_type
+            # Check if there's a correlation with kosher_category
             print(f"\n🔗 Website vs Kosher Type Correlation:")
             result = conn.execute(text("""
                 SELECT 
-                    kosher_type,
+                    kosher_category,
                     COUNT(*) as total,
                     COUNT(CASE WHEN website IS NOT NULL AND website != '' THEN 1 END) as with_website,
                     COUNT(CASE WHEN website IS NULL OR website = '' THEN 1 END) as without_website
                 FROM restaurants 
-                GROUP BY kosher_type
+                GROUP BY kosher_category
                 ORDER BY total DESC
             """))
             
-            for kosher_type, total, with_website, without_website in result.fetchall():
-                print(f"  {kosher_type or 'NULL'}: {total} total, {with_website} with website ({with_website/total*100:.1f}%), {without_website} without")
+            for kosher_category, total, with_website, without_website in result.fetchall():
+                print(f"  {kosher_category or 'NULL'}: {total} total, {with_website} with website ({with_website/total*100:.1f}%), {without_website} without")
                 
     except Exception as e:
         print(f"❌ Analysis failed: {e}")

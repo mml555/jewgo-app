@@ -111,7 +111,7 @@ class Restaurant(Base):
     phone_number = Column(String(50), nullable=False)  # Phone number
     website = Column(String(500))  # Website URL
     certifying_agency = Column(String(100), default='ORB', nullable=False)  # Auto-filled = "ORB"
-    kosher_category = Column(String(20), nullable=False)  # ENUM('meat', 'dairy', 'pareve')
+    kosher_category = Column('kosher_category', String(20), nullable=False)  # ENUM('meat', 'dairy', 'pareve')
     listing_type = Column(String(100), nullable=False)  # Business category
     
     # 📍 Enriched via Google Places API (on creation or scheduled)

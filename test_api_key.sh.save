@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Test script for Google Places API
+# Replace YOUR_API_KEY with your actual API key
+
+API_KEY="YOUR_API_KEY"
+
+echo "🔍 Testing Google Places API with your key..."
+echo "=============================================="
+
+# Test 1: Basic API connection
+echo "📊 Testing API connection..."
+curl -s "https://maps.googleapis.com/maps/api/place/details/json?place_id=ChIJN1t_tDeuEmsRUsoyG83frY4&fields=name&key=$API_KEY" | jq '.status'
+
+echo ""
+echo "🍽️  Searching for kosher restaurants in Miami..."
+curl -s "https://maps.googleapis.com/maps/api/place/textsearch/json?query=kosher%20restaurant%20miami&key=$API_KEY" | jq '.results[0] | {name: .name, place_id: .place_id, address: .formatted_address}'
+
+echo ""
+echo "✅ If you see 'OK' status and restaurant data, your API key is working!"
+echo "❌ If you see 'REQUEST_DENIED', check your API key and restrictions." 
+
+

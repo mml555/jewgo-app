@@ -58,7 +58,7 @@ This guide will help you set up Google Places API to enable automatic restaurant
 2. Navigate to "Settings" → "Environment Variables"
 3. Add the following variable:
    ```
-   Name: GOOGLE_API_KEY
+   Name: GOOGLE_PLACES_API_KEY
    Value: [your-api-key-here]
    Environment: Production
    ```
@@ -67,42 +67,98 @@ This guide will help you set up Google Places API to enable automatic restaurant
 
 1. Create or update `.env.local` file in the frontend directory:
    ```bash
-   GOOGLE_API_KEY=your-api-key-here
+   GOOGLE_PLACES_API_KEY=your-api-key-here
    ```
 
 2. Create or update `.env` file in the backend directory:
    ```bash
-   GOOGLE_API_KEY=your-api-key-here
+   GOOGLE_PLACES_API_KEY=your-api-key-here
    ```
 
 ### 7. Test the API
 
-You can test the API setup using curl:
+You can test the API setup using our test scripts:
 
 ```bash
-# Test with a sample place ID (McDonald's in NYC)
-curl "https://maps.googleapis.com/maps/api/place/details/json?place_id=ChIJN1t_tDeuEmsRUsoyG83frY4&fields=opening_hours,utc_offset_minutes&key=YOUR_API_KEY"
+# Quick test (no database required)
+cd "/Users/mendell/jewgo app"
+source backend/venv_py311/bin/activate
+python scripts/testing/quick_google_places_test.py
+
+# Comprehensive test with real restaurant data
+python scripts/testing/test_real_restaurant_data.py
 ```
 
-Expected response:
-```json
-{
-  "html_attributions": [],
-  "result": {
-    "opening_hours": {
-      "open_now": true,
-      "periods": [...],
-      "weekday_text": [
-        "Monday: 6:00 AM – 12:00 AM",
-        "Tuesday: 6:00 AM – 12:00 AM",
-        ...
-      ]
-    },
-    "utc_offset_minutes": -300
-  },
-  "status": "OK"
-}
+Expected response from quick test:
 ```
+🔍 Google Places API Quick Test
+==================================================
+✅ Google Places API Key found
+🔑 Testing API Key Validity...
+   ✅ API Key is valid
+📊 Test 1/5
+🏪 Testing: McDonald's
+📍 Address: 123 Main St, Miami, FL 33101
+--------------------------------------------------
+1. 🔍 Searching for place...
+   Status: OK
+   ✅ Found Place ID: ChIJ...
+   📍 Google Name: McDonald's
+   🏠 Google Address: 123 Main St, Miami, FL 33101
+   📞 Phone: (305) 555-0123
+   ⭐ Rating: 4.2
+   💰 Price Level: 1
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### 1. "API key expired" Error
+- **Solution**: Create a new API key in Google Cloud Console
+- Go to "APIs & Services" → "Credentials"
+- Click "Create Credentials" → "API Key"
+- Update your environment variables with the new key
+
+#### 2. "API key not valid" Error
+- Check if API key is correctly set in environment variables
+- Verify API key restrictions allow your domain
+- Ensure billing is enabled
+
+#### 3. "Quota exceeded" Error
+- Check current usage in Google Cloud Console
+- Implement rate limiting in your application
+- Consider upgrading quota limits
+
+#### 4. "Place not found" Error
+- Verify the place_id is correct
+- Check if the place exists in Google Places
+- Use Google Places API to search for correct place_id
+
+#### 5. "Billing not enabled" Error
+- Enable billing in Google Cloud Console
+- Link a payment method
+- Wait for billing to activate (may take a few minutes)
+
+### Debug Commands
+
+```bash
+# Test API key validity
+curl "https://maps.googleapis.com/maps/api/place/details/json?place_id=ChIJN1t_tDeuEmsRUsoyG83frY4&fields=name&key=YOUR_API_KEY"
+
+# Check quota usage
+# Go to Google Cloud Console → APIs & Services → Quotas
+```
+
+## Current Status
+
+**⚠️ IMPORTANT**: The current API key is expired and needs to be replaced.
+
+**Next Steps**:
+1. Create a new API key in Google Cloud Console
+2. Update environment variables
+3. Test with the quick test script
+4. Run comprehensive test with real restaurant data
 
 ## Usage in JewGo Application
 
@@ -157,40 +213,6 @@ Set up automated updates:
 2. Create budget with alerts at:
    - $5/month (warning)
    - $10/month (critical)
-
-## Troubleshooting
-
-### Common Issues
-
-#### 1. "API key not valid" Error
-- Check if API key is correctly set in environment variables
-- Verify API key restrictions allow your domain
-- Ensure billing is enabled
-
-#### 2. "Quota exceeded" Error
-- Check current usage in Google Cloud Console
-- Implement rate limiting in your application
-- Consider upgrading quota limits
-
-#### 3. "Place not found" Error
-- Verify the place_id is correct
-- Check if the place exists in Google Places
-- Use Google Places API to search for correct place_id
-
-#### 4. "Billing not enabled" Error
-- Enable billing in Google Cloud Console
-- Link a payment method
-- Wait for billing to activate (may take a few minutes)
-
-### Debug Commands
-
-```bash
-# Test API key
-curl "https://maps.googleapis.com/maps/api/place/details/json?place_id=ChIJN1t_tDeuEmsRUsoyG83frY4&fields=name&key=YOUR_API_KEY"
-
-# Check quota usage
-# Go to Google Cloud Console → APIs & Services → Quotas
-```
 
 ## Security Best Practices
 

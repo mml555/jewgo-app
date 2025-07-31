@@ -1,0 +1,630 @@
+{
+  "test_timestamp": "2025-07-31T19:00:55.084015",
+  "statistics": {
+    "total_tested": 3,
+    "successful_searches": 3,
+    "successful_hours": 3,
+    "successful_websites": 3,
+    "failed_searches": 0,
+    "api_errors": 0,
+    "rate_limit_hits": 0
+  },
+  "results": [
+    {
+      "restaurant": {
+        "id": 833,
+        "name": "Kosher Deli & Grill",
+        "address": "123 Main Street",
+        "city": "Miami",
+        "state": "FL",
+        "zip_code": "33101",
+        "phone_number": "(555) 123-4567",
+        "website": "https://example.com/kosher-deli",
+        "kosher_category": "meat",
+        "listing_type": "restaurant",
+        "hours_of_operation": "Monday: 11:00 AM \u2013 9:00 PM\nTuesday: 11:00 AM \u2013 9:00 PM\nWednesday: 11:00 AM \u2013 9:00 PM\nThursday: 11:00 AM \u2013 9:00 PM\nFriday: 11:00 AM \u2013 3:00 PM\nSaturday: Closed\nSunday: 12:00 PM \u2013 8:00 PM",
+        "hours_json": [
+          {
+            "open": {
+              "day": 1,
+              "time": "1100"
+            },
+            "close": {
+              "day": 1,
+              "time": "2100"
+            }
+          },
+          {
+            "open": {
+              "day": 2,
+              "time": "1100"
+            },
+            "close": {
+              "day": 2,
+              "time": "2100"
+            }
+          },
+          {
+            "open": {
+              "day": 3,
+              "time": "1100"
+            },
+            "close": {
+              "day": 3,
+              "time": "2100"
+            }
+          },
+          {
+            "open": {
+              "day": 4,
+              "time": "1100"
+            },
+            "close": {
+              "day": 4,
+              "time": "2100"
+            }
+          },
+          {
+            "open": {
+              "day": 5,
+              "time": "1100"
+            },
+            "close": {
+              "day": 5,
+              "time": "1500"
+            }
+          },
+          {
+            "open": {
+              "day": 0,
+              "time": "1200"
+            },
+            "close": {
+              "day": 0,
+              "time": "2000"
+            }
+          }
+        ],
+        "hours_last_updated": "2025-07-31T22:26:17.950553+00:00",
+        "short_description": "Authentic kosher deli serving traditional Jewish cuisine.",
+        "price_range": "$$",
+        "image_url": null,
+        "latitude": 25.7617,
+        "longitude": -80.1918,
+        "specials": [],
+        "is_cholov_yisroel": null,
+        "is_pas_yisroel": null,
+        "certifying_agency": "ORB",
+        "google_listing_url": null,
+        "created_at": "2025-07-31T22:26:21.699874",
+        "updated_at": "2025-07-31T22:26:21.699878",
+        "current_time_local": null,
+        "timezone": "UTC",
+        "hours_parsed": false,
+        "status": "unknown",
+        "is_open": false,
+        "status_reason": "Status calculation not available",
+        "next_open_time": null
+      },
+      "search_result": {
+        "restaurant_id": 833,
+        "restaurant_name": "Kosher Deli & Grill",
+        "restaurant_address": "123 Main Street",
+        "search_success": true,
+        "place_id": "ChIJuzduyJoLxkcR2EjOzmCxD2w",
+        "google_name": "Meat Me Kosher // \u05de\u05e1\u05e2\u05d3\u05d5\u05ea \u05db\u05e9\u05e8\u05d5\u05ea \u05d1\u05d0\u05de\u05e1\u05d8\u05e8\u05d3\u05dd",
+        "google_address": "Kastelenstraat 65, 1083 CD Amsterdam, Netherlands",
+        "confidence_score": 0.2,
+        "error": null
+      },
+      "hours_result": {
+        "hours_success": true,
+        "hours_formatted": "Mon 12:00\u2009\u2013\u200910:00\u202fPM, Tue 12:00\u2009\u2013\u200910:00\u202fPM, Wed 12:00\u2009\u2013\u200910:00\u202fPM, Thu 12:00\u2009\u2013\u200910:00\u202fPM, Fri 11:00\u202fAM\u2009\u2013\u20093:00\u202fPM, Sat Closed, Sun 12:00\u2009\u2013\u200910:00\u202fPM",
+        "hours_raw": {
+          "open_now": false,
+          "periods": [
+            {
+              "close": {
+                "day": 0,
+                "time": "2200"
+              },
+              "open": {
+                "day": 0,
+                "time": "1200"
+              }
+            },
+            {
+              "close": {
+                "day": 1,
+                "time": "2200"
+              },
+              "open": {
+                "day": 1,
+                "time": "1200"
+              }
+            },
+            {
+              "close": {
+                "day": 2,
+                "time": "2200"
+              },
+              "open": {
+                "day": 2,
+                "time": "1200"
+              }
+            },
+            {
+              "close": {
+                "day": 3,
+                "time": "2200"
+              },
+              "open": {
+                "day": 3,
+                "time": "1200"
+              }
+            },
+            {
+              "close": {
+                "day": 4,
+                "time": "2200"
+              },
+              "open": {
+                "day": 4,
+                "time": "1200"
+              }
+            },
+            {
+              "close": {
+                "day": 5,
+                "time": "1500"
+              },
+              "open": {
+                "day": 5,
+                "time": "1100"
+              }
+            }
+          ],
+          "weekday_text": [
+            "Monday: 12:00\u2009\u2013\u200910:00\u202fPM",
+            "Tuesday: 12:00\u2009\u2013\u200910:00\u202fPM",
+            "Wednesday: 12:00\u2009\u2013\u200910:00\u202fPM",
+            "Thursday: 12:00\u2009\u2013\u200910:00\u202fPM",
+            "Friday: 11:00\u202fAM\u2009\u2013\u20093:00\u202fPM",
+            "Saturday: Closed",
+            "Sunday: 12:00\u2009\u2013\u200910:00\u202fPM"
+          ]
+        },
+        "error": null
+      },
+      "website_result": {
+        "website_success": true,
+        "website_url": "https://www.meatmekosher.com/",
+        "error": null
+      }
+    },
+    {
+      "restaurant": {
+        "id": 834,
+        "name": "Shalom Pizza & Pasta",
+        "address": "456 Ocean Drive",
+        "city": "Miami Beach",
+        "state": "FL",
+        "zip_code": "33139",
+        "phone_number": "(555) 234-5678",
+        "website": "https://example.com/shalom-pizza",
+        "kosher_category": "dairy",
+        "listing_type": "restaurant",
+        "hours_of_operation": "Monday: 11:00 AM \u2013 11:00 PM\nTuesday: 11:00 AM \u2013 11:00 PM\nWednesday: 11:00 AM \u2013 11:00 PM\nThursday: 11:00 AM \u2013 11:00 PM\nFriday: 11:00 AM \u2013 11:00 PM\nSaturday: 11:00 AM \u2013 11:00 PM\nSunday: 11:00 AM \u2013 11:00 PM",
+        "hours_json": [
+          {
+            "open": {
+              "day": 1,
+              "time": "1100"
+            },
+            "close": {
+              "day": 1,
+              "time": "2300"
+            }
+          },
+          {
+            "open": {
+              "day": 2,
+              "time": "1100"
+            },
+            "close": {
+              "day": 2,
+              "time": "2300"
+            }
+          },
+          {
+            "open": {
+              "day": 3,
+              "time": "1100"
+            },
+            "close": {
+              "day": 3,
+              "time": "2300"
+            }
+          },
+          {
+            "open": {
+              "day": 4,
+              "time": "1100"
+            },
+            "close": {
+              "day": 4,
+              "time": "2300"
+            }
+          },
+          {
+            "open": {
+              "day": 5,
+              "time": "1100"
+            },
+            "close": {
+              "day": 5,
+              "time": "2300"
+            }
+          },
+          {
+            "open": {
+              "day": 6,
+              "time": "1100"
+            },
+            "close": {
+              "day": 6,
+              "time": "2300"
+            }
+          },
+          {
+            "open": {
+              "day": 0,
+              "time": "1100"
+            },
+            "close": {
+              "day": 0,
+              "time": "2300"
+            }
+          }
+        ],
+        "hours_last_updated": "2025-07-31T22:26:17.950557+00:00",
+        "short_description": "Kosher pizza and pasta restaurant with authentic Italian flavors.",
+        "price_range": "$",
+        "image_url": null,
+        "latitude": 25.7907,
+        "longitude": -80.13,
+        "specials": [],
+        "is_cholov_yisroel": null,
+        "is_pas_yisroel": null,
+        "certifying_agency": "ORB",
+        "google_listing_url": null,
+        "created_at": "2025-07-31T22:26:22.460570",
+        "updated_at": "2025-07-31T22:26:22.460574",
+        "current_time_local": null,
+        "timezone": "UTC",
+        "hours_parsed": false,
+        "status": "unknown",
+        "is_open": false,
+        "status_reason": "Status calculation not available",
+        "next_open_time": null
+      },
+      "search_result": {
+        "restaurant_id": 834,
+        "restaurant_name": "Shalom Pizza & Pasta",
+        "restaurant_address": "456 Ocean Drive",
+        "search_success": true,
+        "place_id": "ChIJyV-MT125woAR8dBvfmsYnSA",
+        "google_name": "Shalom Pizza - The Best Kosher Pizza in Los Angeles",
+        "google_address": "8715 W Pico Blvd, Los Angeles, CA 90035, United States",
+        "confidence_score": 0.2,
+        "error": null
+      },
+      "hours_result": {
+        "hours_success": true,
+        "hours_formatted": "Mon 10:30\u202fAM\u2009\u2013\u200912:00\u202fAM, Tue 10:30\u202fAM\u2009\u2013\u200912:00\u202fAM, Wed 10:30\u202fAM\u2009\u2013\u200912:00\u202fAM, Thu 10:30\u202fAM\u2009\u2013\u200912:00\u202fAM, Fri 10:30\u202fAM\u2009\u2013\u20093:00\u202fPM, Sat 9:30\u202fPM\u2009\u2013\u20092:00\u202fAM, Sun 10:00\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "hours_raw": {
+          "open_now": true,
+          "periods": [
+            {
+              "close": {
+                "day": 1,
+                "time": "0000"
+              },
+              "open": {
+                "day": 0,
+                "time": "1000"
+              }
+            },
+            {
+              "close": {
+                "day": 2,
+                "time": "0000"
+              },
+              "open": {
+                "day": 1,
+                "time": "1030"
+              }
+            },
+            {
+              "close": {
+                "day": 3,
+                "time": "0000"
+              },
+              "open": {
+                "day": 2,
+                "time": "1030"
+              }
+            },
+            {
+              "close": {
+                "day": 4,
+                "time": "0000"
+              },
+              "open": {
+                "day": 3,
+                "time": "1030"
+              }
+            },
+            {
+              "close": {
+                "day": 5,
+                "time": "0000"
+              },
+              "open": {
+                "day": 4,
+                "time": "1030"
+              }
+            },
+            {
+              "close": {
+                "day": 5,
+                "time": "1500"
+              },
+              "open": {
+                "day": 5,
+                "time": "1030"
+              }
+            },
+            {
+              "close": {
+                "day": 0,
+                "time": "0200"
+              },
+              "open": {
+                "day": 6,
+                "time": "2130"
+              }
+            }
+          ],
+          "weekday_text": [
+            "Monday: 10:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+            "Tuesday: 10:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+            "Wednesday: 10:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+            "Thursday: 10:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+            "Friday: 10:30\u202fAM\u2009\u2013\u20093:00\u202fPM",
+            "Saturday: 9:30\u202fPM\u2009\u2013\u20092:00\u202fAM",
+            "Sunday: 10:00\u202fAM\u2009\u2013\u200912:00\u202fAM"
+          ]
+        },
+        "error": null
+      },
+      "website_result": {
+        "website_success": true,
+        "website_url": "http://shalompizza.com/",
+        "error": null
+      }
+    },
+    {
+      "restaurant": {
+        "id": 835,
+        "name": "Mazel Tov Bakery",
+        "address": "789 Biscayne Blvd",
+        "city": "Miami",
+        "state": "FL",
+        "zip_code": "33132",
+        "phone_number": "(555) 345-6789",
+        "website": "https://example.com/mazel-tov-bakery",
+        "kosher_category": "dairy",
+        "listing_type": "bakery",
+        "hours_of_operation": "Monday: 6:00 AM \u2013 8:00 PM\nTuesday: 6:00 AM \u2013 8:00 PM\nWednesday: 6:00 AM \u2013 8:00 PM\nThursday: 6:00 AM \u2013 8:00 PM\nFriday: 6:00 AM \u2013 8:00 PM\nSaturday: 6:00 AM \u2013 8:00 PM\nSunday: 7:00 AM \u2013 6:00 PM",
+        "hours_json": [
+          {
+            "open": {
+              "day": 1,
+              "time": "0600"
+            },
+            "close": {
+              "day": 1,
+              "time": "2000"
+            }
+          },
+          {
+            "open": {
+              "day": 2,
+              "time": "0600"
+            },
+            "close": {
+              "day": 2,
+              "time": "2000"
+            }
+          },
+          {
+            "open": {
+              "day": 3,
+              "time": "0600"
+            },
+            "close": {
+              "day": 3,
+              "time": "2000"
+            }
+          },
+          {
+            "open": {
+              "day": 4,
+              "time": "0600"
+            },
+            "close": {
+              "day": 4,
+              "time": "2000"
+            }
+          },
+          {
+            "open": {
+              "day": 5,
+              "time": "0600"
+            },
+            "close": {
+              "day": 5,
+              "time": "2000"
+            }
+          },
+          {
+            "open": {
+              "day": 6,
+              "time": "0600"
+            },
+            "close": {
+              "day": 6,
+              "time": "2000"
+            }
+          },
+          {
+            "open": {
+              "day": 0,
+              "time": "0700"
+            },
+            "close": {
+              "day": 0,
+              "time": "1800"
+            }
+          }
+        ],
+        "hours_last_updated": "2025-07-31T22:26:17.950558+00:00",
+        "short_description": "Traditional Jewish bakery specializing in challah and pastries.",
+        "price_range": "$",
+        "image_url": null,
+        "latitude": 25.7749,
+        "longitude": -80.1977,
+        "specials": [],
+        "is_cholov_yisroel": null,
+        "is_pas_yisroel": null,
+        "certifying_agency": "ORB",
+        "google_listing_url": null,
+        "created_at": "2025-07-31T22:26:24.327930",
+        "updated_at": "2025-07-31T22:26:24.327934",
+        "current_time_local": null,
+        "timezone": "UTC",
+        "hours_parsed": false,
+        "status": "unknown",
+        "is_open": false,
+        "status_reason": "Status calculation not available",
+        "next_open_time": null
+      },
+      "search_result": {
+        "restaurant_id": 835,
+        "restaurant_name": "Mazel Tov Bakery",
+        "restaurant_address": "789 Biscayne Blvd",
+        "search_success": true,
+        "place_id": "ChIJkQtc62jcQUcR-LiTHtkcmfU",
+        "google_name": "Mazel Tov",
+        "google_address": "Budapest, Ak\u00e1cfa u. 47, 1073 Hungary",
+        "confidence_score": 0.4,
+        "error": null
+      },
+      "hours_result": {
+        "hours_success": true,
+        "hours_formatted": "Mon 9:30\u202fAM\u2009\u2013\u200912:00\u202fAM, Tue 12:00\u202fPM\u2009\u2013\u200912:00\u202fAM, Wed 12:00\u202fPM\u2009\u2013\u200912:00\u202fAM, Thu 12:00\u202fPM\u2009\u2013\u200912:00\u202fAM, Fri 9:30\u202fAM\u2009\u2013\u200912:00\u202fAM, Sat 9:30\u202fAM\u2009\u2013\u200912:00\u202fAM, Sun 9:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "hours_raw": {
+          "open_now": false,
+          "periods": [
+            {
+              "close": {
+                "day": 1,
+                "time": "0000"
+              },
+              "open": {
+                "day": 0,
+                "time": "0930"
+              }
+            },
+            {
+              "close": {
+                "day": 2,
+                "time": "0000"
+              },
+              "open": {
+                "day": 1,
+                "time": "0930"
+              }
+            },
+            {
+              "close": {
+                "day": 3,
+                "time": "0000"
+              },
+              "open": {
+                "day": 2,
+                "time": "1200"
+              }
+            },
+            {
+              "close": {
+                "day": 4,
+                "time": "0000"
+              },
+              "open": {
+                "day": 3,
+                "time": "1200"
+              }
+            },
+            {
+              "close": {
+                "day": 5,
+                "time": "0000"
+              },
+              "open": {
+                "day": 4,
+                "time": "1200"
+              }
+            },
+            {
+              "close": {
+                "day": 6,
+                "time": "0000"
+              },
+              "open": {
+                "day": 5,
+                "time": "0930"
+              }
+            },
+            {
+              "close": {
+                "day": 0,
+                "time": "0000"
+              },
+              "open": {
+                "day": 6,
+                "time": "0930"
+              }
+            }
+          ],
+          "weekday_text": [
+            "Monday: 9:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+            "Tuesday: 12:00\u202fPM\u2009\u2013\u200912:00\u202fAM",
+            "Wednesday: 12:00\u202fPM\u2009\u2013\u200912:00\u202fAM",
+            "Thursday: 12:00\u202fPM\u2009\u2013\u200912:00\u202fAM",
+            "Friday: 9:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+            "Saturday: 9:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+            "Sunday: 9:30\u202fAM\u2009\u2013\u200912:00\u202fAM"
+          ]
+        },
+        "error": null
+      },
+      "website_result": {
+        "website_success": true,
+        "website_url": "http://www.mazeltov.hu/",
+        "error": null
+      }
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Restaurant } from '@/types/restaurant';
+import { googlePlacesAPI } from '@/lib/google/places';
 
 interface EnhancedSearchProps {
   onSearch: (query: string) => void;
@@ -61,51 +62,17 @@ export default function EnhancedSearch({
 
   // Initialize Google Places services
   useEffect(() => {
-    const initializeGooglePlaces = () => {
-      if (window.google && window.google.maps && window.google.maps.places) {
-        try {
-          // Try to use the newer AutocompleteSuggestion if available
-          if (window.google.maps.places.AutocompleteSuggestion) {
-            autocompleteServiceRef.current = new window.google.maps.places.AutocompleteSuggestion();
-          } else if (window.google.maps.places.AutocompleteService) {
-            // Fallback to AutocompleteService (deprecated but still works)
-            autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService();
-          } else {
-            console.warn('Google Places API not available');
-            setPlacesApiError('Places API not available');
-            return;
-          }
-          
-          // Create a dummy div for PlacesService (required by Google Maps API)
-          const dummyDiv = document.createElement('div');
-          placesServiceRef.current = new window.google.maps.places.PlacesService(dummyDiv);
-        } catch (error) {
-          console.error('Error initializing Google Places:', error);
-          setPlacesApiError('Failed to initialize Places API');
-        }
+    const initializeGooglePlaces = async () => {
+      try {
+        await googlePlacesAPI.initialize();
+        setPlacesApiError(null);
+      } catch (error) {
+        console.error('Error initializing Google Places:', error);
+        setPlacesApiError('Failed to initialize Places API');
       }
     };
 
-    // Check if Google Maps is already loaded
-    if (window.google && window.google.maps) {
-      initializeGooglePlaces();
-    } else {
-      // Wait for Google Maps to load
-      const checkGoogleMaps = setInterval(() => {
-        if (window.google && window.google.maps) {
-          initializeGooglePlaces();
-          clearInterval(checkGoogleMaps);
-        }
-      }, 100);
-
-      // Cleanup interval after 10 seconds
-      setTimeout(() => {
-        clearInterval(checkGoogleMaps);
-        if (!autocompleteServiceRef.current) {
-          setPlacesApiError('Google Maps failed to load');
-        }
-      }, 10000);
-    }
+    initializeGooglePlaces();
   }, []);
 
   // Enhanced search function that combines database and Google Places
@@ -151,26 +118,16 @@ export default function EnhancedSearch({
 
   // Search Google Places API
   const searchGooglePlaces = async (searchQuery: string): Promise<GooglePlace[]> => {
-    return new Promise((resolve, reject) => {
-      if (!placesServiceRef.current) {
-        reject(new Error('Places service not available'));
-        return;
-      }
-
-      const request = {
-        query: searchQuery + ' restaurant',
-        type: 'restaurant',
-        fields: ['place_id', 'name', 'formatted_address', 'geometry', 'types', 'rating', 'user_ratings_total', 'photos']
-      };
-
-      placesServiceRef.current.textSearch(request, (results: GooglePlace[], status: any) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
-          resolve(results.slice(0, 10)); // Limit to 10 results
-        } else {
-          reject(new Error(`Places search failed: ${status}`));
-        }
+    try {
+      const results = await googlePlacesAPI.searchPlaces(searchQuery + ' restaurant', {
+        types: ['restaurant'],
+        limit: 10
       });
-    });
+      return results;
+    } catch (error) {
+      console.error('Error searching Google Places:', error);
+      return [];
+    }
   };
 
   // Convert Google Place to Restaurant format
@@ -308,47 +265,17 @@ export default function EnhancedSearch({
   }, [query, placesApiError]);
 
   const fetchPlaceSuggestions = async (searchQuery: string) => {
-    if (!autocompleteServiceRef.current) return;
-
     setIsLoadingPlaces(true);
     setPlacesApiError(null);
 
     try {
-      // Check if we're using the newer API
-      if (autocompleteServiceRef.current.getPlacePredictions) {
-        // Use the newer AutocompleteSuggestion API
-        const request = {
-          input: searchQuery,
-          types: ['establishment', 'geocode', 'address'],
-          componentRestrictions: { country: 'us' },
-        };
-
-        const response = await autocompleteServiceRef.current.getPlacePredictions(request);
-        setIsLoadingPlaces(false);
-        
-        if (response && response.predictions) {
-          setPlaceSuggestions(response.predictions);
-        } else {
-          setPlaceSuggestions([]);
-        }
-      } else {
-        // Fallback to older API
-        const request: any = {
-          input: searchQuery,
-          types: ['establishment', 'geocode', 'address'],
-          componentRestrictions: { country: 'us' },
-        };
-
-        autocompleteServiceRef.current.getPlacePredictions(request, (predictions: any, status: any) => {
-          setIsLoadingPlaces(false);
-          if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-            setPlaceSuggestions(predictions);
-          } else {
-            setPlaceSuggestions([]);
-          }
-        });
-      }
+      const predictions = await googlePlacesAPI.getPlacePredictions(searchQuery, {
+        types: ['establishment', 'geocode', 'address'],
+        country: 'us'
+      });
       
+      setIsLoadingPlaces(false);
+      setPlaceSuggestions(predictions);
       setRetryCount(0); // Reset retry count on success
     } catch (error) {
       console.error('Error fetching place suggestions:', error);

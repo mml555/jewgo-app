@@ -68,11 +68,11 @@ def check_certifying_agency():
                     else:
                         print(f"  ❌ kosher_category: NOT FOUND")
                     
-                    # Check for kosher_type
-                    if 'kosher_type' in first_restaurant:
-                        print(f"  ✅ kosher_type: {first_restaurant['kosher_type']}")
-                    else:
-                        print(f"  ❌ kosher_type: NOT FOUND")
+                        # Check for kosher_category
+    if 'kosher_category' in first_restaurant:
+        print(f"  ✅ kosher_category: {first_restaurant['kosher_category']}")
+    else:
+        print(f"  ❌ kosher_category: NOT FOUND")
                     
                     print()
                     print("Sample Restaurant Data:")
@@ -80,7 +80,7 @@ def check_certifying_agency():
                     print(f"  Address: {first_restaurant.get('address', 'N/A')}")
                     print(f"  State: {first_restaurant.get('state', 'N/A')}")
                     print(f"  Kosher Category: {first_restaurant.get('kosher_category', 'N/A')}")
-                    print(f"  Kosher Type: {first_restaurant.get('kosher_type', 'N/A')}")
+                    print(f"  Kosher Category: {first_restaurant.get('kosher_category', 'N/A')}")
                     print(f"  Cert Link: {first_restaurant.get('kosher_cert_link', 'N/A')}")
                     
                     # Check a few more restaurants for patterns

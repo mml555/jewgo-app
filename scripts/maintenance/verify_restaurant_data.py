@@ -43,7 +43,7 @@ def verify_restaurant_data():
                     print(f"  State: {restaurant.get('state', 'N/A')}")
                     print(f"  Rating: {restaurant.get('rating', 'N/A')}")
                     print(f"  Google Rating: {restaurant.get('google_rating', 'N/A')}")
-                    print(f"  Kosher Type: {restaurant.get('kosher_type', 'N/A')}")
+                    print(f"  Kosher Type: {restaurant.get('kosher_category', 'N/A')}")
                     print(f"  Cuisine Type: {restaurant.get('cuisine_type', 'N/A')}")
                     print()
                     
@@ -59,7 +59,7 @@ def verify_restaurant_data():
                     print(f"  State: {restaurant.get('state', 'N/A')}")
                     print(f"  Rating: {restaurant.get('rating', 'N/A')}")
                     print(f"  Google Rating: {restaurant.get('google_rating', 'N/A')}")
-                    print(f"  Kosher Type: {restaurant.get('kosher_type', 'N/A')}")
+                    print(f"  Kosher Type: {restaurant.get('kosher_category', 'N/A')}")
                     print(f"  Cuisine Type: {restaurant.get('cuisine_type', 'N/A')}")
                     print()
             else:

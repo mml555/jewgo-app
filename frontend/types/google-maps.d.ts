@@ -438,6 +438,15 @@ declare namespace google.maps {
       textSearch(request: TextSearchRequest, callback: (results: PlaceResult[] | null, status: PlacesServiceStatus, pagination: PlaceSearchPagination) => void): void;
     }
 
+    // Modern Place API (recommended over PlacesService)
+    class Place {
+      constructor(attrContainer: HTMLDivElement | Map);
+      getDetails(request: PlaceDetailsRequest, callback: (result: PlaceResult | null, status: PlacesServiceStatus) => void): void;
+      findPlaceFromQuery(request: FindPlaceFromQueryRequest, callback: (results: PlaceResult[], status: PlacesServiceStatus) => void): void;
+      nearbySearch(request: PlaceSearchRequest, callback: (results: PlaceResult[] | null, status: PlacesServiceStatus, pagination: PlaceSearchPagination) => void): void;
+      textSearch(request: TextSearchRequest, callback: (results: PlaceResult[] | null, status: PlacesServiceStatus, pagination: PlaceSearchPagination) => void): void;
+    }
+
     interface AutocompletionRequest {
       input: string;
       bounds?: LatLngBounds;
