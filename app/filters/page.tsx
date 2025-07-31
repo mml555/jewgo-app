@@ -248,7 +248,7 @@ const FiltersPage: React.FC = () => {
                     <RestaurantCard
                       key={restaurant.id}
                       restaurant={restaurant}
-                      onClick={() => router.push(`/restaurant/${restaurant.id}`)}
+                      onSelect={() => router.push(`/restaurant/${restaurant.id}`)}
                     />
                   ))}
                 </div>
