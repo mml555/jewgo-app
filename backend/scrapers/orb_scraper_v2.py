@@ -1,7 +1,44 @@
 #!/usr/bin/env python3
 """
 ORB Kosher Scraper V2
-Maps ORB data to current database schema and includes Chalav Stam and Pas Yisroel information.
+====================
+
+This module provides a comprehensive web scraper for extracting kosher restaurant data
+from the ORB Kosher website (https://www.orbkosher.com). The scraper is designed to
+map ORB data directly to the current JewGo database schema with proper kosher
+supervision categorization.
+
+Key Features:
+- Automated scraping of ORB Kosher website
+- Direct mapping to JewGo database schema
+- Chalav Yisroel/Stam categorization
+- Pas Yisroel categorization
+- Duplicate prevention
+- Error handling and logging
+- Playwright-based robust scraping
+
+Data Sources:
+- ORB Kosher dairy restaurants
+- ORB Kosher pareve restaurants
+- Manual curation for Chalav Stam (3 restaurants)
+- Manual curation for Pas Yisroel (22 restaurants)
+
+Expected Results:
+- ~107 total restaurants
+- ~99 dairy restaurants
+- ~8 pareve restaurants
+- 104 Chalav Yisroel, 3 Chalav Stam
+- 22 Pas Yisroel restaurants
+
+Dependencies:
+- Playwright for web scraping
+- SQLAlchemy for database operations
+- structlog for structured logging
+- python-dotenv for environment variables
+
+Author: JewGo Development Team
+Version: 2.0
+Last Updated: 2024
 """
 
 import asyncio

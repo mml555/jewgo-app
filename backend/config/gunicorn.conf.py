@@ -1,4 +1,5 @@
-# Gunicorn configuration file for production deployment
+# Gunicorn configuration file for JewGo Backend
+# Updated for new file structure for production deployment
 import os
 import multiprocessing
 

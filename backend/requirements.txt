@@ -1,0 +1,41 @@
+# Core Flask Framework - Python 3.11.8 compatible (stable versions)
+Flask==2.3.3
+Flask-CORS==4.0.0
+Werkzeug==2.3.7
+Jinja2==3.1.2
+MarkupSafe==2.1.3
+itsdangerous==2.1.2
+click==8.1.7
+blinker==1.6.3
+
+# Database Support - Python 3.11.8 compatible (stable versions)
+psycopg2-binary==2.9.9
+SQLAlchemy==1.4.54
+alembic==1.11.3
+
+# Environment & Configuration
+python-dotenv==1.0.0
+gunicorn==21.2.0
+
+# Security & Validation
+Flask-Limiter==3.5.0
+marshmallow==3.20.1
+
+# Monitoring & Logging
+structlog==23.2.0
+sentry-sdk[flask]==1.38.0
+
+# HTTP Requests
+requests==2.31.0
+
+# Development & Testing
+pytest==7.4.3
+pytest-flask==1.3.0
+
+# Web Scraping
+playwright==1.40.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# Additional Utilities
+python-dotenv==1.0.0

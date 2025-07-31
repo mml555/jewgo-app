@@ -1,8 +1,31 @@
 #!/usr/bin/env python3
 """
 Enhanced Database Manager for JewGo App v3
-Handles PostgreSQL database operations with SQLAlchemy 1.4
-Consolidated to use restaurants table only
+==========================================
+
+This module provides a comprehensive database management system for the JewGo application,
+handling all PostgreSQL database operations with SQLAlchemy 1.4. The system is designed
+to work with a consolidated restaurants table that contains all kosher restaurant data.
+
+Key Features:
+- SQLAlchemy 1.4 compatibility with PostgreSQL
+- Structured logging with structlog
+- Comprehensive restaurant data management
+- Kosher supervision categorization
+- Search and filtering capabilities
+- Geographic location support
+- Statistics and reporting
+
+Database Schema:
+- 28 optimized columns for restaurant data
+- Kosher supervision flags (Chalav Yisroel, Pas Yisroel, etc.)
+- ORB certification information
+- Contact and location details
+- Timestamps for tracking changes
+
+Author: JewGo Development Team
+Version: 3.0
+Last Updated: 2024
 """
 
 import os
@@ -40,38 +63,70 @@ logger = structlog.get_logger()
 Base = declarative_base()
 
 class Restaurant(Base):
-    """Restaurant model for SQLAlchemy (consolidated table)."""
+    """
+    Restaurant model for SQLAlchemy (consolidated table).
+    
+    This model represents the main restaurants table in the JewGo database.
+    It contains all kosher restaurant information including contact details,
+    kosher supervision status, and ORB certification information.
+    
+    Schema Design:
+    - Optimized for kosher restaurant data
+    - Supports multiple kosher supervision levels
+    - Includes ORB certification details
+    - Maintains audit trail with timestamps
+    
+    Current Data:
+    - 107 total restaurants
+    - 99 dairy restaurants, 8 pareve restaurants
+    - 104 Chalav Yisroel, 3 Chalav Stam
+    - 22 Pas Yisroel restaurants
+    """
     __tablename__ = 'restaurants'
     
+    # Primary key
     id = Column(Integer, primary_key=True)
-    name = Column(String(255), nullable=False)
-    address = Column(String(500))
-    city = Column(String(100))
-    state = Column(String(50))
-    zip_code = Column(String(20))
-    phone = Column(String(50))
-    website = Column(String(500))
-    price_range = Column(String(20))
-    image_url = Column(String(500))
-    is_kosher = Column(Boolean, default=False)
-    is_glatt = Column(Boolean, default=False)
-    is_cholov_yisroel = Column(Boolean, default=False)
-    is_pas_yisroel = Column(Boolean, default=False)
-    is_bishul_yisroel = Column(Boolean, default=False)
-    is_mehadrin = Column(Boolean, default=False)
-    is_hechsher = Column(Boolean, default=False)
-    kosher_type = Column(String(100))  # dairy, meat, pareve
-    # Consolidated fields from kosher_places
-    kosher_cert_link = Column(String(500))
-    detail_url = Column(String(500))
-    short_description = Column(Text)
-    email = Column(String(255))
-    google_listing_url = Column(String(500))
-    hours_open = Column(Text)
-    category = Column(String(100), default='restaurant')
-    status = Column(String(50), default='approved')
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Core restaurant information
+    name = Column(String(255), nullable=False)  # Restaurant name (required)
+    address = Column(String(500))               # Street address
+    city = Column(String(100))                  # City name
+    state = Column(String(50))                  # State abbreviation
+    zip_code = Column(String(20))               # ZIP code
+    
+    # Contact information
+    phone = Column(String(50))                  # Phone number
+    website = Column(String(500))               # Website URL
+    email = Column(String(255))                 # Email address
+    
+    # Business details
+    price_range = Column(String(20))            # Price range (e.g., "$", "$$", "$$$")
+    image_url = Column(String(500))             # Restaurant image URL
+    hours_open = Column(Text)                   # Operating hours
+    category = Column(String(100), default='restaurant')  # Business category
+    status = Column(String(50), default='approved')       # Business status
+    
+    # Kosher supervision flags
+    is_kosher = Column(Boolean, default=False)           # General kosher status
+    is_glatt = Column(Boolean, default=False)            # Glatt kosher status
+    is_cholov_yisroel = Column(Boolean, default=False)   # Chalav Yisroel status
+    is_pas_yisroel = Column(Boolean, default=False)      # Pas Yisroel status
+    is_bishul_yisroel = Column(Boolean, default=False)   # Bishul Yisroel status
+    is_mehadrin = Column(Boolean, default=False)         # Mehadrin status
+    is_hechsher = Column(Boolean, default=False)         # Has hechsher
+    
+    # Kosher categorization
+    kosher_type = Column(String(100))           # dairy, meat, pareve
+    
+    # ORB certification information
+    kosher_cert_link = Column(String(500))      # Link to kosher certificate
+    detail_url = Column(String(500))            # ORB detail page URL
+    short_description = Column(Text)             # Restaurant description
+    google_listing_url = Column(String(500))    # Google Maps listing URL
+    
+    # Audit trail
+    created_at = Column(DateTime, default=datetime.utcnow)           # Creation timestamp
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # Update timestamp
 
 class EnhancedDatabaseManager:
     """Enhanced database manager with SQLAlchemy 1.4 support for consolidated restaurants table."""

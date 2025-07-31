@@ -12,7 +12,6 @@ import NavTabs from '@/components/NavTabs';
 
 export default function HomePageClient() {
   const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
-  const [displayedRestaurants, setDisplayedRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [showSplash, setShowSplash] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -146,16 +145,25 @@ export default function HomePageClient() {
   const displayedRestaurants = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    return filteredRestaurants.slice(startIndex, endIndex);
+    const result = filteredRestaurants.slice(startIndex, endIndex);
+    console.log(`Pagination: Page ${currentPage}, showing ${result.length} restaurants (${startIndex}-${endIndex} of ${filteredRestaurants.length})`);
+    return result;
   }, [filteredRestaurants, currentPage, itemsPerPage]);
 
   // Memoized total count and pages
   const totalFilteredRestaurants = useMemo(() => filteredRestaurants.length, [filteredRestaurants]);
-  const totalPages = useMemo(() => Math.ceil(totalFilteredRestaurants / itemsPerPage), [totalFilteredRestaurants, itemsPerPage]);
+  const totalPages = useMemo(() => {
+    const pages = Math.ceil(totalFilteredRestaurants / itemsPerPage);
+    console.log(`Total pages calculation: ${totalFilteredRestaurants} restaurants, ${itemsPerPage} per page = ${pages} pages`);
+    return pages;
+  }, [totalFilteredRestaurants, itemsPerPage]);
 
   // Validate current page when total pages change
   useEffect(() => {
-    if (currentPage > totalPages && totalPages > 0) {
+    // Only reset to page 1 if current page is greater than total pages AND total pages is greater than 0
+    // This prevents unnecessary resets when filters are applied
+    if (totalPages > 0 && currentPage > totalPages) {
+      console.log(`Page validation: Resetting from page ${currentPage} to page 1 (total pages: ${totalPages})`);
       setCurrentPage(1);
     }
   }, [totalPages, currentPage]);
@@ -239,7 +247,7 @@ export default function HomePageClient() {
       
       if (data.data) {
         setAllRestaurants(data.data);
-        setDisplayedRestaurants(data.data.slice(0, itemsPerPage));
+        // Removed setDisplayedRestaurants since we now use memoized displayedRestaurants
       } else {
         setApiError('No restaurants data received');
       }
@@ -259,8 +267,8 @@ export default function HomePageClient() {
 
   const handleResultsUpdate = (results: Restaurant[]) => {
     console.log('Enhanced search results:', results.length, 'restaurants');
-    // Update the displayed restaurants with the enhanced results
-    setDisplayedRestaurants(results.slice(0, itemsPerPage));
+    // Update the all restaurants with the enhanced results
+    // The displayed restaurants will be automatically updated via memoization
     setAllRestaurants(results);
   };
 
@@ -291,6 +299,7 @@ export default function HomePageClient() {
   };
 
   const handlePageChange = (page: number) => {
+    console.log(`HomePageClient: Changing page from ${currentPage} to ${page}`);
     setCurrentPage(page);
   };
 
