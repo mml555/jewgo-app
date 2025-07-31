@@ -133,7 +133,7 @@ class RestaurantStatusCalculator:
         """
         # If we have coordinates, we could use a geocoding service to get timezone
         # For now, we'll use a simple mapping based on state
-        if state:
+        if state and state.strip():
             state_timezones = {
                 'NY': 'America/New_York',
                 'CA': 'America/Los_Angeles',
@@ -187,12 +187,13 @@ class RestaurantStatusCalculator:
                 'WY': 'America/Denver'
             }
             
-            timezone = state_timezones.get(state.upper())
+            timezone = state_timezones.get(state.upper().strip())
             if timezone:
                 return timezone
         
         # Default to UTC if we can't determine timezone
-        logger.warning(f"Could not determine timezone for location: {city}, {state}")
+        if city or state:
+            logger.warning(f"Could not determine timezone for location: {city or 'unknown'}, {state or 'unknown'}")
         return 'UTC'
     
     def _get_current_time_in_timezone(self, timezone_str: str) -> datetime:

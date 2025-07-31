@@ -47,7 +47,13 @@ from database.database_manager_v3 import EnhancedDatabaseManager, Restaurant
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
+
+# Load configuration
+from config.config import get_config
+app.config.from_object(get_config())
+
+# Initialize CORS with configuration
+CORS(app, origins=app.config.get('CORS_ORIGINS', ['*']))
 
 # Initialize database manager
 db_manager = None
@@ -67,6 +73,21 @@ def init_database():
 # Initialize database on app startup
 with app.app_context():
     init_database()
+
+@app.route('/', methods=['GET'])
+def root():
+    """Root endpoint - redirect to health check or return API info."""
+    return jsonify({
+        'message': 'JewGo Backend API',
+        'version': '3.0',
+        'status': 'running',
+        'endpoints': {
+            'health': '/health',
+            'restaurants': '/api/restaurants',
+            'search': '/api/restaurants/search',
+            'statistics': '/api/statistics'
+        }
+    }), 200
 
 @app.route('/health', methods=['GET'])
 def health_check():
@@ -492,10 +513,14 @@ if __name__ == '__main__':
     # Initialize database
     if init_database():
         logger.info("Starting JewGo Backend API Server")
+        
+        # Determine if we're in production
+        is_production = os.environ.get('ENVIRONMENT') == 'production' or os.environ.get('RENDER') == 'true'
+        
         app.run(
             host='0.0.0.0',
             port=int(os.environ.get('PORT', 5000)),
-            debug=os.environ.get('ENVIRONMENT') != 'production'
+            debug=not is_production
         )
     else:
         logger.error("Failed to initialize database. Exiting.")

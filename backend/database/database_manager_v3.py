@@ -410,6 +410,7 @@ class EnhancedDatabaseManager:
             'is_pas_yisroel': restaurant.is_pas_yisroel,
             'kosher_type': restaurant.kosher_type,
             'kosher_cert_link': restaurant.kosher_cert_link,
+            'certifying_agency': restaurant.certifying_agency,
             'detail_url': restaurant.detail_url,
             'email': restaurant.email,
             'google_listing_url': restaurant.google_listing_url,
