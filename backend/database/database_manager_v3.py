@@ -107,22 +107,32 @@ class Restaurant(Base):
     status = Column(String(50), default='approved')       # Business status
     
     # Kosher supervision flags
-    is_kosher = Column(Boolean, default=False)           # General kosher status
-    is_glatt = Column(Boolean, default=False)            # Glatt kosher status
+  
     is_cholov_yisroel = Column(Boolean, default=False)   # Chalav Yisroel status
     is_pas_yisroel = Column(Boolean, default=False)      # Pas Yisroel status
-    is_bishul_yisroel = Column(Boolean, default=False)   # Bishul Yisroel status
-    is_mehadrin = Column(Boolean, default=False)         # Mehadrin status
-    is_hechsher = Column(Boolean, default=False)         # Has hechsher
     
     # Kosher categorization
     kosher_type = Column(String(100))           # dairy, meat, pareve
-    
+    cuisine_type = Column(String(100))          # cuisine type
+   
     # ORB certification information
     kosher_cert_link = Column(String(500))      # Link to kosher certificate
     detail_url = Column(String(500))            # ORB detail page URL
     short_description = Column(Text)             # Restaurant description
+    description = Column(Text)                   # Additional description
     google_listing_url = Column(String(500))    # Google Maps listing URL
+    
+    # Location and rating information
+    latitude = Column(Float)                     # Latitude coordinate
+    longitude = Column(Float)                    # Longitude coordinate
+    rating = Column(Float)                       # General rating
+    review_count = Column(Integer)               # Number of reviews
+    google_rating = Column(Float)                # Google rating
+    google_review_count = Column(Integer)        # Google review count
+    google_reviews = Column(Text)                # Google reviews data
+    
+    # Additional hours field
+    hours = Column(Text)                         # Alternative hours field
     
     # Audit trail
     created_at = Column(DateTime, default=datetime.utcnow)           # Creation timestamp
@@ -434,7 +444,6 @@ class EnhancedDatabaseManager:
             if restaurant:
                 restaurant.address = address
                 restaurant.kosher_type = kosher_type
-                restaurant.hechsher_details = certifying_agency
                 
                 # Update extra kosher information
                 if extra_kosher_info:
@@ -442,7 +451,6 @@ class EnhancedDatabaseManager:
                     extra_info_lower = extra_kosher_info.lower()
                     restaurant.is_cholov_yisroel = 'cholov yisroel' in extra_info_lower
                     restaurant.is_pas_yisroel = 'pas yisroel' in extra_info_lower
-                    restaurant.is_bishul_yisroel = 'bishul yisroel' in extra_info_lower
                     # Note: Cholov Stam is the default when Cholov Yisroel is not specified
                     if 'cholov stam' in extra_info_lower:
                         restaurant.is_cholov_yisroel = False
@@ -469,9 +477,6 @@ class EnhancedDatabaseManager:
                 address=address,
                 phone=phone_number,
                 kosher_type=kosher_type,
-                hechsher_details=certifying_agency,
-                is_kosher=True,
-                is_hechsher=True
             )
             
             # Set extra kosher information
