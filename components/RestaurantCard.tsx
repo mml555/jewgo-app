@@ -154,7 +154,7 @@ export default function RestaurantCard({
       }}
     >
       {/* Image Section */}
-      <div className="relative h-48 sm:h-52 overflow-hidden bg-gray-100">
+      <div className="relative h-44 sm:h-48 overflow-hidden bg-gray-100">
         <img
           src={getHeroImage()}
           alt={`${restaurant.name} restaurant`}
@@ -166,18 +166,7 @@ export default function RestaurantCard({
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
         
-        {/* Top View More Button */}
-        <div className="absolute top-3 left-1/2 transform -translate-x-1/2">
-          <button
-            className="bg-green-500 text-white py-1 px-3 rounded-md text-xs font-medium hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCardClick();
-            }}
-          >
-            View More
-          </button>
-        </div>
+
         
         {/* Kosher Type Badge (Top Right) */}
         {restaurant.kosher_category && (
@@ -207,29 +196,29 @@ export default function RestaurantCard({
           </div>
         )}
         
-        {/* Quick Action Buttons */}
-        <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        {/* Quick Action Buttons - Top Right */}
+        <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <button
-            className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-full shadow-sm hover:bg-white transition-colors"
+            className="bg-white/90 backdrop-blur-sm text-gray-700 p-1.5 rounded-full shadow-sm hover:bg-white transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               // Add to favorites functionality
             }}
             aria-label="Add to favorites"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </button>
           <button
-            className="bg-white/90 backdrop-blur-sm text-gray-700 p-2 rounded-full shadow-sm hover:bg-white transition-colors"
+            className="bg-white/90 backdrop-blur-sm text-gray-700 p-1.5 rounded-full shadow-sm hover:bg-white transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               // Share functionality
             }}
             aria-label="Share restaurant"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
             </svg>
           </button>
@@ -237,15 +226,16 @@ export default function RestaurantCard({
       </div>
 
       {/* Content Section */}
-      <div className="p-4 sm:p-5">
+      <div className="p-3 sm:p-4">
         {/* Header */}
-        <div className="mb-3">
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-green-600 transition-colors">
+        <div className="mb-4">
+          {/* Restaurant Name - Larger and bolder */}
+          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-green-600 transition-colors">
             {restaurant.name}
           </h3>
           
           {/* Rating and Description */}
-          <div className="text-sm text-gray-600 mb-2">
+          <div className="text-sm text-gray-600 mb-3">
             {restaurant.google_rating ? (
               <span>Rated {restaurant.google_rating}/5 stars on Google. </span>
             ) : restaurant.rating ? (
@@ -261,41 +251,45 @@ export default function RestaurantCard({
             )}
           </div>
           
-          {/* Open/Closed Status */}
-          <div className="mb-2">
+          {/* Open/Closed Status with Icon */}
+          <div className="mb-3">
             {restaurant.hours_open ? (
-              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 Open • {restaurant.hours_open}
               </span>
             ) : restaurant.hours_of_operation ? (
-              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800 border border-red-200">
-                <span className="w-2 h-2 bg-red-500 rounded-full mr-1"></span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
                 Closed now • {restaurant.hours_of_operation}
               </span>
             ) : (
-              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                <span className="w-2 h-2 bg-gray-500 rounded-full mr-1"></span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 Hours not available
               </span>
             )}
           </div>
           
-          {/* Address */}
-          <div className="flex items-start gap-2 text-sm text-gray-600 mb-3">
-            <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span className="line-clamp-2">
-              {restaurant.address}, {restaurant.city}, {restaurant.state}
-            </span>
-          </div>
-          
-          {/* Maps Button */}
-          <div className="flex items-center gap-2 mb-3">
+          {/* Address with Maps Button */}
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-start gap-2 text-sm text-gray-600 flex-1">
+              <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span className="line-clamp-2">
+                {restaurant.address}, {restaurant.city}, {restaurant.state}
+              </span>
+            </div>
             <button
-              className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs font-medium hover:bg-gray-200 transition-colors"
+              className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs font-medium hover:bg-gray-200 transition-colors ml-2 flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
                 const address = `${restaurant.address}, ${restaurant.city}, ${restaurant.state}`;
@@ -311,11 +305,24 @@ export default function RestaurantCard({
           </div>
         </div>
 
-        {/* Additional Badges */}
+        {/* Badges Section - Consistent Styling */}
         <div className="flex flex-wrap gap-2 mb-4">
+          {/* Certification Badge */}
+          {restaurant.certifying_agency && (
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {restaurant.certifying_agency}
+            </span>
+          )}
+          
           {/* Listing Type */}
           {restaurant.listing_type && (
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
               {restaurant.listing_type}
             </span>
           )}
@@ -329,8 +336,8 @@ export default function RestaurantCard({
           </span>
         </div>
 
-        {/* Additional Info */}
-        <div className="space-y-2 text-sm text-gray-600">
+        {/* Contact Information */}
+        <div className="space-y-2 text-sm text-gray-600 mb-4">
           {/* Phone */}
           {restaurant.phone_number && (
             <div className="flex items-center gap-2">
@@ -340,7 +347,7 @@ export default function RestaurantCard({
               <a 
                 href={`tel:${restaurant.phone_number}`}
                 onClick={(e) => e.stopPropagation()}
-                className="hover:text-green-600 transition-colors"
+                className="text-green-600 hover:text-green-700 underline transition-colors"
               >
                 {restaurant.phone_number}
               </a>
@@ -358,7 +365,7 @@ export default function RestaurantCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="hover:text-green-600 transition-colors truncate"
+                className="text-green-600 hover:text-green-700 underline transition-colors truncate"
               >
                 Visit Website
               </a>
@@ -369,7 +376,7 @@ export default function RestaurantCard({
         {/* Action Button */}
         <div className="mt-4 pt-4 border-t border-gray-100">
           <button
-            className="w-full bg-green-500 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 touch-manipulation"
+            className="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 touch-manipulation shadow-sm"
             onClick={(e) => {
               e.stopPropagation();
               handleCardClick();
@@ -377,17 +384,6 @@ export default function RestaurantCard({
           >
             View More
           </button>
-        </div>
-        
-        {/* Repeated Address */}
-        <div className="mt-3 flex items-start gap-2 text-sm text-gray-600">
-          <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <span className="line-clamp-2">
-            {restaurant.address}, {restaurant.city}, {restaurant.state}
-          </span>
         </div>
       </div>
 
