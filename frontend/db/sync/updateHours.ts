@@ -1,16 +1,22 @@
-import { fetchPlaceDetails } from "@/lib/google/places";
-import { db } from "@/lib/db";
+export async function updateRestaurantHours(restaurantId: number) {
+  try {
+    // Call the backend API to fetch and update hours
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://jewgo.onrender.com';
+    const response = await fetch(`${backendUrl}/api/restaurants/${restaurantId}/fetch-hours`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-export async function updateRestaurantHours(restaurantId: number, placeId: string) {
-  const { hoursText, hoursJson, timezone } = await fetchPlaceDetails(placeId);
-
-  await db.restaurant.update({
-    where: { id: restaurantId },
-    data: {
-      hours_of_operation: hoursText,
-      hours_json: hoursJson,
-      hours_last_updated: new Date(),
-      timezone
+    if (!response.ok) {
+      throw new Error(`Backend API error: ${response.status} ${response.statusText}`);
     }
-  });
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating restaurant hours:', error);
+    throw error;
+  }
 }

@@ -99,9 +99,6 @@ class Restaurant(Base):
     id = Column(Integer, primary_key=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    current_time_local = Column(DateTime)  # System-generated (local time snapshot)
-    hours_parsed = Column(Boolean, default=False)  # Internal flag — OK to keep
-    timezone = Column(String(50))  # Based on geolocation or ORB data
     
     # 🧾 Required (updated via ORB scrape every 3 weeks)
     name = Column(String(255), nullable=False)  # Restaurant name (required)
@@ -112,7 +109,7 @@ class Restaurant(Base):
     phone_number = Column(String(50), nullable=False)  # Phone number
     website = Column(String(500))  # Website URL
     certifying_agency = Column(String(100), default='ORB', nullable=False)  # Auto-filled = "ORB"
-    kosher_category = Column(String(20), nullable=False)  # ENUM('meat', 'dairy', 'pareve')
+    kosher_type = Column(String(20), nullable=False)  # ENUM('meat', 'dairy', 'pareve')
     listing_type = Column(String(100), nullable=False)  # Business category
     
     # 📍 Enriched via Google Places API (on creation or scheduled)
@@ -120,6 +117,8 @@ class Restaurant(Base):
     price_range = Column(String(20))  # Optional
     short_description = Column(Text)  # Optional (e.g. from GMB or internal AI)
     hours_of_operation = Column(Text)  # Optional (check every 7 days)
+    hours_json = Column(Text)  # JSONB for structured hours data
+    hours_last_updated = Column(DateTime)  # Track when hours were last updated
     latitude = Column(Float)  # Based on geocoded address
     longitude = Column(Float)  # Based on geocoded address
     
@@ -416,6 +415,8 @@ class EnhancedDatabaseManager:
             'kosher_category': restaurant.kosher_category,
             'listing_type': restaurant.listing_type,
             'hours_of_operation': restaurant.hours_of_operation,
+            'hours_json': restaurant.hours_json,
+            'hours_last_updated': restaurant.hours_last_updated.isoformat() if restaurant.hours_last_updated else None,
             'short_description': restaurant.short_description,
             'price_range': restaurant.price_range,
             'image_url': restaurant.image_url,
