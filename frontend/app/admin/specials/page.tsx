@@ -21,7 +21,9 @@ export default function SpecialsManagementPage() {
   const fetchSpecials = async () => {
     try {
       setLoading(true);
-      const apiUrl = process.env.NODE_ENV === 'production' 
+      const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL 
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/specials`
+        : process.env.NODE_ENV === 'production'
         ? 'https://jewgo.onrender.com/api/admin/specials'
         : 'http://127.0.0.1:8081/api/admin/specials';
       
@@ -46,7 +48,9 @@ export default function SpecialsManagementPage() {
     }
     
     try {
-      const apiUrl = process.env.NODE_ENV === 'production' 
+      const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL 
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/specials`
+        : process.env.NODE_ENV === 'production'
         ? 'https://jewgo.onrender.com/api/admin/specials'
         : 'http://127.0.0.1:8081/api/admin/specials';
       

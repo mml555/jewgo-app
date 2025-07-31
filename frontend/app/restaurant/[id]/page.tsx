@@ -22,7 +22,9 @@ const RestaurantDetailPage: React.FC = () => {
   useEffect(() => {
     const fetchRestaurant = async () => {
       try {
-        const apiUrl = process.env.NODE_ENV === 'production' 
+        const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL 
+          ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/restaurants`
+          : process.env.NODE_ENV === 'production'
           ? 'https://jewgo.onrender.com/api/restaurants'
           : 'http://127.0.0.1:8081/api/restaurants';
         

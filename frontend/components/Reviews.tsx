@@ -68,7 +68,7 @@ const Reviews: React.FC<ReviewsProps> = ({ restaurant, onWriteReview }) => {
   }
 
   const renderStars = (rating: number) => {
-    const stars = [];
+    const stars: JSX.Element[] = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
 

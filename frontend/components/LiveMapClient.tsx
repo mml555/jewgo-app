@@ -514,7 +514,7 @@ export default function LiveMapClient() {
   };
 
   const getFilterDescription = () => {
-    const filters = [];
+    const filters: string[] = [];
     if (searchQuery.trim()) filters.push(`"${searchQuery}"`);
     if (activeFilters.agency) filters.push(`${activeFilters.agency} certified`);
     if (activeFilters.dietary) filters.push(`${activeFilters.dietary} only`);

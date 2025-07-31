@@ -104,6 +104,7 @@ export default function HomePageClient() {
     // Apply "near me" filter
     if (activeFilters.nearMe && userLocation) {
       const maxDistance = activeFilters.distanceRadius || 10; // Default 10 miles
+      
       filtered = filtered.filter(restaurant => {
         if (!restaurant.latitude || !restaurant.longitude) return false;
         const distance = calculateDistance(

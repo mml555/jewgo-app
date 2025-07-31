@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   try {
     // Fetch actual data from the backend API to get real filter options
-    const backendUrl = process.env.BACKEND_URL || 'https://jewgo.onrender.com';
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://jewgo.onrender.com';
     
     // Get restaurants to extract unique values
     const restaurantsResponse = await fetch(`${backendUrl}/api/restaurants?limit=1000`);
