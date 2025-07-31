@@ -1,0 +1,13 @@
+{
+  "checks": 1,
+  "failures": 0,
+  "responseTimes": [
+    424
+  ],
+  "lastCheck": 1753974214596,
+  "uptime": {
+    "start": 1753974214163,
+    "lastFailure": null
+  },
+  "availability": 1
+}

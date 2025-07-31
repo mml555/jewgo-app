@@ -1,0 +1,10 @@
+{
+  "endpoints": [
+    "https://jewgo-app.vercel.app",
+    "https://jewgo-app.vercel.app/health",
+    "https://jewgo.onrender.com/health"
+  ],
+  "interval": 300,
+  "timeout": 10000,
+  "retries": 3
+}

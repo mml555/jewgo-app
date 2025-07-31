@@ -1,0 +1,12 @@
+{
+  "environment": "staging",
+  "urls": {
+    "frontend": "https://staging.jewgo-app.vercel.app",
+    "backend": "https://staging.jewgo.onrender.com"
+  },
+  "monitoring": {
+    "enabled": false,
+    "interval": 60,
+    "alerts": false
+  }
+}

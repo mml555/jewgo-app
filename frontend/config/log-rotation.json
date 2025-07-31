@@ -1,0 +1,22 @@
+{
+  "logs": [
+    {
+      "path": "/Users/mendell/jewgo app/frontend/logs/health-monitor.log",
+      "maxSize": "10MB",
+      "maxFiles": 5,
+      "compress": true
+    },
+    {
+      "path": "/Users/mendell/jewgo app/frontend/logs/errors/error.log",
+      "maxSize": "5MB",
+      "maxFiles": 10,
+      "compress": true
+    },
+    {
+      "path": "/Users/mendell/jewgo app/frontend/logs/performance/performance.log",
+      "maxSize": "10MB",
+      "maxFiles": 7,
+      "compress": true
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "version": "1.0.0",
+  "timestamp": "2025-07-31T15:03:32.121Z",
+  "services": {
+    "uptime": {
+      "enabled": true,
+      "interval": 300,
+      "endpoints": [
+        "https://jewgo-app.vercel.app",
+        "https://jewgo-app.vercel.app/health",
+        "https://jewgo.onrender.com/health"
+      ]
+    },
+    "performance": {
+      "enabled": true,
+      "interval": 900,
+      "metrics": [
+        "responseTime",
+        "availability",
+        "errorRate"
+      ]
+    },
+    "errors": {
+      "enabled": true,
+      "captureUnhandled": true,
+      "logLevel": "error"
+    }
+  },
+  "alerts": {
+    "email": {
+      "enabled": false,
+      "recipients": []
+    },
+    "slack": {
+      "enabled": false,
+      "webhook": ""
+    },
+    "webhook": {
+      "enabled": false,
+      "url": ""
+    }
+  }
+}

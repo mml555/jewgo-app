@@ -1,0 +1,58 @@
+{
+  "title": "JewGo Frontend Monitoring",
+  "refreshInterval": 30000,
+  "widgets": [
+    {
+      "type": "uptime",
+      "title": "Application Uptime",
+      "endpoints": [
+        "https://jewgo-app.vercel.app",
+        "https://jewgo-app.vercel.app/health",
+        "https://jewgo.onrender.com/health"
+      ],
+      "position": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "responseTime",
+      "title": "Response Times",
+      "metrics": [
+        "avg",
+        "p95",
+        "p99"
+      ],
+      "position": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "errorRate",
+      "title": "Error Rate",
+      "threshold": 0.05,
+      "position": {
+        "x": 0,
+        "y": 4,
+        "w": 6,
+        "h": 3
+      }
+    },
+    {
+      "type": "alerts",
+      "title": "Recent Alerts",
+      "maxItems": 10,
+      "position": {
+        "x": 6,
+        "y": 4,
+        "w": 6,
+        "h": 3
+      }
+    }
+  ]
+}

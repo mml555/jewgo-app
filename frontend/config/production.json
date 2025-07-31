@@ -1,0 +1,12 @@
+{
+  "environment": "production",
+  "urls": {
+    "frontend": "https://jewgo-app.vercel.app",
+    "backend": "https://jewgo.onrender.com"
+  },
+  "monitoring": {
+    "enabled": true,
+    "interval": 300,
+    "alerts": true
+  }
+}

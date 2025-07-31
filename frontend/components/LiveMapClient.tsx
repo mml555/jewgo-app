@@ -34,9 +34,9 @@ export default function LiveMapClient() {
 
   // Handle URL parameters for centering map on specific location
   useEffect(() => {
-    const lat = searchParams.get('lat');
-    const lng = searchParams.get('lng');
-    const name = searchParams.get('name');
+    const lat = searchParams?.get('lat');
+    const lng = searchParams?.get('lng');
+    const name = searchParams?.get('name');
     
     if (lat && lng) {
       const latitude = parseFloat(lat);

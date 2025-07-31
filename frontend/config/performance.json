@@ -1,0 +1,13 @@
+{
+  "metrics": [
+    "responseTime",
+    "availability",
+    "errorRate"
+  ],
+  "interval": 900,
+  "thresholds": {
+    "responseTime": 3000,
+    "availability": 0.99,
+    "errorRate": 0.05
+  }
+}

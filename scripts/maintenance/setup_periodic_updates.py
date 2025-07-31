@@ -248,7 +248,7 @@ def show_current_schedule():
     except subprocess.CalledProcessError:
         print("📋 No cron jobs found")
     
-    # Check systemd timers
+    # Check systemd timers (Linux only)
     try:
         result = subprocess.run(['systemctl', 'list-timers', 'jewgo-hours-update.timer'], 
                               capture_output=True, text=True)
@@ -257,8 +257,8 @@ def show_current_schedule():
             print(result.stdout)
         else:
             print("\n⏰ No systemd timers found")
-    except subprocess.CalledProcessError:
-        print("\n⏰ No systemd timers found")
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("\n⏰ Systemd not available (likely macOS)")
 
 def main():
     """Main function to set up periodic updates."""

@@ -1,0 +1,12 @@
+{
+  "environment": "development",
+  "urls": {
+    "frontend": "http://localhost:3000",
+    "backend": "http://localhost:5000"
+  },
+  "monitoring": {
+    "enabled": false,
+    "interval": 60,
+    "alerts": false
+  }
+}

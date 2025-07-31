@@ -28,7 +28,7 @@ const RestaurantDetailPage: React.FC = () => {
           ? 'https://jewgo.onrender.com/api/restaurants'
           : 'http://127.0.0.1:8081/api/restaurants';
         
-        const response = await fetch(`${apiUrl}/${params.id}`, {
+        const response = await fetch(`${apiUrl}/${params?.id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -53,10 +53,10 @@ const RestaurantDetailPage: React.FC = () => {
       }
     };
 
-    if (params.id) {
+    if (params?.id) {
       fetchRestaurant();
     }
-  }, [params.id]);
+  }, [params?.id]);
 
   const getAgencyBadgeClass = (agency: string) => {
     switch (agency?.toUpperCase()) {

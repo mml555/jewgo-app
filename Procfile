@@ -1,1 +1,1 @@
-web: cd backend && gunicorn --config config/gunicorn.conf.py app:app 
+web: cd backend && playwright install chromium && gunicorn --config config/gunicorn.conf.py app:app 
