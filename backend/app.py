@@ -254,7 +254,7 @@ def get_kosher_types():
             'message': str(e)
         }), 500
 
-@app.route('/api/migrate', methods=['POST'])
+@app.route('/api/migrate', methods=['GET', 'POST'])
 def run_migration():
     """Run database migration to add missing columns."""
     try:
