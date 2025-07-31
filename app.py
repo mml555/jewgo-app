@@ -954,6 +954,52 @@ def create_app(config_name=None):
                 'timestamp': datetime.utcnow().isoformat()
             }), 500
     
+    @app.route('/deploy/run-orb-scraper', methods=['POST'])
+    @limiter.limit("2 per hour")  # Limit to prevent abuse
+    def deploy_run_orb_scraper():
+        """Manual trigger for running ORB static scraper."""
+        try:
+            logger.info("Manual ORB scraper triggered")
+            
+            # Import and run the ORB static scraper
+            import asyncio
+            from orb_static_scraper import main as run_orb_scraper
+            
+            # Run the scraper in a separate thread to avoid blocking
+            import threading
+            import queue
+            
+            result_queue = queue.Queue()
+            
+            def run_scraper():
+                try:
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    result = loop.run_until_complete(run_orb_scraper())
+                    result_queue.put(('success', result))
+                except Exception as e:
+                    result_queue.put(('error', str(e)))
+                finally:
+                    loop.close()
+            
+            # Start scraper in background thread
+            scraper_thread = threading.Thread(target=run_scraper)
+            scraper_thread.start()
+            
+            return jsonify({
+                'status': 'success',
+                'message': 'ORB scraper started in background',
+                'timestamp': datetime.utcnow().isoformat()
+            }), 200
+                
+        except Exception as e:
+            logger.error("Manual ORB scraper failed", error=str(e))
+            return jsonify({
+                'status': 'error',
+                'message': f'ORB scraper failed: {str(e)}',
+                'timestamp': datetime.utcnow().isoformat()
+            }), 500
+    
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
