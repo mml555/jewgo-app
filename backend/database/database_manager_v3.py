@@ -111,7 +111,7 @@ class Restaurant(Base):
     phone_number = Column(String(50), nullable=False)  # Phone number
     website = Column(String(500))  # Website URL
     certifying_agency = Column(String(100), default='ORB', nullable=False)  # Auto-filled = "ORB"
-    kosher_category = Column('kosher_category', String(20), nullable=False)  # ENUM('meat', 'dairy', 'pareve')
+    kosher_category = Column(String(20), nullable=False)  # ENUM('meat', 'dairy', 'pareve')
     listing_type = Column(String(100), nullable=False)  # Business category
     
     # 📍 Enriched via Google Places API (on creation or scheduled)
@@ -256,11 +256,19 @@ class EnhancedDatabaseManager:
             session = self.get_session()
             restaurants = session.query(Restaurant).limit(limit).offset(offset).all()
             
+            logger.info(f"Found {len(restaurants)} restaurants in database")
+            
             # Convert to unified format
             all_places = []
             for restaurant in restaurants:
-                place_dict = self._restaurant_to_unified_dict(restaurant)
-                all_places.append(place_dict)
+                try:
+                    place_dict = self._restaurant_to_unified_dict(restaurant)
+                    all_places.append(place_dict)
+                except Exception as e:
+                    logger.error(f"Error converting restaurant {restaurant.name}: {e}")
+                    continue
+            
+            logger.info(f"Successfully converted {len(all_places)} restaurants")
             
             # Sort by name
             all_places.sort(key=lambda x: x['name'])
