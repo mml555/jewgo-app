@@ -83,6 +83,10 @@ export default function HomePageClient() {
               return kosherCategory === 'dairy';
             case 'pareve':
               return kosherCategory === 'pareve';
+            case 'chalav-yisrael':
+              return kosherCategory === 'dairy' && restaurant.is_cholov_yisroel === true;
+            case 'pas-yisrael':
+              return (kosherCategory === 'meat' || kosherCategory === 'pareve') && restaurant.is_pas_yisroel === true;
             default:
               return true;
           }

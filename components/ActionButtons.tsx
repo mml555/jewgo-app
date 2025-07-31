@@ -285,7 +285,7 @@ export default function ActionButtons({
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
-            <span className="hidden sm:inline">Advanced Filters</span>
+            <span className="hidden sm:inline">Quick Filters</span>
             <span className="sm:hidden">Filters</span>
             {getActiveFiltersCount() > 0 && (
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white text-xs text-white flex items-center justify-center font-bold">
@@ -293,6 +293,17 @@ export default function ActionButtons({
               </div>
             )}
           </button>
+
+          <a
+            href="/filters"
+            className="flex items-center justify-center gap-1 sm:gap-2 bg-jewgo-primary text-white border border-jewgo-primary px-3 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium shadow-sm hover:bg-jewgo-primary-dark transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-jewgo-primary/20 flex-1 touch-manipulation"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <span className="hidden sm:inline">Advanced Search</span>
+            <span className="sm:hidden">Advanced</span>
+          </a>
         </div>
       </div>
 

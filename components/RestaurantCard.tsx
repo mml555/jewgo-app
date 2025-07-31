@@ -264,6 +264,17 @@ export default function RestaurantCard({
               {restaurant.is_cholov_yisroel ? "Chalav Yisrael" : "Chalav Stam"}
             </span>
           )}
+          
+          {/* Pas Yisroel Badge - Only for specific restaurants that are Pas Yisroel */}
+          {(restaurant.kosher_category === 'meat' || restaurant.kosher_category === 'pareve') && 
+           restaurant.is_pas_yisroel === true && (
+            <span className={cn(
+              "inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold border shadow-sm",
+              "bg-purple-100 text-purple-800 border-purple-200"
+            )}>
+              Pas Yisroel
+            </span>
+          )}
         </div>
         
         {/* Distance Badge (if needed) */}

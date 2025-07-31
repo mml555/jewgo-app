@@ -1,5 +1,5 @@
 {
-  "count": 278,
+  "last_updated": "2025-07-30T23:23:25.758781",
   "restaurants": [
     {
       "address": "1751 Alton Rd, Miami Beach, FL 33139, United States",
@@ -83,7 +83,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33139"
+      "zip_code": "33139",
+      "is_cholov_yisroel": true
     },
     {
       "address": "9487 Harding Ave, Surfside, FL 33154, United States",
@@ -251,7 +252,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33019"
+      "zip_code": "33019",
+      "is_cholov_yisroel": true
     },
     {
       "address": "451 W 41st St, Miami Beach, FL 33140, United States",
@@ -330,7 +332,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33140"
+      "zip_code": "33140",
+      "is_cholov_yisroel": true
     },
     {
       "address": "613 W Hallandale Beach Blvd #7, Hallandale Beach, FL 33009",
@@ -414,7 +417,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33009"
+      "zip_code": "33009",
+      "is_pas_yisroel": false
     },
     {
       "address": "3420 W Hallandale Blvd",
@@ -661,7 +665,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33312"
+      "zip_code": "33312",
+      "is_cholov_yisroel": true
     },
     {
       "address": "2906 NE 207th St, Aventura, FL 33180, United States",
@@ -829,7 +834,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33162"
+      "zip_code": "33162",
+      "is_cholov_yisroel": true
     },
     {
       "address": "",
@@ -1041,7 +1047,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33308"
+      "zip_code": "33308",
+      "is_cholov_yisroel": true
     },
     {
       "address": "5978 SW 40th Ave, Fort Lauderdale, FL 33314",
@@ -1094,7 +1101,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33314"
+      "zip_code": "33314",
+      "is_pas_yisroel": false
     },
     {
       "address": "5850 S Pine Island Rd, Davie, FL 33328",
@@ -1147,7 +1155,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33328"
+      "zip_code": "33328",
+      "is_pas_yisroel": false
     },
     {
       "address": "740 W 41st St, Miami Beach, FL 33140",
@@ -1200,7 +1209,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33140"
+      "zip_code": "33140",
+      "is_pas_yisroel": false
     },
     {
       "address": "9543 Harding Ave, Surfside, FL 33154",
@@ -1253,7 +1263,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33154"
+      "zip_code": "33154",
+      "is_pas_yisroel": false
     },
     {
       "address": "18549 W Dixie Hwy, Aventura, FL 33180",
@@ -1306,7 +1317,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33180"
+      "zip_code": "33180",
+      "is_pas_yisroel": false
     },
     {
       "address": "22107 Powerline Rd, Boca Raton, FL, 33433",
@@ -1359,7 +1371,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_pas_yisroel": false
     },
     {
       "address": "5650 Stirling Rd, Hollywood, FL 33021, United States",
@@ -1412,7 +1425,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_pas_yisroel": false
     },
     {
       "address": "141 NW 20th St, Boca Raton, FL 33431",
@@ -1465,7 +1479,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33431"
+      "zip_code": "33431",
+      "is_pas_yisroel": false
     },
     {
       "address": "47 NE 2nd Ave, Miami, FL 33132",
@@ -1571,7 +1586,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33132"
+      "zip_code": "33132",
+      "is_cholov_yisroel": true
     },
     {
       "address": "3455 NE 163rd St, North Miami Beach, FL 33160",
@@ -1624,7 +1640,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33160"
+      "zip_code": "33160",
+      "is_pas_yisroel": false
     },
     {
       "address": "501 Silks Run, Suite 1130, Hallandale Beach, FL 33009",
@@ -1730,7 +1747,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33437"
+      "zip_code": "33437",
+      "is_pas_yisroel": false
     },
     {
       "address": "3523 Griffin Road, Fort Lauderdale, FL 33312",
@@ -1783,7 +1801,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "8903 Glades Rd, Suite G-9, Boca Raton, FL 33434",
@@ -1836,7 +1855,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "Raton"
+      "zip_code": "Raton",
+      "is_pas_yisroel": true
     },
     {
       "address": "9101 Lakeridge Blvd #4, Boca Raton, FL 33496",
@@ -1889,7 +1909,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "5970 SW 18th St, Boca Raton, FL 33433",
@@ -1942,7 +1963,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "8177 Glades Rd, Bay 21, Boca Raton, FL 33434",
@@ -1995,7 +2017,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "Raton"
+      "zip_code": "Raton",
+      "is_pas_yisroel": true
     },
     {
       "address": "9858 Clint Moore Rd #134, Boca Raton, FL 33496, United States",
@@ -2049,7 +2072,7 @@
       "yelp_review_count": 0,
       "yelp_reviews": null,
       "zip_code": "33496",
-      "is_cholov_yisroel": true
+      "is_cholov_yisroel": false
     },
     {
       "address": "3000 Stirling Rd, Unit 112 Hollywood, FL 33021",
@@ -2102,7 +2125,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_cholov_yisroel": true
     },
     {
       "address": "21000 W Dixie Hwy, Miami, FL 33180, United States",
@@ -2155,7 +2179,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33180"
+      "zip_code": "33180",
+      "is_pas_yisroel": false
     },
     {
       "address": "5650 Stirling Rd, Hollywood, FL 33021, United States",
@@ -2208,7 +2233,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_cholov_yisroel": true
     },
     {
       "address": "7300 W Camino Real, Boca Raton, FL 33433",
@@ -2261,7 +2287,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33433"
+      "zip_code": "33433",
+      "is_cholov_yisroel": true
     },
     {
       "address": "",
@@ -2367,7 +2394,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "9176 Glades Rd, Boca Raton, FL 33434",
@@ -2420,7 +2448,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "725 NE 167th St, North Miami Beach, FL 33162",
@@ -2473,7 +2502,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "2208 NE 123rd Street",
@@ -2738,7 +2768,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33009"
+      "zip_code": "33009",
+      "is_pas_yisroel": false
     },
     {
       "address": "",
@@ -2844,7 +2875,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "7158 Beracasa Way, Boca Raton, FL 33433, United States",
@@ -2897,7 +2929,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33433"
+      "zip_code": "33433",
+      "is_pas_yisroel": true
     },
     {
       "address": "17831 Biscayne Blvd",
@@ -2950,7 +2983,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "17831"
+      "zip_code": "17831",
+      "is_cholov_yisroel": true
     },
     {
       "address": "3919 Alton Rd, Miami Beach, FL 33140, United States",
@@ -3056,7 +3090,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "19501"
+      "zip_code": "19501",
+      "is_cholov_yisroel": true
     },
     {
       "address": "9544 Harding Ave",
@@ -3109,7 +3144,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "12801 W Sunrise Blvd, Suite F205, Sunrise FL 33325",
@@ -3321,7 +3357,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "5210 S University Dr #106",
@@ -3427,7 +3464,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_pas_yisroel": false
     },
     {
       "address": "7350 NE 2nd Ave #102",
@@ -3904,7 +3942,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "250 N Dixie Highway #107",
@@ -4063,7 +4102,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "18900"
+      "zip_code": "18900",
+      "is_cholov_yisroel": true
     },
     {
       "address": "1402 NW 23rd St.",
@@ -4222,7 +4262,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "544 Arthur Godfrey Rd",
@@ -4275,7 +4316,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "19010 NE 29th Ave",
@@ -4487,7 +4529,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "4101 Pinetree Dr.",
@@ -4593,7 +4636,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "19048"
+      "zip_code": "19048",
+      "is_cholov_yisroel": true
     },
     {
       "address": "1304 E Las Olas Blvd, Fort Lauderdale, FL 33301",
@@ -4646,7 +4690,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33301"
+      "zip_code": "33301",
+      "is_cholov_yisroel": true
     },
     {
       "address": "3861 NE 163rd Street",
@@ -4752,7 +4797,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33314"
+      "zip_code": "33314",
+      "is_pas_yisroel": false
     },
     {
       "address": "19206 W Dixie Hwy",
@@ -4858,7 +4904,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33154"
+      "zip_code": "33154",
+      "is_cholov_yisroel": true
     },
     {
       "address": "96th St & The Beach, Surfside, FL 33155",
@@ -4911,7 +4958,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33155"
+      "zip_code": "33155",
+      "is_cholov_yisroel": true
     },
     {
       "address": "4747 Collins Ave, Miami Beach, FL 33140",
@@ -4964,7 +5012,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33140"
+      "zip_code": "33140",
+      "is_pas_yisroel": false
     },
     {
       "address": "7515 N State Road 7, Parkland, FL 33073",
@@ -5017,7 +5066,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "19593 NE 10th Ave, Bldg. 4, Bay C&D, North Miami Beach, FL 33179",
@@ -5070,7 +5120,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "5225 Collins Avenue",
@@ -5337,7 +5388,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33431"
+      "zip_code": "33431",
+      "is_pas_yisroel": false
     },
     {
       "address": "10143 W Oakland Park Blvd, Sunrise, FL 33351, United States",
@@ -5390,7 +5442,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33351"
+      "zip_code": "33351",
+      "is_pas_yisroel": true
     },
     {
       "address": "2500 NE 186St",
@@ -5443,7 +5496,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "",
@@ -5496,7 +5550,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "9415 Harding Avenue",
@@ -5708,7 +5763,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_cholov_yisroel": true
     },
     {
       "address": "19202 West Dixie Hwy",
@@ -5867,7 +5923,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "32765"
+      "zip_code": "32765",
+      "is_pas_yisroel": true
     },
     {
       "address": "1880 NE 183rd Street",
@@ -5973,7 +6030,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33009"
+      "zip_code": "33009",
+      "is_pas_yisroel": true
     },
     {
       "address": "5800 Stirling Rd, Hollywood, FL 33021",
@@ -6026,7 +6084,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_pas_yisroel": false
     },
     {
       "address": "18800 NE 29th Ave Suite 9",
@@ -6079,7 +6138,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "18800"
+      "zip_code": "18800",
+      "is_cholov_yisroel": true
     },
     {
       "address": "17030 W Dixie Hwy",
@@ -6132,7 +6192,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "17030"
+      "zip_code": "17030",
+      "is_cholov_yisroel": true
     },
     {
       "address": "4141 Nautilus Drive",
@@ -6291,7 +6352,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_pas_yisroel": false
     },
     {
       "address": "761 NE 167th St",
@@ -6344,7 +6406,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "3288 Stirling Rd, Hollywood, FL 33021",
@@ -6397,7 +6460,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_cholov_yisroel": true
     },
     {
       "address": "22191 Powerline Rd, Boca Raton, FL 33434",
@@ -6556,7 +6620,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "",
@@ -6662,7 +6727,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "3925 Lockwood Blvd, Oviedo, FL 32765",
@@ -6715,7 +6781,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "32765"
+      "zip_code": "32765",
+      "is_pas_yisroel": false
     },
     {
       "address": "18947 West Dixie High Way",
@@ -6874,7 +6941,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33009"
+      "zip_code": "33009",
+      "is_cholov_yisroel": true
     },
     {
       "address": "4875 Okeechobee Blvd, West Palm Beach, FL 33417",
@@ -6927,7 +6995,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33417"
+      "zip_code": "33417",
+      "is_pas_yisroel": false
     },
     {
       "address": "1523 Dewey Street",
@@ -7086,7 +7155,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33154"
+      "zip_code": "33154",
+      "is_cholov_yisroel": true
     },
     {
       "address": "3017 Aventura Blvd",
@@ -7298,7 +7368,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "987 41st Street",
@@ -8041,7 +8112,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33312"
+      "zip_code": "33312",
+      "is_pas_yisroel": false
     },
     {
       "address": "1840 NE 16th Street",
@@ -8200,7 +8272,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "Raton"
+      "zip_code": "Raton",
+      "is_cholov_yisroel": true
     },
     {
       "address": "3575 NE 207th St, Aventura, FL 33180, United States",
@@ -8253,7 +8326,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33180"
+      "zip_code": "33180",
+      "is_pas_yisroel": true
     },
     {
       "address": "17100 NE 6th Ave",
@@ -8359,7 +8433,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "Raton"
+      "zip_code": "Raton",
+      "is_pas_yisroel": true
     },
     {
       "address": "5804 Stirling Rd",
@@ -8412,7 +8487,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "209 6th St, West Palm Beach, FL 33401",
@@ -8518,7 +8594,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "19200"
+      "zip_code": "19200",
+      "is_cholov_yisroel": true
     },
     {
       "address": "1017 Kane Concourse",
@@ -8571,7 +8648,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "1009 Kane Concourse",
@@ -8730,7 +8808,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "68 miracle mile",
@@ -8942,7 +9021,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33139"
+      "zip_code": "33139",
+      "is_cholov_yisroel": true
     },
     {
       "address": "369 96th Street",
@@ -9260,7 +9340,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "19090 NE 29th Ave",
@@ -9313,7 +9394,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "19090"
+      "zip_code": "19090",
+      "is_cholov_yisroel": true
     },
     {
       "address": "3775 Woolbright Rd, Boynton Beach, FL 33436",
@@ -9366,7 +9448,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33436"
+      "zip_code": "33436",
+      "is_cholov_yisroel": true
     },
     {
       "address": "5650 Stirling Rd, Hollywood, FL 33021",
@@ -9419,7 +9502,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_cholov_yisroel": true
     },
     {
       "address": "1002 E Hallandale Beach Blvd, Hallandale Beach, FL 33009",
@@ -9472,7 +9556,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33009"
+      "zip_code": "33009",
+      "is_cholov_yisroel": true
     },
     {
       "address": "",
@@ -9525,7 +9610,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "18110 Collins Ave, Sunny Isles Beach, FL 33160",
@@ -9897,7 +9983,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "8194 Glades Rd",
@@ -10003,7 +10090,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "15400"
+      "zip_code": "15400",
+      "is_cholov_yisroel": true
     },
     {
       "address": "9540 W Bay Harbor Dr.",
@@ -10109,7 +10197,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33433"
+      "zip_code": "33433",
+      "is_pas_yisroel": true
     },
     {
       "address": "9455 Harding Ave",
@@ -10215,7 +10304,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33328"
+      "zip_code": "33328",
+      "is_pas_yisroel": false
     },
     {
       "address": "3873 NE 163rd Street",
@@ -10427,7 +10517,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_pas_yisroel": false
     },
     {
       "address": "3558 N Ocean Blvd, Fort Lauderdale, FL 33308",
@@ -10480,7 +10571,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33308"
+      "zip_code": "33308",
+      "is_pas_yisroel": true
     },
     {
       "address": "5978 SW 40th Ave, Fort Lauderdale, FL 33314",
@@ -10533,7 +10625,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33314"
+      "zip_code": "33314",
+      "is_pas_yisroel": false
     },
     {
       "address": "9454 Harding Ave, Surfside, FL 33154",
@@ -10586,7 +10679,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33154"
+      "zip_code": "33154",
+      "is_pas_yisroel": false
     },
     {
       "address": "530 41st Street",
@@ -10745,7 +10839,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "Beach"
+      "zip_code": "Beach",
+      "is_pas_yisroel": false
     },
     {
       "address": "4017 Prairie Ave",
@@ -10851,7 +10946,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33312"
+      "zip_code": "33312",
+      "is_pas_yisroel": false
     },
     {
       "address": "2445 Stirling Rd, Dania Beach, FL 33312",
@@ -10904,7 +11000,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33312"
+      "zip_code": "33312",
+      "is_pas_yisroel": true
     },
     {
       "address": "",
@@ -11010,7 +11107,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33324"
+      "zip_code": "33324",
+      "is_pas_yisroel": false
     },
     {
       "address": "6616 Collins Ave",
@@ -11222,7 +11320,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "Beach"
+      "zip_code": "Beach",
+      "is_pas_yisroel": false
     },
     {
       "address": "1305 S. Military Trail",
@@ -11275,7 +11374,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "7300 West Camino Real, Boca Raton, FL 33433",
@@ -11328,7 +11428,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33433"
+      "zip_code": "33433",
+      "is_cholov_yisroel": true
     },
     {
       "address": "17301 NE 12th Ct.",
@@ -11487,7 +11588,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "2020 NE 163rd street #300",
@@ -11540,7 +11642,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "5810 S Pine Island Rd, Davie, FL 33328",
@@ -11646,7 +11749,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33020"
+      "zip_code": "33020",
+      "is_pas_yisroel": false
     },
     {
       "address": "954 West 41st Street",
@@ -11858,7 +11962,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "18533 W Dixie Hwy, Aventura, FL 33180",
@@ -11911,7 +12016,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33180"
+      "zip_code": "33180",
+      "is_pas_yisroel": true
     },
     {
       "address": "5650 Stirling Rd, Hollywood, FL 33021",
@@ -11964,7 +12070,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_pas_yisroel": false
     },
     {
       "address": "5225 Collins Ave",
@@ -12070,7 +12177,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "Raton"
+      "zip_code": "Raton",
+      "is_pas_yisroel": false
     },
     {
       "address": "1550 NE 164th St, Miami, FL 33162",
@@ -12123,7 +12231,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33162"
+      "zip_code": "33162",
+      "is_pas_yisroel": false
     },
     {
       "address": "2228 NE 123rd Street",
@@ -12229,7 +12338,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33434"
+      "zip_code": "33434",
+      "is_cholov_yisroel": true
     },
     {
       "address": "6691 W Boynton Beach Blvd, Boynton Beach, FL 33437",
@@ -12494,7 +12604,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "31 NW 9th Street",
@@ -12547,7 +12658,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "9561 Harding Ave, Surfside, FL 33154",
@@ -12600,7 +12712,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33154"
+      "zip_code": "33154",
+      "is_pas_yisroel": false
     },
     {
       "address": "9460 Harding Avenue",
@@ -12706,7 +12819,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33314"
+      "zip_code": "33314",
+      "is_pas_yisroel": false
     },
     {
       "address": "2275 S University Dr, Davie, FL 33324",
@@ -12812,7 +12926,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33312"
+      "zip_code": "33312",
+      "is_cholov_yisroel": true
     },
     {
       "address": "5818 Stirling Rd, Hollywood, FL 33021",
@@ -12865,7 +12980,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_cholov_yisroel": true
     },
     {
       "address": "1220 Okeechhobee Blvd, West Palm Beach 33401",
@@ -12918,7 +13034,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "2615 NE 205th Street",
@@ -13024,7 +13141,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "Beach"
+      "zip_code": "Beach",
+      "is_pas_yisroel": true
     },
     {
       "address": "4041 Royal Palm Ave",
@@ -13077,7 +13195,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "",
@@ -13183,7 +13302,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33101"
+      "zip_code": "33101",
+      "is_cholov_yisroel": true
     },
     {
       "address": "2906 NE 207th St, Aventura, FL 33180",
@@ -13343,7 +13463,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33021"
+      "zip_code": "33021",
+      "is_pas_yisroel": false
     },
     {
       "address": "7750 Lago Del Mar Dr, #702, Boca Raton, FL 33433",
@@ -13449,7 +13570,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "1629 S 21st Ave",
@@ -13555,7 +13677,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "18435"
+      "zip_code": "18435",
+      "is_cholov_yisroel": true
     },
     {
       "address": "12250 Westchester Club Dr, Boynton Beach, FL 33437, United States",
@@ -13608,7 +13731,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33437"
+      "zip_code": "33437",
+      "is_pas_yisroel": false
     },
     {
       "address": "",
@@ -13714,7 +13838,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33312"
+      "zip_code": "33312",
+      "is_cholov_yisroel": true
     },
     {
       "address": "2900 #2 Griffin Rd",
@@ -13820,7 +13945,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "7000 W Camino Real, Suite 100, Boca Raton, FL, 33433",
@@ -13873,7 +13999,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "Raton"
+      "zip_code": "Raton",
+      "is_pas_yisroel": false
     },
     {
       "address": "1376 NE 163rd Street",
@@ -14085,7 +14212,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33160"
+      "zip_code": "33160",
+      "is_pas_yisroel": false
     },
     {
       "address": "16422 NW 54th Ave",
@@ -14138,7 +14266,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "16422"
+      "zip_code": "16422",
+      "is_cholov_yisroel": true
     },
     {
       "address": "2893 Stirling Rd, Fort Lauderdale, FL 33312",
@@ -14191,7 +14320,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33312"
+      "zip_code": "33312",
+      "is_pas_yisroel": true
     },
     {
       "address": "1646 NE 164th Street",
@@ -14509,7 +14639,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": null
+      "zip_code": null,
+      "is_cholov_yisroel": true
     },
     {
       "address": "19098 W. Dixie Hwy",
@@ -14562,7 +14693,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "19098"
+      "zip_code": "19098",
+      "is_cholov_yisroel": true
     },
     {
       "address": "2127 Stirling Rd",
@@ -14722,7 +14854,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33433"
+      "zip_code": "33433",
+      "is_cholov_yisroel": true
     },
     {
       "address": "3575 NE 207th Street Suite C-2A",
@@ -14775,7 +14908,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "901 NE 163rd Street #3",
@@ -14828,7 +14962,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "730 W Hallandale Beach Blvd, Hallandale Beach, FL 33009",
@@ -14881,7 +15016,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33009"
+      "zip_code": "33009",
+      "is_cholov_yisroel": true
     },
     {
       "address": "9543 Harding Ave",
@@ -14934,7 +15070,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": ""
+      "zip_code": "",
+      "is_cholov_yisroel": true
     },
     {
       "address": "900 N Federal Highway, Hollywood, FL 33020",
@@ -14987,7 +15124,8 @@
       "yelp_rating": 0.0,
       "yelp_review_count": 0,
       "yelp_reviews": null,
-      "zip_code": "33020"
+      "zip_code": "33020",
+      "is_pas_yisroel": false
     },
     {
       "address": "1970 NE 153St #13",
