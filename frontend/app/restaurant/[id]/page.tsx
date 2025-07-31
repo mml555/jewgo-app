@@ -106,7 +106,7 @@ const RestaurantDetailPage: React.FC = () => {
   };
 
   const formatCompleteAddress = (restaurant: Restaurant) => {
-    const parts = [];
+    const parts: string[] = [];
     
     // Check if address already contains city, state, zip
     if (restaurant.address && restaurant.address.includes(',')) {
