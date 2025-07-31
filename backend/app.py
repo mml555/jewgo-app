@@ -17,6 +17,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 import structlog
+import json
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -972,6 +974,95 @@ def update_database():
             'error': 'Failed to update database',
             'message': str(e)
         }), 500
+
+@app.route('/api/admin/update-hours', methods=['POST'])
+def update_restaurant_hours():
+    """Update restaurant hours using Google Places API."""
+    try:
+        data = request.get_json()
+        restaurant_id = data.get('id')
+        place_id = data.get('placeId')
+        
+        if not restaurant_id or not place_id:
+            return jsonify({'error': 'Missing restaurant ID or place ID'}), 400
+        
+        # Get the restaurant from database
+        db = EnhancedDatabaseManager()
+        if not db.connect():
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        session = db.get_session()
+        restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
+        
+        if not restaurant:
+            return jsonify({'error': 'Restaurant not found'}), 404
+        
+        # Fetch hours from Google Places API
+        google_api_key = os.environ.get('GOOGLE_API_KEY')
+        if not google_api_key:
+            return jsonify({'error': 'Google Places API key not configured'}), 500
+        
+        # Make request to Google Places API
+        url = f"https://maps.googleapis.com/maps/api/place/details/json"
+        params = {
+            'place_id': place_id,
+            'fields': 'opening_hours,utc_offset_minutes',
+            'key': google_api_key
+        }
+        
+        response = requests.get(url, params=params)
+        data = response.json()
+        
+        if data.get('status') != 'OK':
+            return jsonify({'error': f'Google Places API error: {data.get("status")}'}), 400
+        
+        result = data.get('result', {})
+        opening_hours = result.get('opening_hours', {})
+        
+        # Extract hours data
+        periods = opening_hours.get('periods', [])
+        weekday_text = opening_hours.get('weekday_text', [])
+        utc_offset = result.get('utc_offset_minutes', 0)
+        
+        # Convert UTC offset to timezone
+        timezone = offset_to_timezone(utc_offset)
+        
+        # Update restaurant hours
+        restaurant.hours_of_operation = '\n'.join(weekday_text)
+        restaurant.hours_json = json.dumps(periods)
+        restaurant.hours_last_updated = datetime.utcnow()
+        restaurant.timezone = timezone
+        restaurant.hours_parsed = True
+        
+        session.commit()
+        session.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Hours updated successfully',
+            'restaurant_id': restaurant_id,
+            'hours_updated': True,
+            'timezone': timezone
+        })
+        
+    except Exception as e:
+        logger.error(f"Error updating restaurant hours: {e}")
+        return jsonify({'error': str(e)}), 500
+
+def offset_to_timezone(offset_minutes):
+    """Convert UTC offset to timezone name."""
+    # Simple mapping for common US timezones
+    offset_hours = offset_minutes / 60
+    if offset_hours == -5:
+        return 'America/New_York'
+    elif offset_hours == -6:
+        return 'America/Chicago'
+    elif offset_hours == -7:
+        return 'America/Denver'
+    elif offset_hours == -8:
+        return 'America/Los_Angeles'
+    else:
+        return 'UTC'
 
 @app.errorhandler(404)
 def not_found(error):
