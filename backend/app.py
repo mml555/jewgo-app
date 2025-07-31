@@ -907,25 +907,15 @@ def update_database():
         # Step 2: Load ORB data directly
         logger.info("Loading ORB data into database...")
         
-        import subprocess
-        
         try:
-            # Run the ORB data loader script
-            result = subprocess.run(
-                ['python', 'load_orb_data.py'],
-                capture_output=True,
-                text=True,
-                cwd='backend'
-            )
+            # Import and run the ORB data loader function directly
+            from load_orb_data import load_orb_data
+            businesses = load_orb_data()
             
-            if result.returncode == 0:
+            if businesses:
                 logger.info("ORB data loaded successfully")
-                businesses = True
             else:
-                logger.error(f"ORB data loader failed with return code {result.returncode}")
-                logger.error(f"STDOUT: {result.stdout}")
-                logger.error(f"STDERR: {result.stderr}")
-                businesses = False
+                logger.error("ORB data loader failed")
                 
         except Exception as e:
             logger.error(f"Error loading ORB data: {e}")
