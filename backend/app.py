@@ -914,14 +914,8 @@ def update_database():
             
             async def run_scraper():
                 scraper = ORBScraperV2()
-                
-                if not await scraper.setup_playwright():
-                    logger.error("Failed to setup Playwright")
-                    return None
-                
-                businesses = await scraper.scrape_all_categories()
-                await scraper.cleanup()
-                return businesses
+                success = await scraper.run()
+                return success
             
             businesses = loop.run_until_complete(run_scraper())
         except Exception as e:
@@ -931,25 +925,10 @@ def update_database():
             if 'loop' in locals():
                 loop.close()
         
-        if businesses:
-            logger.info(f"ORB scraper returned {len(businesses)} businesses")
+        if businesses:  # businesses is now a boolean indicating success
+            logger.info("ORB scraper completed successfully")
             
-            # Step 3: Save real ORB data to database
-            logger.info(f"Saving {len(businesses)} ORB restaurants to database...")
-            
-            success_count = 0
-            for business in businesses:
-                try:
-                    success = db_manager.add_restaurant(business)
-                    if success:
-                        success_count += 1
-                        logger.info(f"Added: {business['name']} ({business.get('kosher_type', 'unknown')})")
-                except Exception as e:
-                    logger.error(f"Error saving business {business.get('name', 'Unknown')}: {e}")
-            
-            logger.info(f"Successfully saved {success_count} ORB restaurants")
-            
-            # Step 4: Verify the data
+            # Step 3: Verify the data (scraper already saved to database)
             final_count = session.query(Restaurant).count()
             logger.info(f"Final restaurant count: {final_count}")
             
@@ -975,9 +954,9 @@ def update_database():
             ).count()
             
             return jsonify({
-                'message': f'Successfully updated database with {success_count} ORB restaurants',
+                'message': f'Successfully updated database with ORB restaurants',
                 'deleted_count': deleted_count,
-                'saved_count': success_count,
+                'saved_count': final_count,
                 'final_count': final_count,
                 'kosher_types': dict(kosher_types),
                 'chalav_yisroel': chalav_yisroel_count,
@@ -985,10 +964,10 @@ def update_database():
                 'pas_yisroel': pas_yisroel_count
             }), 200
         else:
-            logger.error("ORB scraper returned no businesses")
+            logger.error("ORB scraper failed")
             return jsonify({
-                'error': 'No businesses were scraped from ORB',
-                'message': 'ORB scraper returned no data - check logs for details'
+                'error': 'ORB scraper failed',
+                'message': 'Failed to scrape ORB data - check logs for details'
             }), 500
         
     except Exception as e:
