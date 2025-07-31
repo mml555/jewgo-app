@@ -906,7 +906,10 @@ def update_database():
         sample_restaurants = [
             {
                 'name': 'Sample Dairy Restaurant 1',
-                'address': '123 Dairy St, Miami, FL',
+                'address': '123 Dairy St',
+                'city': 'Miami',
+                'state': 'FL',
+                'zip_code': '33101',
                 'phone': '(305) 555-0101',
                 'website': 'https://example.com',
                 'kosher_type': 'dairy',
@@ -917,7 +920,10 @@ def update_database():
             },
             {
                 'name': 'Sample Meat Restaurant 1',
-                'address': '456 Meat Ave, Miami, FL',
+                'address': '456 Meat Ave',
+                'city': 'Miami',
+                'state': 'FL',
+                'zip_code': '33102',
                 'phone': '(305) 555-0202',
                 'website': 'https://example.com',
                 'kosher_type': 'meat',
@@ -928,7 +934,10 @@ def update_database():
             },
             {
                 'name': 'Sample Pareve Restaurant 1',
-                'address': '789 Pareve Blvd, Miami, FL',
+                'address': '789 Pareve Blvd',
+                'city': 'Miami',
+                'state': 'FL',
+                'zip_code': '33103',
                 'phone': '(305) 555-0303',
                 'website': 'https://example.com',
                 'kosher_type': 'pareve',

@@ -161,10 +161,18 @@ export default function RestaurantCard({
   };
 
   // Clean address formatting - remove trailing commas
-  const formatAddress = (address: string, city: string, state: string) => {
-    const cleanAddress = address.replace(/,\s*$/, ''); // Remove trailing comma
-    const cleanCity = city.replace(/,\s*$/, ''); // Remove trailing comma
-    return `${cleanAddress}, ${cleanCity}, ${state}`;
+  const formatAddress = (address: string, city: string | null, state: string | null) => {
+    const cleanAddress = address?.replace(/,\s*$/, '') || ''; // Remove trailing comma
+    const cleanCity = city?.replace(/,\s*$/, '') || ''; // Remove trailing comma
+    const cleanState = state || '';
+    
+    if (cleanCity && cleanState) {
+      return `${cleanAddress}, ${cleanCity}, ${cleanState}`;
+    } else if (cleanCity) {
+      return `${cleanAddress}, ${cleanCity}`;
+    } else {
+      return cleanAddress;
+    }
   };
 
   // Enhanced rating display with stars
