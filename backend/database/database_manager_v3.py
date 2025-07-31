@@ -38,6 +38,17 @@ import structlog
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
+# Import the dynamic status calculation module
+try:
+    from utils.restaurant_status import get_restaurant_status, is_restaurant_open
+except ImportError:
+    # Fallback for when utils module is not available
+    def get_restaurant_status(restaurant_data):
+        return {'is_open': False, 'status': 'unknown', 'status_reason': 'Status calculation not available'}
+    
+    def is_restaurant_open(restaurant_data):
+        return False
+
 # Configure structured logging
 structlog.configure(
     processors=[
@@ -119,17 +130,11 @@ class Restaurant(Base):
     kosher_cert_link = Column(String(500))      # Link to kosher certificate
     detail_url = Column(String(500))            # ORB detail page URL
     short_description = Column(Text)             # Restaurant description
-    description = Column(Text)                   # Additional description
     google_listing_url = Column(String(500))    # Google Maps listing URL
     
     # Location and rating information
     latitude = Column(Float)                     # Latitude coordinate
     longitude = Column(Float)                    # Longitude coordinate
-    rating = Column(Float)                       # General rating
-    review_count = Column(Integer)               # Number of reviews
-    google_rating = Column(Float)                # Google rating
-    google_review_count = Column(Integer)        # Google review count
-    google_reviews = Column(Text)                # Google reviews data
     
     # Additional hours field
     hours = Column(Text)                         # Alternative hours field
@@ -293,7 +298,7 @@ class EnhancedDatabaseManager:
             if query:
                 query_obj = query_obj.filter(
                     Restaurant.name.ilike(f'%{query}%') | 
-                    Restaurant.description.ilike(f'%{query}%')
+                    Restaurant.short_description.ilike(f'%{query}%')
                 )
             
             if category:
@@ -379,8 +384,9 @@ class EnhancedDatabaseManager:
                 session.close()
     
     def _restaurant_to_unified_dict(self, restaurant: Restaurant) -> Dict[str, Any]:
-        """Convert Restaurant object to unified dictionary format."""
-        return {
+        """Convert Restaurant object to unified dictionary format with dynamic status calculation."""
+        # Create base restaurant data dictionary
+        restaurant_data = {
             'id': restaurant.id,
             'name': restaurant.name,
             'address': restaurant.address,
@@ -391,19 +397,13 @@ class EnhancedDatabaseManager:
             'website': restaurant.website,
             'kosher_category': restaurant.kosher_type or restaurant.cuisine_type or 'restaurant',
             'listing_type': restaurant.category or 'restaurant',
-            'status': restaurant.status or 'active',
             'hours_of_operation': restaurant.hours_open or restaurant.hours,
             'hours_open': restaurant.hours_open or restaurant.hours,
-            'short_description': restaurant.short_description or restaurant.description,
+            'short_description': restaurant.short_description,
             'price_range': restaurant.price_range,
             'image_url': restaurant.image_url,
             'latitude': restaurant.latitude,
             'longitude': restaurant.longitude,
-            'rating': restaurant.rating,
-            'review_count': restaurant.review_count,
-            'google_rating': restaurant.google_rating or restaurant.rating,
-            'google_review_count': restaurant.google_review_count or restaurant.review_count,
-            'google_reviews': restaurant.google_reviews,
             'specials': [],
             'is_cholov_yisroel': restaurant.is_cholov_yisroel,
             'is_pas_yisroel': restaurant.is_pas_yisroel,
@@ -414,7 +414,34 @@ class EnhancedDatabaseManager:
             'google_listing_url': restaurant.google_listing_url,
             'created_at': restaurant.created_at.isoformat() if restaurant.created_at else None,
             'updated_at': restaurant.updated_at.isoformat() if restaurant.updated_at else None
-        } 
+        }
+        
+        # Calculate dynamic status based on business hours and current time
+        try:
+            status_info = get_restaurant_status(restaurant_data)
+            restaurant_data.update({
+                'status': status_info.get('status', 'unknown'),
+                'is_open': status_info.get('is_open', False),
+                'status_reason': status_info.get('status_reason', 'Status calculation failed'),
+                'next_open_time': status_info.get('next_open_time'),
+                'current_time_local': status_info.get('current_time_local'),
+                'timezone': status_info.get('timezone', 'UTC'),
+                'hours_parsed': status_info.get('hours_parsed', False)
+            })
+        except Exception as e:
+            logger.error(f"Error calculating dynamic status for restaurant {restaurant.name}: {e}")
+            # Fallback to stored status if dynamic calculation fails
+            restaurant_data.update({
+                'status': restaurant.status or 'unknown',
+                'is_open': False,
+                'status_reason': f'Dynamic status calculation failed: {str(e)}',
+                'next_open_time': None,
+                'current_time_local': None,
+                'timezone': 'UTC',
+                'hours_parsed': False
+            })
+        
+        return restaurant_data 
     
     def get_restaurant_by_name(self, name: str) -> Optional[Dict[str, Any]]:
         """Get restaurant by name."""

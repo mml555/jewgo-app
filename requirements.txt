@@ -38,4 +38,8 @@ beautifulsoup4==4.12.2
 lxml==4.9.3
 
 # Additional Utilities
-python-dotenv==1.0.0 
+python-dotenv==1.0.0
+
+# Timezone and Date/Time Support
+pytz==2023.3
+python-dateutil==2.8.2 

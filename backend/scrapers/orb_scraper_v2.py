@@ -53,10 +53,10 @@ from urllib.parse import urljoin
 from dotenv import load_dotenv
 load_dotenv()
 
-# Add the current directory to Python path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Add the backend directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database_manager_v3 import EnhancedDatabaseManager as DatabaseManager
+from database.database_manager_v3 import EnhancedDatabaseManager as DatabaseManager
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -303,18 +303,8 @@ class ORBScraperV2:
                 'image_url': photo or '',
                 'latitude': None,
                 'longitude': None,
-                'rating': None,
-                'review_count': None,
-                'google_rating': None,
-                'google_review_count': None,
-                'google_reviews': None,
-                'is_kosher': True,
-                'is_glatt': False,
                 'is_cholov_yisroel': is_cholov_yisroel,
                 'is_pas_yisroel': is_pas_yisroel,
-                'is_bishul_yisroel': False,
-                'is_mehadrin': False,
-                'is_hechsher': True,
                 'kosher_cert_link': kosher_cert_link or '',
                 'detail_url': website or '',
                 'email': '',
@@ -471,12 +461,12 @@ class ORBScraperV2:
                 # Show sample results
                 logger.info("Sample scraped businesses:")
                 for i, business in enumerate(businesses[:5]):
-                    logger.info(f"{i+1}. {business['name']} - {business['kosher_category']} - {business['address']}")
+                    logger.info(f"{i+1}. {business['name']} - {business['kosher_type']} - {business['address']}")
                 
                 # Show statistics
                 kosher_types = {}
                 for business in businesses:
-                    kosher_type = business.get('kosher_category', 'unknown')
+                    kosher_type = business.get('kosher_type', 'unknown')
                     kosher_types[kosher_type] = kosher_types.get(kosher_type, 0) + 1
                 
                 logger.info("Kosher Type Statistics:")

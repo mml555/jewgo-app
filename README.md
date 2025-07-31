@@ -53,6 +53,7 @@ jewgo-app/
 │   ├── 📁 database/               # Database documentation
 │   ├── 📁 deployment/             # Deployment guides
 │   ├── 📁 development/            # Development guides
+│   │   └── USER_RULES.md          # Development rules and guidelines
 │   ├── ORB_SCRAPER_V2_README.md   # ORB scraper documentation
 │   ├── FINAL_ORB_IMPLEMENTATION_SUMMARY.md
 │   ├── CURRENT_ORB_SYSTEM_STATUS.md
@@ -165,12 +166,28 @@ The database uses a consolidated `restaurants` table with 28 optimized columns:
 
 ## 🛠️ Development
 
+### Development Rules & Guidelines
+**📋 [Complete User Rules](docs/development/USER_RULES.md)**
+
+All developers must follow the comprehensive development rules covering:
+- Python 3.11 compatibility requirements
+- Security and API key management
+- Code quality and organization standards
+- Error handling and testing requirements
+- Business logic requirements (restaurant status, FPT validation)
+- Performance optimization guidelines
+- Accessibility and mobile responsiveness
+- Data validation and backup procedures
+- Environment management and monitoring
+- Documentation and deployment procedures
+
 ### Adding New Features
 1. Create feature branch from `main`
-2. Implement changes in appropriate directory
-3. Update documentation in `docs/`
-4. Test thoroughly
-5. Submit pull request
+2. Review and follow the [User Rules](docs/development/USER_RULES.md)
+3. Implement changes in appropriate directory
+4. Update documentation in `docs/`
+5. Test thoroughly
+6. Submit pull request
 
 ### Code Organization
 - **Backend**: Python with SQLAlchemy and FastAPI
