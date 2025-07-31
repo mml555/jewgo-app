@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import EnvDebug from '@/components/EnvDebug'
-import { ToastContainer } from '@/components/ui/Toast'
-import AuthProvider from '@/components/AuthProvider'
-import ErrorBoundary from '@/components/ui/ErrorBoundary'
+// import EnvDebug from '@/components/EnvDebug'
+// import { ToastContainer } from '@/components/ui/Toast'
+// import AuthProvider from '@/components/AuthProvider'
+// import ErrorBoundary from '@/components/ui/ErrorBoundary'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -42,15 +42,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className={`${inter.className} h-full antialiased`}>
-        <ErrorBoundary>
-          <AuthProvider>
+        {/* <ErrorBoundary>
+          <AuthProvider> */}
             <div className="min-h-full bg-gray-50 flex flex-col">
               {children}
             </div>
-            <ToastContainer />
-            {process.env.NODE_ENV === 'development' && <EnvDebug />}
-          </AuthProvider>
-        </ErrorBoundary>
+            {/* <ToastContainer />
+            {process.env.NODE_ENV === 'development' && <EnvDebug />} */}
+          {/* </AuthProvider>
+        </ErrorBoundary> */}
       </body>
     </html>
   )

@@ -54,40 +54,40 @@ interface ActionButtonsProps {
   isOnMapPage?: boolean;
 }
 
-// Enhanced filter options
+// Enhanced filter options - Updated to match actual database data
 const FILTER_OPTIONS = {
   agencies: [
     { value: 'all', label: 'All Agencies' },
-    { value: 'ou', label: 'OU (Orthodox Union)' },
-    { value: 'ok', label: 'OK Kosher' },
-    { value: 'star-k', label: 'Star-K' },
-    { value: 'crc', label: 'CRC (Chicago Rabbinical Council)' },
-    { value: 'kof-k', label: 'KOF-K' },
-    { value: 'ou-d', label: 'OU-D (Dairy)' },
-    { value: 'ou-p', label: 'OU-P (Pareve)' },
-    { value: 'ou-m', label: 'OU-M (Meat)' }
+    { value: 'ORB', label: 'ORB (Orthodox Rabbinical Board)' },
+    { value: 'KM', label: 'KM (Kosher Miami)' },
+    { value: 'Star-K', label: 'Star-K' },
+    { value: 'CRC', label: 'CRC (Chicago Rabbinical Council)' },
+    { value: 'Kof-K', label: 'KOF-K' },
+    { value: 'Diamond K', label: 'Diamond K' },
+    { value: 'OU', label: 'OU (Orthodox Union)' },
+    { value: 'OK', label: 'OK Kosher' },
+    { value: 'Chabad', label: 'Chabad' },
+    { value: 'Local Rabbi', label: 'Local Rabbi' }
   ],
-  dietary: [
-    { value: 'all', label: 'All Dietary Types' },
-    { value: 'glatt', label: 'Glatt Kosher' },
-    { value: 'chassidish', label: 'Chassidish' },
-    { value: 'shtark', label: 'Shtark' },
-    { value: 'mehadrin', label: 'Mehadrin' },
-    { value: 'chalav-yisrael', label: 'Chalav Yisroel' },
-    { value: 'pas-yisrael', label: 'Pas Yisrael' },
-    { value: 'bishul-yisrael', label: 'Bishul Yisrael' }
+  kosherTypes: [
+    { value: 'all', label: 'All Kosher Types' },
+    { value: 'dairy', label: 'Dairy' },
+    { value: 'meat', label: 'Meat' },
+    { value: 'pareve', label: 'Pareve' }
   ],
   categories: [
     { value: 'all', label: 'All Categories' },
     { value: 'restaurant', label: 'Restaurant' },
-    { value: 'cafe', label: 'Cafe' },
     { value: 'bakery', label: 'Bakery' },
+    { value: 'catering', label: 'Catering' },
+    { value: 'grocery', label: 'Grocery Store' },
+    { value: 'market', label: 'Market' },
     { value: 'deli', label: 'Deli' },
     { value: 'pizza', label: 'Pizza' },
-    { value: 'ice-cream', label: 'Ice Cream' },
-    { value: 'grocery', label: 'Grocery Store' },
-    { value: 'catering', label: 'Catering' },
-    { value: 'food-truck', label: 'Food Truck' }
+    { value: 'ice cream', label: 'Ice Cream' },
+    { value: 'coffee shop', label: 'Coffee Shop' },
+    { value: 'food truck', label: 'Food Truck' },
+    { value: 'synagogue', label: 'Synagogue' }
   ],
   priceRanges: [
     { value: 'all', label: 'All Prices' },
@@ -95,6 +95,13 @@ const FILTER_OPTIONS = {
     { value: '$$', label: '$$ ($15-$30)' },
     { value: '$$$', label: '$$$ ($30-$60)' },
     { value: '$$$$', label: '$$$$ (Over $60)' }
+  ],
+  kosherFeatures: [
+    { value: 'is_cholov_yisroel', label: 'Chalav Yisroel' },
+    { value: 'is_pas_yisroel', label: 'Pas Yisroel' },
+    { value: 'is_glatt', label: 'Glatt Kosher' },
+    { value: 'is_mehadrin', label: 'Mehadrin' },
+    { value: 'is_bishul_yisroel', label: 'Bishul Yisroel' }
   ],
   features: [
     { value: 'delivery', label: 'Delivery Available' },
@@ -126,8 +133,9 @@ export default function ActionButtons({
   const [expandedSections, setExpandedSections] = useState({
     distance: false,
     agencies: false,
-    dietary: false,
+    kosherTypes: false,
     categories: false,
+    kosherFeatures: false,
     price: false,
     features: false
   });
@@ -187,10 +195,15 @@ export default function ActionButtons({
     switch (section) {
       case 'agencies':
         return activeFilters?.agency && activeFilters.agency !== 'all' ? 1 : 0;
-      case 'dietary':
-        return activeFilters?.dietary && activeFilters.dietary !== 'all' ? 1 : 0;
+      case 'kosherTypes':
+        return activeFilters?.kosherType && activeFilters.kosherType !== 'all' ? 1 : 0;
       case 'categories':
         return activeFilters?.category && activeFilters.category !== 'all' ? 1 : 0;
+      case 'kosherFeatures':
+        return Object.values(activeFilters || {}).filter(value => 
+          typeof value === 'boolean' && value === true && 
+          ['is_cholov_yisroel', 'is_pas_yisroel', 'is_glatt', 'is_mehadrin', 'is_bishul_yisroel'].includes(Object.keys(activeFilters || {}).find(key => activeFilters[key] === value) || '')
+        ).length;
       case 'price':
         return activeFilters?.priceRange && activeFilters.priceRange !== 'all' ? 1 : 0;
       case 'features':
@@ -229,11 +242,19 @@ export default function ActionButtons({
   const getActiveFiltersCount = () => {
     let count = 0;
     if (activeFilters?.agency && activeFilters.agency !== 'all') count++;
-    if (activeFilters?.dietary && activeFilters.dietary !== 'all') count++;
+    if (activeFilters?.kosherType && activeFilters.kosherType !== 'all') count++;
     if (activeFilters?.category && activeFilters.category !== 'all') count++;
     if (activeFilters?.priceRange && activeFilters.priceRange !== 'all') count++;
     if (activeFilters?.features?.length > 0) count += activeFilters.features.length;
     if (activeFilters?.distanceRadius) count++;
+    
+    // Count kosher features
+    if (activeFilters?.is_cholov_yisroel) count++;
+    if (activeFilters?.is_pas_yisroel) count++;
+    if (activeFilters?.is_glatt) count++;
+    if (activeFilters?.is_mehadrin) count++;
+    if (activeFilters?.is_bishul_yisroel) count++;
+    
     return count;
   };
 
@@ -285,7 +306,7 @@ export default function ActionButtons({
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
-            <span className="hidden sm:inline">Quick Filters</span>
+            <span className="hidden sm:inline">Filters</span>
             <span className="sm:hidden">Filters</span>
             {getActiveFiltersCount() > 0 && (
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white text-xs text-white flex items-center justify-center font-bold">
@@ -294,16 +315,7 @@ export default function ActionButtons({
             )}
           </button>
 
-          <a
-            href="/filters"
-            className="flex items-center justify-center gap-1 sm:gap-2 bg-jewgo-primary text-white border border-jewgo-primary px-3 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium shadow-sm hover:bg-jewgo-primary-dark transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-jewgo-primary/20 flex-1 touch-manipulation"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
-            <span className="hidden sm:inline">Advanced Search</span>
-            <span className="sm:hidden">Advanced</span>
-          </a>
+
         </div>
       </div>
 
@@ -314,7 +326,7 @@ export default function ActionButtons({
             {/* Header */}
             <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Advanced Filters</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Filters</h2>
                 {getActiveFiltersCount() > 0 && (
                   <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">
                     {getActiveFiltersCount()}
@@ -456,39 +468,39 @@ export default function ActionButtons({
                 )}
               </div>
 
-              {/* Dietary Types Filter */}
+              {/* Kosher Types Filter */}
               <div className="border border-gray-200 rounded-lg">
                 <button
-                  onClick={() => toggleSection('dietary')}
+                  onClick={() => toggleSection('kosherTypes')}
                   className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
-                    <span className="font-medium">Dietary Type</span>
+                    <span className="font-medium">Kosher Type</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {getSelectedCount('dietary') > 0 && (
+                    {getSelectedCount('kosherTypes') > 0 && (
                       <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-                        {getSelectedCount('dietary')}
+                        {getSelectedCount('kosherTypes')}
                       </span>
                     )}
-                    <svg className={`w-5 h-5 transition-transform ${expandedSections.dietary ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-5 h-5 transition-transform ${expandedSections.kosherTypes ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
                 </button>
                 
-                {expandedSections.dietary && (
+                {expandedSections.kosherTypes && (
                   <div className="px-4 pb-4 space-y-2">
-                    {FILTER_OPTIONS.dietary.map((option) => (
+                    {FILTER_OPTIONS.kosherTypes.map((option) => (
                       <button
                         key={option.value}
-                        onClick={() => onFilterChange?.('dietary', option.value)}
+                        onClick={() => onFilterChange?.('kosherType', option.value)}
                         className={cn(
                           "w-full text-left px-3 py-2 rounded-lg transition-colors",
-                          activeFilters?.dietary === option.value
+                          activeFilters?.kosherType === option.value
                             ? "bg-purple-500 text-white"
                             : "hover:bg-gray-50"
                         )}
@@ -538,6 +550,55 @@ export default function ActionButtons({
                         )}
                       >
                         {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Kosher Features Filter */}
+              <div className="border border-gray-200 rounded-lg">
+                <button
+                  onClick={() => toggleSection('kosherFeatures')}
+                  className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="font-medium">Kosher Features</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {getSelectedCount('kosherFeatures') > 0 && (
+                      <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                        {getSelectedCount('kosherFeatures')}
+                      </span>
+                    )}
+                    <svg className={`w-5 h-5 transition-transform ${expandedSections.kosherFeatures ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </button>
+                
+                {expandedSections.kosherFeatures && (
+                  <div className="px-4 pb-4 space-y-2">
+                    {FILTER_OPTIONS.kosherFeatures.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => onToggleFilter?.(option.value, !activeFilters?.[option.value])}
+                        className={cn(
+                          "w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center justify-between",
+                          activeFilters?.[option.value]
+                            ? "bg-green-500 text-white"
+                            : "hover:bg-gray-50"
+                        )}
+                      >
+                        <span>{option.label}</span>
+                        {activeFilters?.[option.value] && (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
                       </button>
                     ))}
                   </div>

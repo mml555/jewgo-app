@@ -23,11 +23,16 @@ export default function HomePageClient() {
   const [sortByDistance, setSortByDistance] = useState(false);
   const [activeFilters, setActiveFilters] = useState<{
     agency?: string;
-    dietary?: string;
+    kosherType?: string;
     openNow?: boolean;
     category?: string;
     nearMe?: boolean;
     distanceRadius?: number;
+    is_cholov_yisroel?: boolean;
+    is_pas_yisroel?: boolean;
+    is_glatt?: boolean;
+    is_mehadrin?: boolean;
+    is_bishul_yisroel?: boolean;
   }>({});
   const [activeTab, setActiveTab] = useState('eatery');
   const [mounted, setMounted] = useState(false);
@@ -71,25 +76,33 @@ export default function HomePageClient() {
       );
     }
     
-    // Apply dietary filter
-    if (activeFilters.dietary) {
+    // Apply kosher type filter
+    if (activeFilters.kosherType && activeFilters.kosherType !== 'all') {
       filtered = filtered.filter(restaurant => {
-        const kosherCategory = restaurant.kosher_category?.toLowerCase() || '';
-        switch (activeFilters.dietary) {
-          case 'meat':
-            return kosherCategory === 'meat';
-          case 'dairy':
-            return kosherCategory === 'dairy';
-          case 'pareve':
-            return kosherCategory === 'pareve';
-          case 'chalav-yisrael':
-            return kosherCategory === 'dairy' && restaurant.is_cholov_yisroel === true;
-          case 'pas-yisrael':
-            return (kosherCategory === 'meat' || kosherCategory === 'pareve') && restaurant.is_pas_yisroel === true;
-          default:
-            return true;
-        }
+        const kosherCategory = restaurant.kosher_category?.toLowerCase() || restaurant.kosher_type?.toLowerCase() || '';
+        return kosherCategory === activeFilters.kosherType.toLowerCase();
       });
+    }
+    
+    // Apply kosher features filters
+    if (activeFilters.is_cholov_yisroel) {
+      filtered = filtered.filter(restaurant => restaurant.is_cholov_yisroel === true);
+    }
+    
+    if (activeFilters.is_pas_yisroel) {
+      filtered = filtered.filter(restaurant => restaurant.is_pas_yisroel === true);
+    }
+    
+    if (activeFilters.is_glatt) {
+      filtered = filtered.filter(restaurant => restaurant.is_glatt === true);
+    }
+    
+    if (activeFilters.is_mehadrin) {
+      filtered = filtered.filter(restaurant => restaurant.is_mehadrin === true);
+    }
+    
+    if (activeFilters.is_bishul_yisroel) {
+      filtered = filtered.filter(restaurant => restaurant.is_bishul_yisroel === true);
     }
     
     // Apply category filter
