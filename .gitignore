@@ -75,6 +75,11 @@ next-env.d.ts
 *.sqlite3
 restaurants.db
 
+# Data exports (may contain API keys)
+restaurant_data_export_*.json
+*_export_*.json
+*_backup_*.json
+
 # Logs
 *.log
 localtunnel_backend.log
