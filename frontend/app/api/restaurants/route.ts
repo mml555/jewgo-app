@@ -154,6 +154,7 @@ export async function GET(request: NextRequest) {
     if (city) queryParams.append('city', city);
     if (state) queryParams.append('state', state);
     if (certifying_agency) queryParams.append('certifying_agency', certifying_agency);
+    // Map kosher_category to kosher_type for backend API compatibility
     if (kosher_category) queryParams.append('kosher_type', kosher_category);
     if (is_cholov_yisroel) queryParams.append('is_cholov_yisroel', is_cholov_yisroel);
     if (listing_type) queryParams.append('listing_type', listing_type);
