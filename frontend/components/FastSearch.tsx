@@ -1,13 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Restaurant } from '@/types/restaurant';
 import { Search, MapPin, Clock, Star, Filter, X } from 'lucide-react';
 
-interface GoogleMapsStyleSearchProps {
+interface FastSearchProps {
   onSearch: (query: string) => void;
-  onResultsUpdate: (results: Restaurant[]) => void;
-  onLocationSelect?: (location: { lat: number; lng: number; address: string }) => void;
   placeholder?: string;
   className?: string;
   showAdvancedFilters?: boolean;
@@ -15,28 +12,24 @@ interface GoogleMapsStyleSearchProps {
 
 interface SearchSuggestion {
   id: string;
-  type: 'place' | 'category' | 'agency' | 'location' | 'popular';
+  type: 'category' | 'agency' | 'location' | 'popular';
   title: string;
   subtitle?: string;
   icon: string;
   color: string;
   action: () => void;
-  metadata?: any;
 }
 
-export default function GoogleMapsStyleSearch({
+export default function FastSearch({
   onSearch,
-  onResultsUpdate,
-  onLocationSelect,
-  placeholder = "Search for restaurants, kosher agencies, or locations...",
+  placeholder = "Search for kosher restaurants, agencies, or locations...",
   className = "",
   showAdvancedFilters = true
-}: GoogleMapsStyleSearchProps) {
+}: FastSearchProps) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showFilters, setShowFilters] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -51,7 +44,6 @@ export default function GoogleMapsStyleSearch({
   ]);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Load recent searches from localStorage
@@ -73,8 +65,8 @@ export default function GoogleMapsStyleSearch({
     localStorage.setItem('jewgo-recent-searches', JSON.stringify(updated));
   }, [recentSearches]);
 
-  // Generate search suggestions (optimized without Google Places API for now)
-  const generateSuggestions = useCallback(async (searchQuery: string) => {
+  // Generate search suggestions (fast, local only)
+  const generateSuggestions = useCallback((searchQuery: string) => {
     const allSuggestions: SearchSuggestion[] = [];
 
     // Category suggestions
@@ -83,7 +75,7 @@ export default function GoogleMapsStyleSearch({
       { text: 'KM', icon: '🥛', color: 'bg-blue-500' },
       { text: 'Star-K', icon: '⭐', color: 'bg-yellow-500' },
       { text: 'OU', icon: '🕎', color: 'bg-purple-500' },
-      { text: 'dairy', icon: '��', color: 'bg-blue-400' },
+      { text: 'dairy', icon: '🥛', color: 'bg-blue-400' },
       { text: 'meat', icon: '🥩', color: 'bg-red-500' },
       { text: 'pareve', icon: '🥬', color: 'bg-green-500' },
       { text: 'restaurant', icon: '🍽️', color: 'bg-orange-500' },
@@ -125,7 +117,7 @@ export default function GoogleMapsStyleSearch({
 
     allSuggestions.push(...agencySuggestions);
 
-    // Location suggestions (simplified)
+    // Location suggestions (local)
     if (searchQuery.length > 2) {
       const locationSuggestions: SearchSuggestion[] = [
         { text: 'Miami Beach', state: 'FL', icon: '🏖️', color: 'bg-yellow-500' },
@@ -152,7 +144,7 @@ export default function GoogleMapsStyleSearch({
     return allSuggestions;
   }, []);
 
-  // Handle input change with debouncing (optimized)
+  // Handle input change with fast debouncing
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
@@ -164,15 +156,12 @@ export default function GoogleMapsStyleSearch({
     }
 
     if (value.trim()) {
-      setIsLoading(true);
-      searchTimeoutRef.current = setTimeout(async () => {
-        const newSuggestions = await generateSuggestions(value);
+      searchTimeoutRef.current = setTimeout(() => {
+        const newSuggestions = generateSuggestions(value);
         setSuggestions(newSuggestions);
-        setIsLoading(false);
-      }, 200); // Reduced from 300ms to 200ms
+      }, 100); // Very fast - only 100ms delay
     } else {
       setSuggestions([]);
-      setIsLoading(false);
     }
   }, [generateSuggestions]);
 
@@ -216,7 +205,7 @@ export default function GoogleMapsStyleSearch({
     setTimeout(() => {
       setIsFocused(false);
       setShowSuggestions(false);
-    }, 150); // Reduced from 200ms
+    }, 100);
   }, []);
 
   // Handle clear
@@ -260,10 +249,6 @@ export default function GoogleMapsStyleSearch({
 
           {/* Right Side Actions */}
           <div className="absolute inset-y-0 right-0 pr-4 flex items-center space-x-2">
-            {isLoading && (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-            )}
-            
             {showAdvancedFilters && (
               <button
                 type="button"
@@ -293,12 +278,9 @@ export default function GoogleMapsStyleSearch({
         </div>
       </form>
 
-      {/* Enhanced Suggestions Panel */}
+      {/* Fast Suggestions Panel */}
       {showSuggestions && (
-        <div 
-          ref={suggestionsRef}
-          className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-80 overflow-y-auto"
-        >
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-80 overflow-y-auto">
           <div className="p-4">
             {/* Search Results */}
             {query.length > 0 && suggestions.length > 0 && (
@@ -388,18 +370,10 @@ export default function GoogleMapsStyleSearch({
             )}
 
             {/* No Results */}
-            {query.length > 0 && suggestions.length === 0 && !isLoading && (
+            {query.length > 0 && suggestions.length === 0 && (
               <div className="text-center py-8">
                 <div className="text-gray-500 text-sm mb-2">No results found for "{query}"</div>
                 <div className="text-gray-400 text-xs">Try a different search term</div>
-              </div>
-            )}
-
-            {/* Loading State */}
-            {isLoading && (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                <div className="text-gray-500 text-sm">Searching...</div>
               </div>
             )}
           </div>

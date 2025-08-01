@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
-import GoogleMapsStyleSearch from '@/components/GoogleMapsStyleSearch';
+import FastSearch from '@/components/FastSearch';
 import NavTabs from '@/components/NavTabs';
 import ActionButtons from '@/components/ActionButtons';
 import EateryCard from '@/components/eatery/ui/EateryCard';
@@ -113,18 +113,10 @@ export default function EateryExplorePage() {
     <div className="min-h-screen bg-neutral-50">
       <Header />
       
-      {/* Google Maps Style Search */}
+      {/* Fast Search */}
       <div className="px-4 sm:px-6 py-4 bg-white border-b border-gray-100">
-        <GoogleMapsStyleSearch
+        <FastSearch
           onSearch={handleSearch}
-          onResultsUpdate={(results) => {
-            console.log('Google Maps search results:', results.length, 'restaurants');
-            setFilteredRestaurants(results);
-          }}
-          onLocationSelect={(location) => {
-            console.log('Location selected:', location);
-            // You can use this to center the map or filter by location
-          }}
           placeholder="Search for kosher restaurants, agencies, or locations..."
           showAdvancedFilters={true}
         />

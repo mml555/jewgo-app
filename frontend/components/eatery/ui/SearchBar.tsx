@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import GoogleMapsStyleSearch from '@/components/GoogleMapsStyleSearch';
+import FastSearch from '@/components/FastSearch';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -17,9 +17,8 @@ export default function SearchBar({
 }: SearchBarProps) {
   return (
     <div className={`w-full ${className}`}>
-      <GoogleMapsStyleSearch
+      <FastSearch
         onSearch={onSearch}
-        onResultsUpdate={() => {}}
         placeholder={placeholder}
         showAdvancedFilters={!!onFilterClick}
         className=""
