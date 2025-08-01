@@ -125,20 +125,19 @@ export default function LiveMapClient() {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       filtered = safeFilter(filtered, restaurant => 
-        (restaurant.name?.toLowerCase().includes(query) || false) ||
-        (restaurant.address?.toLowerCase().includes(query) || false) ||
-        (restaurant.city?.toLowerCase().includes(query) || false) ||
-        (restaurant.state?.toLowerCase().includes(query) || false) ||
-        (restaurant.listing_type && restaurant.listing_type.toLowerCase().includes(query)) ||
-        (restaurant.certifying_agency && restaurant.certifying_agency.toLowerCase().includes(query))
+        Boolean(restaurant.name?.toLowerCase().includes(query)) ||
+        Boolean(restaurant.address?.toLowerCase().includes(query)) ||
+        Boolean(restaurant.city?.toLowerCase().includes(query)) ||
+        Boolean(restaurant.state?.toLowerCase().includes(query)) ||
+        Boolean(restaurant.listing_type?.toLowerCase().includes(query)) ||
+        Boolean(restaurant.certifying_agency?.toLowerCase().includes(query))
       );
     }
 
     // Apply agency filter
     if (activeFilters.agency) {
       filtered = safeFilter(filtered, restaurant => 
-        restaurant.certifying_agency && 
-        restaurant.certifying_agency.toLowerCase().includes(activeFilters.agency!.toLowerCase())
+        Boolean(restaurant.certifying_agency?.toLowerCase().includes(activeFilters.agency!.toLowerCase()))
       );
     }
 
@@ -162,8 +161,7 @@ export default function LiveMapClient() {
     // Apply category filter
     if (activeFilters.category) {
       filtered = safeFilter(filtered, restaurant => 
-        restaurant.listing_type && 
-        restaurant.listing_type.toLowerCase().includes(activeFilters.category!.toLowerCase())
+        Boolean(restaurant.listing_type?.toLowerCase().includes(activeFilters.category!.toLowerCase()))
       );
     }
 
@@ -350,20 +348,19 @@ export default function LiveMapClient() {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       filtered = safeFilter(filtered, restaurant => 
-        (restaurant.name?.toLowerCase().includes(query) || false) ||
-        (restaurant.address?.toLowerCase().includes(query) || false) ||
-        (restaurant.city?.toLowerCase().includes(query) || false) ||
-        (restaurant.state?.toLowerCase().includes(query) || false) ||
-        (restaurant.listing_type && restaurant.listing_type.toLowerCase().includes(query)) ||
-        (restaurant.certifying_agency && restaurant.certifying_agency.toLowerCase().includes(query))
+        Boolean(restaurant.name?.toLowerCase().includes(query)) ||
+        Boolean(restaurant.address?.toLowerCase().includes(query)) ||
+        Boolean(restaurant.city?.toLowerCase().includes(query)) ||
+        Boolean(restaurant.state?.toLowerCase().includes(query)) ||
+        Boolean(restaurant.listing_type?.toLowerCase().includes(query)) ||
+        Boolean(restaurant.certifying_agency?.toLowerCase().includes(query))
       );
     }
 
     // Apply agency filter
     if (activeFilters.agency) {
       filtered = safeFilter(filtered, restaurant => 
-        restaurant.certifying_agency && 
-        restaurant.certifying_agency.toLowerCase().includes(activeFilters.agency!.toLowerCase())
+        Boolean(restaurant.certifying_agency?.toLowerCase().includes(activeFilters.agency!.toLowerCase()))
       );
     }
 
@@ -387,8 +384,7 @@ export default function LiveMapClient() {
     // Apply category filter
     if (activeFilters.category) {
       filtered = safeFilter(filtered, restaurant => 
-        restaurant.listing_type && 
-        restaurant.listing_type.toLowerCase().includes(activeFilters.category!.toLowerCase())
+        Boolean(restaurant.listing_type?.toLowerCase().includes(activeFilters.category!.toLowerCase()))
       );
     }
 
