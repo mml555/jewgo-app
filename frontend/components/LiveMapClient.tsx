@@ -600,14 +600,13 @@ export default function LiveMapClient() {
       
       {/* Enhanced Search */}
       <div className="px-4 sm:px-6 py-4 bg-white border-b border-gray-100">
-        <EnhancedSearch
-          onSearch={handleRestaurantSearch}
-          onResultsUpdate={(results) => {
-            console.log('Enhanced search results:', results.length, 'restaurants');
-            setDisplayedRestaurants(results);
-          }}
-          userLocation={userLocation}
-        />
+                       <EnhancedSearch
+                 onSearch={handleRestaurantSearch}
+                 onResultsUpdate={(results) => {
+                   console.log('Enhanced search results:', results.length, 'restaurants');
+                   setDisplayedRestaurants(results);
+                 }}
+               />
       </div>
 
       {/* Action Buttons */}
