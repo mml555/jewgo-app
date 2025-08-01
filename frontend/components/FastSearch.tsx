@@ -12,7 +12,7 @@ interface FastSearchProps {
 
 interface SearchSuggestion {
   id: string;
-  type: 'category' | 'agency' | 'location' | 'popular';
+  type: 'category' | 'agency' | 'location' | 'address' | 'popular';
   title: string;
   subtitle?: string;
   icon: string;

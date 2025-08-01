@@ -1,3 +1,33 @@
+// Simple Google Places search function for SmartSearch component
+export async function searchGooglePlaces(query: string, getDetails: boolean = false): Promise<any[]> {
+  try {
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      console.error('Google Maps API key not found');
+      return [];
+    }
+
+    if (getDetails) {
+      // Get place details
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${query}&fields=geometry,formatted_address&key=${apiKey}`
+      );
+      const data = await response.json();
+      return data.result ? [data.result] : [];
+    } else {
+      // Get place predictions
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&types=geocode&key=${apiKey}`
+      );
+      const data = await response.json();
+      return data.predictions || [];
+    }
+  } catch (error) {
+    console.error('Error searching Google Places:', error);
+    return [];
+  }
+}
+
 export async function fetchPlaceDetails(place_id: string): Promise<{
   hoursText: string,
   hoursJson: any[],
@@ -341,3 +371,13 @@ export class ModernGooglePlacesAPI {
 
 // Export a singleton instance
 export const googlePlacesAPI = ModernGooglePlacesAPI.getInstance();
+
+// Legacy function for backward compatibility
+export async function searchGooglePlaces(query: string, options: {
+  location?: { lat: number; lng: number };
+  radius?: number;
+  types?: string[];
+  limit?: number;
+} = {}): Promise<any[]> {
+  return googlePlacesAPI.searchPlaces(query, options);
+}
