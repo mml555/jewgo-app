@@ -34,6 +34,10 @@ export class ModernGooglePlacesAPI {
   private static instance: ModernGooglePlacesAPI;
   private isInitialized = false;
   private initPromise: Promise<void> | null = null;
+  private lastInitAttempt = 0;
+  private readonly INIT_RETRY_DELAY = 60000; // 1 minute between retry attempts
+  private cache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+  private readonly DEFAULT_CACHE_TTL = 300000; // 5 minutes default cache time
 
   static getInstance(): ModernGooglePlacesAPI {
     if (!ModernGooglePlacesAPI.instance) {
@@ -42,15 +46,71 @@ export class ModernGooglePlacesAPI {
     return ModernGooglePlacesAPI.instance;
   }
 
-  async initialize(): Promise<void> {
-    if (this.isInitialized) return;
+  // Get cached data if still valid
+  private getCachedData(key: string): any | null {
+    const cached = this.cache.get(key);
+    if (cached && Date.now() - cached.timestamp < cached.ttl) {
+      return cached.data;
+    }
+    if (cached) {
+      this.cache.delete(key); // Remove expired cache
+    }
+    return null;
+  }
+
+  // Set cache data
+  private setCachedData(key: string, data: any, ttl: number = this.DEFAULT_CACHE_TTL): void {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+      ttl
+    });
+  }
+
+  // Clear expired cache entries
+  private cleanupCache(): void {
+    const now = Date.now();
+    const keysToDelete: string[] = [];
     
-    if (this.initPromise) return this.initPromise;
+    this.cache.forEach((cached, key) => {
+      if (now - cached.timestamp > cached.ttl) {
+        keysToDelete.push(key);
+      }
+    });
+    
+    keysToDelete.forEach(key => {
+      this.cache.delete(key);
+    });
+  }
+
+  async initialize(): Promise<void> {
+    // If already initialized, return immediately
+    if (this.isInitialized) {
+      console.log('Google Places API already initialized, skipping...');
+      return;
+    }
+    
+    // If there's an ongoing initialization, return that promise
+    if (this.initPromise) {
+      console.log('Google Places API initialization already in progress, waiting...');
+      return this.initPromise;
+    }
+
+    // Check if we should retry initialization (avoid too frequent attempts)
+    const now = Date.now();
+    if (now - this.lastInitAttempt < this.INIT_RETRY_DELAY) {
+      console.log('Google Places API initialization retry too soon, skipping...');
+      return;
+    }
+
+    this.lastInitAttempt = now;
+    console.log('Initializing Google Places API...');
 
     this.initPromise = new Promise((resolve, reject) => {
       const checkGoogleMaps = () => {
         if (window.google && window.google.maps && window.google.maps.places) {
           this.isInitialized = true;
+          console.log('Google Places API initialized successfully');
           resolve();
         } else {
           setTimeout(checkGoogleMaps, 100);
@@ -60,19 +120,51 @@ export class ModernGooglePlacesAPI {
       // Check if API key is available
       const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
       if (!apiKey) {
-        reject(new Error('Google Maps API key is missing. Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your environment variables.'));
+        const error = 'Google Maps API key is missing. Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your environment variables.';
+        console.error(error);
+        reject(new Error(error));
         return;
       }
 
-      // Timeout after 30 seconds (increased from 10)
+      // Timeout after 30 seconds
       const timeout = setTimeout(() => {
-        reject(new Error('Google Maps failed to load within 30 seconds. Please check your internet connection and try again.'));
+        const error = 'Google Maps failed to load within 30 seconds. Please check your internet connection and try again.';
+        console.error(error);
+        reject(new Error(error));
       }, 30000);
 
       checkGoogleMaps();
     });
 
     return this.initPromise;
+  }
+
+  // Method to reset initialization state (useful for testing or manual refresh)
+  resetInitialization(): void {
+    this.isInitialized = false;
+    this.initPromise = null;
+    this.lastInitAttempt = 0;
+    console.log('Google Places API initialization state reset');
+  }
+
+  // Method to check if API is ready
+  isReady(): boolean {
+    return this.isInitialized && !!(window.google && window.google.maps && window.google.maps.places);
+  }
+
+  // Method to clear cache
+  clearCache(): void {
+    this.cache.clear();
+    console.log('Google Places API cache cleared');
+  }
+
+  // Method to get cache statistics
+  getCacheStats(): { size: number; keys: string[] } {
+    this.cleanupCache();
+    return {
+      size: this.cache.size,
+      keys: Array.from(this.cache.keys())
+    };
   }
 
   async searchPlaces(query: string, options: {
@@ -84,6 +176,16 @@ export class ModernGooglePlacesAPI {
     await this.initialize();
 
     try {
+      // Create cache key based on search parameters
+      const cacheKey = `search:${query}:${JSON.stringify(options)}`;
+      
+      // Check cache first
+      const cachedResult = this.getCachedData(cacheKey);
+      if (cachedResult) {
+        console.log('Using cached search result for:', query);
+        return cachedResult;
+      }
+
       // Use the new Place API for text search
       const request: google.maps.places.TextSearchRequest = {
         query,
@@ -92,7 +194,7 @@ export class ModernGooglePlacesAPI {
         types: options.types
       };
 
-      return new Promise((resolve, reject) => {
+      const results = await new Promise<any[]>((resolve, reject) => {
         // Create a dummy div for the service (required by Google Maps API)
         const dummyDiv = document.createElement('div');
         
@@ -119,6 +221,12 @@ export class ModernGooglePlacesAPI {
           });
         }
       });
+
+      // Cache the results
+      this.setCachedData(cacheKey, results, 300000); // Cache for 5 minutes
+      console.log('Cached search result for:', query);
+
+      return results;
     } catch (error) {
       console.error('Error searching places:', error);
       return [];

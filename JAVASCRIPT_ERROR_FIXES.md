@@ -9,6 +9,7 @@
 - Variable initialization issues in React useMemo hooks
 - Potential race conditions during component rendering
 - Missing error handling in complex filtering logic
+- **Array.sort function initialization errors** in distance-based sorting
 
 **Fixes Implemented**:
 
@@ -31,6 +32,12 @@
   - Return empty arrays on errors
   - Continue rendering even if filtering fails
   - Log errors for debugging without breaking the UI
+
+#### D. Array.sort Initialization Fix
+- ✅ **Moved `calculateDistance` function** before useMemo hooks
+- ✅ **Added specific error handling** for sort operations
+- ✅ **Nested try-catch blocks** in sort comparison functions
+- ✅ **Fallback behavior** when sorting fails (keep original order)
 
 ### 2. Health Check Build-Time Error
 **Problem**: `GET https://jewgo.onrender.com/health 500 (Internal Server Error)` during build
@@ -75,6 +82,39 @@ const filteredRestaurants = useMemo(() => {
     if (searchQuery && searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       // ... filtering logic
+    }
+    
+    // Sort by distance with specific error handling
+    if (userLocation) {
+      try {
+        filtered.sort((a, b) => {
+          try {
+            if (!a.latitude || !a.longitude) return 1;
+            if (!b.latitude || !b.longitude) return -1;
+            
+            const distanceA = calculateDistance(
+              userLocation.latitude, 
+              userLocation.longitude, 
+              a.latitude, 
+              a.longitude
+            );
+            const distanceB = calculateDistance(
+              userLocation.latitude, 
+              userLocation.longitude, 
+              b.latitude, 
+              b.longitude
+            );
+            
+            return distanceA - distanceB;
+          } catch (sortError) {
+            console.error('Error in sort comparison:', sortError);
+            return 0; // Keep original order on error
+          }
+        });
+      } catch (sortError) {
+        console.error('Error in sort operation:', sortError);
+        // Continue without sorting on error
+      }
     }
     
     return filtered;
