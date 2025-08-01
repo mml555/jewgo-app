@@ -13,6 +13,7 @@ import { Restaurant } from '@/types/restaurant';
 import NavTabs from '@/components/NavTabs';
 import { fetchRestaurants, getMockRestaurants } from '@/lib/api/restaurants';
 import ApiHealthIndicator from '@/components/ApiHealthIndicator';
+import { validateRestaurants, validateApiResponse, safeFilter } from '@/utils/validation';
 
 export default function HomePageClient() {
   const router = useRouter();
@@ -102,9 +103,17 @@ export default function HomePageClient() {
   // Memoized filtered restaurants to prevent unnecessary recalculations
   const filteredRestaurants = useMemo(() => {
     try {
-      if (!allRestaurants || allRestaurants.length === 0) return [];
+      // Use safeFilter to ensure allRestaurants is an array and filter valid restaurants
+      const validRestaurants = safeFilter(allRestaurants, restaurant => 
+        Boolean(restaurant && typeof restaurant === 'object' && restaurant.id)
+      );
       
-      let filtered = [...allRestaurants];
+      if (validRestaurants.length === 0) {
+        console.log('No valid restaurants data available');
+        return [];
+      }
+      
+      let filtered = [...validRestaurants];
       
       // Apply search query filter
       if (searchQuery && searchQuery.trim()) {
@@ -212,6 +221,12 @@ export default function HomePageClient() {
   // Memoized paginated restaurants
   const displayedRestaurants = useMemo(() => {
     try {
+      // Ensure filteredRestaurants is an array
+      if (!Array.isArray(filteredRestaurants)) {
+        console.warn('filteredRestaurants is not an array:', typeof filteredRestaurants);
+        return [];
+      }
+      
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
       const result = filteredRestaurants.slice(startIndex, endIndex);
@@ -316,11 +331,24 @@ export default function HomePageClient() {
       const data = await fetchRestaurants(1000);
       console.log('Restaurants fetched:', data.restaurants?.length || 0);
       
-      if (data.restaurants && data.restaurants.length > 0) {
-        setAllRestaurants(data.restaurants);
+      // Validate the API response structure
+      const validation = validateApiResponse(data);
+      if (!validation.isValid) {
+        console.warn('Invalid API response structure:', validation.error);
+        setAllRestaurants(getMockRestaurants());
+        setApiError('Using fallback data - Invalid API response');
+        return;
+      }
+      
+      // Validate and filter restaurants
+      const restaurants = data.restaurants || [];
+      const validRestaurants = validateRestaurants(restaurants);
+      
+      if (validRestaurants.length > 0) {
+        setAllRestaurants(validRestaurants);
         setApiError(null);
       } else {
-        console.warn('No restaurants received from API, using mock data');
+        console.warn('No valid restaurants received from API, using mock data');
         setAllRestaurants(getMockRestaurants());
         setApiError('Using fallback data - API temporarily unavailable');
       }
