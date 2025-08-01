@@ -582,24 +582,20 @@ def fetch_restaurant_website(restaurant_id):
         # Try to get website from Google Places API if we have coordinates
         if restaurant.latitude and restaurant.longitude:
             try:
-                # Import Google Places helper
-                from utils.google_places_helper import GooglePlacesHelper
+                # Import Google Places helper functions
+                from utils.google_places_helper import search_google_places_website
                 
-                places_helper = GooglePlacesHelper()
-                place_details = places_helper.get_place_details_by_coordinates(
-                    restaurant.latitude, 
-                    restaurant.longitude, 
-                    restaurant.name
-                )
+                # Search for website using restaurant name and address
+                website_url = search_google_places_website(restaurant.name, restaurant.address or "")
                 
-                if place_details and place_details.get('website'):
+                if website_url:
                     # Update the restaurant with the found website
-                    restaurant.website = place_details['website']
+                    restaurant.website = website_url
                     session.commit()
                     
                     return jsonify({
                         'success': True,
-                        'website': place_details['website'],
+                        'website': website_url,
                         'message': 'Website found via Google Places API'
                     })
                 else:
