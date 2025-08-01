@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, MapPin, Clock, Star, Filter, X } from 'lucide-react';
-import { searchGooglePlaces } from '@/lib/google/places';
+import { searchGooglePlaces, googlePlacesAPI } from '@/lib/google/places';
 
 interface SmartSearchProps {
   onSearch: (query: string) => void;
@@ -316,8 +316,8 @@ export default function SmartSearch({
   // Handle Google Place selection
   const handleGooglePlaceSelect = useCallback(async (place: GooglePlaceSuggestion) => {
     try {
-      // Get place details for coordinates
-      const placeDetails = await searchGooglePlaces(place.description, true);
+      // Get place details for coordinates using the Google Places API
+      const placeDetails = await googlePlacesAPI.getPlaceDetails(place.place_id, ['geometry', 'formatted_address']);
       if (placeDetails && placeDetails.geometry) {
         const { lat, lng } = placeDetails.geometry.location;
         const locationData = {
