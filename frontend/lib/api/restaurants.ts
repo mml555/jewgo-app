@@ -18,10 +18,25 @@ interface ApiError {
 }
 
 export class RestaurantsAPI {
+  private static async wakeUpBackend(): Promise<boolean> {
+    try {
+      console.log('Attempting to wake up backend service...');
+      const response = await fetch(`${API_BASE_URL}/`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(5000) // 5 second timeout for wake-up
+      });
+      return response.ok;
+    } catch (error) {
+      console.log('Wake-up attempt failed, continuing with normal request...');
+      return false;
+    }
+  }
+
   private static async makeRequest<T>(
     endpoint: string, 
     options: RequestInit = {},
-    retries: number = 3
+    retries: number = 3,
+    timeout: number = 15000 // 15 second timeout
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
     
@@ -42,7 +57,21 @@ export class RestaurantsAPI {
       try {
         console.log(`API request attempt ${attempt}/${retries}: ${url}`);
         
-        const response = await fetch(url, config);
+        // On first attempt, try to wake up the backend if it's the main restaurants endpoint
+        if (attempt === 1 && endpoint.includes('/api/restaurants')) {
+          await this.wakeUpBackend();
+        }
+        
+        // Create AbortController for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+        
+        const response = await fetch(url, {
+          ...config,
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
         
         if (!response.ok) {
           const error: ApiError = {
@@ -77,6 +106,14 @@ export class RestaurantsAPI {
       } catch (error) {
         console.error(`API request failed (attempt ${attempt}/${retries}):`, error);
         
+        // Handle timeout errors specifically
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.error(`Request timed out after ${timeout}ms`);
+          if (attempt === retries) {
+            throw new Error(`Request timed out after ${timeout}ms - the backend server may be down or overloaded`);
+          }
+        }
+        
         if (attempt === retries) {
           throw error;
         }
@@ -98,21 +135,19 @@ export class RestaurantsAPI {
       let total: number = 0;
       
       if (data && typeof data === 'object') {
-        // Check if data has restaurants array
-        if (Array.isArray(data.restaurants)) {
-          restaurants = data.restaurants;
-          total = data.total || restaurants.length;
-        } else if (Array.isArray(data)) {
+        if (Array.isArray(data)) {
           // Direct array response
           restaurants = data;
           total = data.length;
+        } else if (data.restaurants && Array.isArray(data.restaurants)) {
+          // Wrapped response
+          restaurants = data.restaurants;
+          total = data.total || data.restaurants.length;
         } else {
-          console.error('Invalid response format - missing restaurants array:', data);
-          throw new Error('Invalid response format - missing restaurants array');
+          console.warn('Unexpected API response format:', data);
+          restaurants = [];
+          total = 0;
         }
-      } else {
-        console.error('Invalid response format - not an object:', data);
-        throw new Error('Invalid response format - not an object');
       }
       
       return {
@@ -120,9 +155,9 @@ export class RestaurantsAPI {
         total
       };
     } catch (error) {
-      console.error('Failed to fetch restaurants from API:', error);
+      console.error('Failed to fetch restaurants:', error);
       
-      // Return empty data as fallback
+      // Return empty response on error
       return {
         restaurants: [],
         total: 0
