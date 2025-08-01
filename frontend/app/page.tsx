@@ -1,10 +1,6 @@
-import HomePageClient from '@/components/HomePageClient';
-import ErrorBoundary from '@/components/ErrorBoundary';
+import { redirect } from 'next/navigation';
 
 export default function HomePage() {
-  return (
-    <ErrorBoundary>
-      <HomePageClient />
-    </ErrorBoundary>
-  );
+  // Redirect to the new Eatery explore page
+  redirect('/eatery');
 } 

@@ -34,8 +34,8 @@ export default function ApiHealthIndicator() {
         headers: {
           'Accept': 'application/json',
         },
-        // Add timeout to prevent hanging requests
-        signal: AbortSignal.timeout(5000)
+        // Increase timeout to 15 seconds to handle cold starts
+        signal: AbortSignal.timeout(15000)
       });
 
       if (response.ok) {
@@ -54,21 +54,36 @@ export default function ApiHealthIndicator() {
       }
     } catch (error) {
       console.error('API health check failed:', error);
+      
+      // Provide more specific error messages
+      let errorMessage = 'API Unavailable - Connection failed';
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorMessage = 'API Timeout - Backend may be starting up';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'API Unreachable - Network issue';
+        }
+      }
+      
       setHealthStatus({
         status: 'unhealthy',
-        message: 'API Unavailable - Connection failed',
+        message: errorMessage,
         lastChecked: new Date()
       });
     }
   };
 
   useEffect(() => {
-    checkApiHealth();
+    // Initial check with a delay to avoid blocking page load
+    const initialCheck = setTimeout(checkApiHealth, 2000);
     
-    // Check health every 30 seconds
-    const interval = setInterval(checkApiHealth, 30000);
+    // Check health every 60 seconds instead of 30 to reduce load
+    const interval = setInterval(checkApiHealth, 60000);
     
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(initialCheck);
+      clearInterval(interval);
+    };
   }, []);
 
   const getStatusColor = () => {

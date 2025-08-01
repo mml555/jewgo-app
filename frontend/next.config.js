@@ -44,10 +44,10 @@ const nextConfig = {
       },
     ];
   },
-  // Bundle optimization
-  experimental: {
-    optimizePackageImports: ['lucide-react', 'clsx', 'tailwind-merge'],
-  },
+  // Bundle optimization - temporarily disabled to fix webpack issue
+  // experimental: {
+  //   optimizePackageImports: ['lucide-react', 'clsx', 'tailwind-merge'],
+  // },
   // Image optimization
   images: {
     formats: ['image/webp', 'image/avif'],
@@ -55,7 +55,7 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60,
   },
-  // Webpack configuration for optimization
+  // Webpack configuration - simplified to avoid optimization conflicts
   webpack: (config, { dev, isServer }) => {
     // Bundle analyzer
     if (process.env.ANALYZE === 'true') {
@@ -67,32 +67,6 @@ const nextConfig = {
         })
       );
     }
-
-    // Tree shaking optimization
-    config.optimization = {
-      ...config.optimization,
-      usedExports: true,
-      sideEffects: false,
-    };
-
-    // Code splitting optimization
-    config.optimization.splitChunks = {
-      chunks: 'all',
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all',
-          priority: 10,
-        },
-        common: {
-          name: 'common',
-          minChunks: 2,
-          chunks: 'all',
-          priority: 5,
-        },
-      },
-    };
 
     // External dependencies optimization
     if (!isServer) {

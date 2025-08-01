@@ -15,7 +15,8 @@ export function isValidRestaurant(restaurant: any): restaurant is Restaurant {
     typeof restaurant.certifying_agency === 'string' &&
     typeof restaurant.kosher_category === 'string' &&
     typeof restaurant.listing_type === 'string' &&
-    typeof restaurant.status === 'string'
+    // Make status optional since it's calculated dynamically
+    (restaurant.status === undefined || typeof restaurant.status === 'string')
   );
 }
 
