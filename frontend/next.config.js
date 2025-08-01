@@ -4,7 +4,7 @@ const nextConfig = {
     // Set default values for required environment variables
     NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'https://jewgo-app.vercel.app',
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'fallback-secret-key-change-in-production',
-    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
     NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL || 'https://jewgo.onrender.com',
   },
   // Add error handling for missing environment variables
@@ -34,7 +34,7 @@ const nextConfig = {
           },
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'ALLOWALL',
           },
           {
             key: 'X-XSS-Protection',
