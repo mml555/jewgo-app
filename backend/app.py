@@ -1079,6 +1079,14 @@ def get_admin_specials():
         logger.error(f"API error: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/admin/specials-test', methods=['GET'])
+def get_admin_specials_test():
+    """Test endpoint for admin specials."""
+    return jsonify({
+        'success': True,
+        'message': 'Test endpoint is working'
+    })
+
 @app.route('/api/admin/specials/<int:special_id>/payment', methods=['PUT'])
 def update_special_payment(special_id):
     """API endpoint for updating special payment status."""
