@@ -3,12 +3,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
-import SearchBar from '@/components/SearchBar';
+import EnhancedSearch from '@/components/EnhancedSearch';
 import ActionButtons from '@/components/ActionButtons';
 import InteractiveRestaurantMap from '@/components/InteractiveRestaurantMap';
 import BottomNavigation from '@/components/BottomNavigation';
 import NavTabs from '@/components/NavTabs';
+import LocationPermissionPrompt from '@/components/LocationPermissionPrompt';
+import ApiHealthIndicator from '@/components/ApiHealthIndicator';
 import { Restaurant } from '@/types/restaurant';
+import { fetchRestaurants, getMockRestaurants } from '@/lib/api/restaurants';
+import { safeFilter } from '@/utils/validation';
 
 export default function LiveMapClient() {
   const searchParams = useSearchParams();
@@ -31,6 +35,9 @@ export default function LiveMapClient() {
   }>({});
   const [mapCenter, setMapCenter] = useState<{lat: number, lng: number} | null>(null);
   const [activeTab, setActiveTab] = useState('eatery');
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+  const [locationPromptShown, setLocationPromptShown] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   // Handle URL parameters for centering map on specific location
   useEffect(() => {
@@ -58,10 +65,40 @@ export default function LiveMapClient() {
     }
   }, [searchParams]);
 
+  // Initialize component
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Check location permission on mount
+  useEffect(() => {
+    if (mounted) {
+      const checkLocationPermission = async () => {
+        if (!navigator.geolocation) {
+          console.log('Geolocation not supported');
+          return;
+        }
+
+        // Check if we have a stored location or if permission has been explicitly handled
+        const hasStoredLocation = localStorage.getItem('userLocation');
+        const hasHandledPermission = localStorage.getItem('locationPermissionHandled');
+        
+        if (!userLocation && !hasStoredLocation && !hasHandledPermission && !locationPromptShown) {
+          setShowLocationPrompt(true);
+          setLocationPromptShown(true);
+        }
+      };
+
+      checkLocationPermission();
+    }
+  }, [mounted, userLocation, locationPromptShown]);
+
   // Fetch restaurants on component mount
   useEffect(() => {
-    fetchRestaurants();
-  }, []);
+    if (mounted) {
+      fetchRestaurantsData();
+    }
+  }, [mounted]);
 
   // Request location automatically when live map loads
   useEffect(() => {
@@ -71,7 +108,7 @@ export default function LiveMapClient() {
   useEffect(() => {
     // Fetch restaurants when user location changes
     if (userLocation) {
-      fetchRestaurants();
+      fetchRestaurantsData();
     }
   }, [userLocation]);
 
@@ -209,63 +246,42 @@ export default function LiveMapClient() {
     setDisplayedRestaurants(filtered);
   }, [allRestaurants, searchQuery, activeFilters, userLocation]);
 
-  const fetchRestaurants = useCallback(async () => {
+  const fetchRestaurantsData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const apiUrl = '/api/restaurants';
+      console.log('Live map fetching restaurants...');
       
-      if (userLocation) {
-        // If there's a search query, fetch all restaurants to ensure we can find the specific restaurant
-        // Otherwise, fetch restaurants within 50 miles of user location
-        const url = searchQuery.trim() 
-          ? `${apiUrl}?limit=1000`
-          : `${apiUrl}?limit=200&lat=${userLocation.latitude}&lng=${userLocation.longitude}&radius=50`;
+      const data = await fetchRestaurants(1000);
+      console.log('Live map restaurants fetched:', data.restaurants?.length || 0);
+      
+      // Validate the API response structure
+      if (data && data.restaurants && Array.isArray(data.restaurants) && data.restaurants.length > 0) {
+        // Ensure each restaurant has the required properties
+        const validRestaurants = data.restaurants.filter(restaurant => 
+          restaurant && typeof restaurant === 'object' && restaurant.id
+        );
         
-        console.log('Live map fetching from:', url);
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        if (validRestaurants.length !== data.restaurants.length) {
+          console.warn(`Live map filtered out ${data.restaurants.length - validRestaurants.length} invalid restaurants from API response`);
         }
         
-        const data = await response.json();
-        
-        if (data.data && Array.isArray(data.data)) {
-          setAllRestaurants(data.data);
-        } else if (data.restaurants && Array.isArray(data.restaurants)) {
-          // Fallback for old format
-          setAllRestaurants(data.restaurants);
-        } else {
-          throw new Error('Invalid response format');
-        }
+        setAllRestaurants(validRestaurants);
       } else {
-        // If no user location, fetch all restaurants
-        const response = await fetch(`${apiUrl}?limit=1000`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.data && Array.isArray(data.data)) {
-          setAllRestaurants(data.data);
-        } else if (data.restaurants && Array.isArray(data.restaurants)) {
-          // Fallback for old format
-          setAllRestaurants(data.restaurants);
-        } else {
-          throw new Error('Invalid response format');
-        }
+        console.warn('Live map no valid restaurants received from API, using mock data');
+        setAllRestaurants(getMockRestaurants());
+        setError('Using fallback data - API temporarily unavailable');
       }
-    } catch (err) {
-      console.error('Error fetching restaurants:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch restaurants');
+    } catch (error) {
+      console.error('Live map error fetching restaurants:', error);
+      console.log('Live map falling back to mock data');
+      setAllRestaurants(getMockRestaurants());
+      setError('Using fallback data - API temporarily unavailable');
     } finally {
       setLoading(false);
     }
-  }, [userLocation, searchQuery]);
+  }, []);
 
   const getUserLocation = () => {
     if (!navigator.geolocation) {
@@ -509,6 +525,43 @@ export default function LiveMapClient() {
            );
   };
 
+  const handleLocationGranted = (location: { latitude: number; longitude: number }) => {
+    console.log('Location granted:', location);
+    setUserLocation(location);
+    setShowLocationPrompt(false);
+    
+    // Store location and permission state
+    localStorage.setItem('userLocation', JSON.stringify(location));
+    localStorage.setItem('locationPermissionHandled', 'granted');
+  };
+
+  const handleLocationDenied = () => {
+    console.log('Location denied by user');
+    setShowLocationPrompt(false);
+    setLocationError('Location access denied');
+    
+    // Store permission state
+    localStorage.setItem('locationPermissionHandled', 'denied');
+  };
+
+  const handleLocationPromptDismiss = () => {
+    console.log('Location prompt dismissed');
+    setShowLocationPrompt(false);
+    
+    // Store permission state
+    localStorage.setItem('locationPermissionHandled', 'dismissed');
+  };
+
+  const handleLocationReset = () => {
+    console.log('Resetting location permission');
+    localStorage.removeItem('userLocation');
+    localStorage.removeItem('locationPermissionHandled');
+    setUserLocation(null);
+    setLocationError(null);
+    setLocationPromptShown(false);
+    setShowLocationPrompt(true);
+  };
+
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
   };
@@ -542,25 +595,32 @@ export default function LiveMapClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-neutral-50">
       <Header />
       
-      <div className="px-4 py-2 bg-white border-b border-gray-100">
-        <SearchBar 
+      {/* Enhanced Search */}
+      <div className="px-4 sm:px-6 py-4 bg-white border-b border-gray-100">
+        <EnhancedSearch
           onSearch={handleRestaurantSearch}
-          placeholder="Search restaurants..."
+          onResultsUpdate={(results) => {
+            console.log('Enhanced search results:', results.length, 'restaurants');
+            setDisplayedRestaurants(results);
+          }}
+          userLocation={userLocation}
         />
       </div>
 
-      <div className="px-4 py-2 bg-white border-b border-gray-100">
-        <ActionButtons 
+      {/* Action Buttons */}
+      <div className="px-4 sm:px-6 py-3 bg-white border-b border-gray-100">
+        <ActionButtons
           onShowFilters={() => {}}
           onShowMap={() => {}}
-          onAddEatery={() => {}}
+          onAddEatery={() => window.location.href = '/add-eatery'}
           onFilterChange={handleFilterChange}
           onToggleFilter={handleToggleFilter}
           onDistanceChange={handleDistanceChange}
           onClearAll={handleClearAll}
+          onLocationReset={handleLocationReset}
           activeFilters={activeFilters}
           userLocation={userLocation ? { lat: userLocation.latitude, lng: userLocation.longitude } : null}
           locationLoading={locationLoading}
@@ -569,7 +629,8 @@ export default function LiveMapClient() {
         />
       </div>
 
-      <div className="px-4 py-2 bg-white border-b border-gray-100">
+      {/* Navigation Tabs */}
+      <div className="px-4 sm:px-6 py-2 bg-white border-b border-gray-100">
         <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
 
@@ -616,7 +677,20 @@ export default function LiveMapClient() {
         />
       </div>
 
+      {/* Bottom Navigation */}
       <BottomNavigation />
+      
+      {/* API Health Indicator */}
+      <ApiHealthIndicator />
+      
+      {/* Location Permission Prompt */}
+      {showLocationPrompt && (
+        <LocationPermissionPrompt
+          onLocationGranted={handleLocationGranted}
+          onLocationDenied={handleLocationDenied}
+          onDismiss={handleLocationPromptDismiss}
+        />
+      )}
     </div>
   );
 } 
