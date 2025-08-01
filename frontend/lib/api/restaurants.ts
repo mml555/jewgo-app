@@ -51,6 +51,11 @@ export class RestaurantsAPI {
             retryable: response.status >= 500 || response.status === 429
           };
           
+          // For 404 errors, don't retry
+          if (response.status === 404) {
+            throw error;
+          }
+          
           if (error.retryable && attempt < retries) {
             console.warn(`Retryable error, attempting retry ${attempt + 1}/${retries}`);
             await new Promise(resolve => setTimeout(resolve, 1000 * attempt)); // Exponential backoff
@@ -86,15 +91,33 @@ export class RestaurantsAPI {
 
   static async fetchRestaurants(limit: number = 1000): Promise<RestaurantsResponse> {
     try {
-      const data = await this.makeRequest<RestaurantsResponse>(`/api/restaurants?limit=${limit}`);
+      const data = await this.makeRequest<any>(`/api/restaurants?limit=${limit}`);
       
-      if (!data.restaurants) {
-        throw new Error('Invalid response format - missing restaurants array');
+      // Handle different response formats
+      let restaurants: Restaurant[] = [];
+      let total: number = 0;
+      
+      if (data && typeof data === 'object') {
+        // Check if data has restaurants array
+        if (Array.isArray(data.restaurants)) {
+          restaurants = data.restaurants;
+          total = data.total || restaurants.length;
+        } else if (Array.isArray(data)) {
+          // Direct array response
+          restaurants = data;
+          total = data.length;
+        } else {
+          console.error('Invalid response format - missing restaurants array:', data);
+          throw new Error('Invalid response format - missing restaurants array');
+        }
+      } else {
+        console.error('Invalid response format - not an object:', data);
+        throw new Error('Invalid response format - not an object');
       }
       
       return {
-        restaurants: data.restaurants,
-        total: data.total || data.restaurants.length
+        restaurants,
+        total
       };
     } catch (error) {
       console.error('Failed to fetch restaurants from API:', error);
@@ -127,8 +150,27 @@ export class RestaurantsAPI {
   static async getRestaurant(id: number): Promise<Restaurant | null> {
     try {
       const data = await this.makeRequest<Restaurant>(`/api/restaurants/${id}`);
+      
+      // Validate the response structure
+      if (!data || typeof data !== 'object') {
+        console.error(`Invalid response format for restaurant ${id}:`, data);
+        return null;
+      }
+      
+      // Check if it's a valid restaurant object
+      if (!data.id || !data.name) {
+        console.error(`Invalid restaurant data for ID ${id}:`, data);
+        return null;
+      }
+      
       return data;
-    } catch (error) {
+    } catch (error: any) {
+      // Handle 404 errors gracefully
+      if (error.status === 404) {
+        console.warn(`Restaurant ${id} not found`);
+        return null;
+      }
+      
       console.error(`Failed to fetch restaurant ${id}:`, error);
       return null;
     }

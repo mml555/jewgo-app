@@ -35,23 +35,37 @@ const RestaurantDetailPage: React.FC = () => {
             'Content-Type': 'application/json',
           },
         });
-        if (!response.ok) {
-          throw new Error('Restaurant not found');
+        
+        if (response.status === 404) {
+          setError('Restaurant not found');
+          setLoading(false);
+          return;
         }
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
+        
+        // Validate the response data
+        if (!data || typeof data !== 'object') {
+          throw new Error('Invalid response format');
+        }
         
         // Handle both response formats: direct restaurant object or wrapped in success/restaurant
         if (data.success && data.restaurant) {
           setRestaurant(data.restaurant);
         } else if (data.restaurant) {
           setRestaurant(data.restaurant);
-        } else if (data.id) {
+        } else if (data.id && data.name) {
           // Direct restaurant object format (current backend response)
           setRestaurant(data);
         } else {
-          throw new Error('Invalid response format');
+          throw new Error('Invalid response format - missing restaurant data');
         }
       } catch (err) {
+        console.error('Error fetching restaurant:', err);
         setError(err instanceof Error ? err.message : 'Failed to load restaurant');
       } finally {
         setLoading(false);

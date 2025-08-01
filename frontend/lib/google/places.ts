@@ -107,14 +107,28 @@ export class ModernGooglePlacesAPI {
     console.log('Initializing Google Places API...');
 
     this.initPromise = new Promise((resolve, reject) => {
+      let checkCount = 0;
+      const maxChecks = 300; // 30 seconds with 100ms intervals
+      
       const checkGoogleMaps = () => {
+        checkCount++;
+        
         if (window.google && window.google.maps && window.google.maps.places) {
           this.isInitialized = true;
           console.log('Google Places API initialized successfully');
           resolve();
-        } else {
-          setTimeout(checkGoogleMaps, 100);
+          return;
         }
+        
+        if (checkCount >= maxChecks) {
+          const error = 'Google Maps failed to load within 30 seconds. Please check your internet connection and try again.';
+          console.error(error);
+          reject(new Error(error));
+          return;
+        }
+        
+        // Continue checking
+        setTimeout(checkGoogleMaps, 100);
       };
 
       // Check if API key is available
@@ -126,15 +140,18 @@ export class ModernGooglePlacesAPI {
         return;
       }
 
-      // Timeout after 30 seconds
-      const timeout = setTimeout(() => {
-        const error = 'Google Maps failed to load within 30 seconds. Please check your internet connection and try again.';
-        console.error(error);
-        reject(new Error(error));
-      }, 30000);
-
+      // Start checking for Google Maps availability
       checkGoogleMaps();
     });
+
+    try {
+      await this.initPromise;
+    } catch (error) {
+      // Reset initialization state on error so it can be retried
+      this.isInitialized = false;
+      this.initPromise = null;
+      throw error;
+    }
 
     return this.initPromise;
   }
