@@ -14,7 +14,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # CORS Configuration
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,https://jewgo-app.vercel.app,https://jewgo-j953cxrfi-mml555s-projects.vercel.app,https://jewgo-app-git-main-mml555s-projects.vercel.app').split(',')
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*').split(',') if os.environ.get('CORS_ORIGINS') else ['*']
     CORS_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
     CORS_ALLOW_HEADERS = ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
     
@@ -42,7 +42,7 @@ class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'postgresql://username:password@localhost:5432/jewgo_db'
-    CORS_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://jewgo-app.vercel.app', 'https://jewgo-j953cxrfi-mml555s-projects.vercel.app']
+    CORS_ORIGINS = ['*']
 
 class ProductionConfig(Config):
     """Production configuration."""
@@ -51,7 +51,7 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     
     # Production CORS origins
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://jewgo.com,https://jewgo-app.vercel.app,https://jewgo-j953cxrfi-mml555s-projects.vercel.app,https://jewgo-app-git-main-mml555s-projects.vercel.app').split(',')
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*').split(',') if os.environ.get('CORS_ORIGINS') else ['*']
     
     # Enhanced security for production
     SESSION_COOKIE_SECURE = True
