@@ -41,20 +41,13 @@ export default function InteractiveRestaurantMap({
   const [apiLoaded, setApiLoaded] = useState(false);
 
   // Filter restaurants with valid coordinates and addresses
-  const restaurantsWithCoords = safeFilter(restaurants, restaurant => {
+  const restaurantsWithCoords = safeFilter(restaurants, (restaurant: any) => {
     // Check if restaurant has valid coordinates
     if (!restaurant.latitude || !restaurant.longitude) return false;
     
     const lat = parseFloat(restaurant.latitude.toString());
     const lng = parseFloat(restaurant.longitude.toString());
-    
-    if (isNaN(lat) || isNaN(lng)) return false;
-    if (lat === 0 && lng === 0) return false;
-    
-    // Only check for valid coordinate ranges (latitude: -90 to 90, longitude: -180 to 180)
-    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return false;
-    
-    return true;
+    return !isNaN(lat) && !isNaN(lng);
   });
 
   // Debug logging

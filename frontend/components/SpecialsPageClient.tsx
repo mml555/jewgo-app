@@ -66,21 +66,18 @@ export default function SpecialsPageClient() {
   // Memoized categories and filtered specials
   const categories = useMemo(() => [
     { id: 'all', name: 'All Specials', count: specials.length },
-    { id: 'shabbat', name: 'Shabbat', count: safeFilter(specials, s => s.category === 'shabbat').length },
-    { id: 'lunch', name: 'Lunch', count: safeFilter(specials, s => s.category === 'lunch').length },
-    { id: 'dinner', name: 'Dinner', count: safeFilter(specials, s => s.category === 'dinner').length },
-    { id: 'breakfast', name: 'Breakfast', count: safeFilter(specials, s => s.category === 'breakfast').length },
-    { id: 'dessert', name: 'Dessert', count: safeFilter(specials, s => s.category === 'dessert').length },
-    { id: 'catering', name: 'Catering', count: safeFilter(specials, s => s.category === 'catering').length },
-    { id: 'promotion', name: 'Promotions', count: safeFilter(specials, s => s.category === 'promotion').length },
-    { id: 'discount', name: 'Discounts', count: safeFilter(specials, s => s.category === 'discount').length },
-    { id: 'event', name: 'Events', count: safeFilter(specials, s => s.category === 'event').length }
+    { id: 'shabbat', name: 'Shabbat', count: safeFilter(specials, (s: any) => s.category === 'shabbat').length },
+    { id: 'lunch', name: 'Lunch', count: safeFilter(specials, (s: any) => s.category === 'lunch').length },
+    { id: 'dinner', name: 'Dinner', count: safeFilter(specials, (s: any) => s.category === 'dinner').length },
+    { id: 'breakfast', name: 'Breakfast', count: safeFilter(specials, (s: any) => s.category === 'breakfast').length },
+    { id: 'holiday', name: 'Holiday', count: safeFilter(specials, (s: any) => s.category === 'holiday').length },
+    { id: 'weekly', name: 'Weekly', count: safeFilter(specials, (s: any) => s.category === 'weekly').length }
   ], [specials]);
 
   const filteredSpecials = useMemo(() => {
     try {
       // First filter by category
-      let filtered = safeFilter(specials, special => 
+      let filtered = safeFilter(specials, (special: any) => 
         categoryTab === 'all' || special.category === categoryTab
       );
       

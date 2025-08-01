@@ -60,11 +60,13 @@ export function safeGet<T>(obj: any, path: string, defaultValue: T): T {
 }
 
 /**
- * Safely filters an array
+ * Safely filters an array with comprehensive error handling
+ * This function handles all edge cases where the input might not be an array
  */
-export function safeFilter<T>(array: T[] | null | undefined, predicate: (item: T) => boolean): T[] {
-  if (!Array.isArray(array)) {
-    console.warn('safeFilter: Input is not an array:', typeof array);
+export function safeFilter<T>(array: T[] | null | undefined | any, predicate: (item: T) => boolean): T[] {
+  // Handle null, undefined, or non-array inputs
+  if (!array || !Array.isArray(array)) {
+    console.warn('safeFilter: Input is not an array:', typeof array, array);
     return [];
   }
   
@@ -77,11 +79,12 @@ export function safeFilter<T>(array: T[] | null | undefined, predicate: (item: T
 }
 
 /**
- * Safely maps an array
+ * Safely maps an array with comprehensive error handling
  */
-export function safeMap<T, U>(array: T[] | null | undefined, mapper: (item: T) => U): U[] {
-  if (!Array.isArray(array)) {
-    console.warn('safeMap: Input is not an array:', typeof array);
+export function safeMap<T, U>(array: T[] | null | undefined | any, mapper: (item: T) => U): U[] {
+  // Handle null, undefined, or non-array inputs
+  if (!array || !Array.isArray(array)) {
+    console.warn('safeMap: Input is not an array:', typeof array, array);
     return [];
   }
   
@@ -90,6 +93,83 @@ export function safeMap<T, U>(array: T[] | null | undefined, mapper: (item: T) =
   } catch (error) {
     console.error('safeMap error:', error);
     return [];
+  }
+}
+
+/**
+ * Safely reduces an array with comprehensive error handling
+ */
+export function safeReduce<T, U>(
+  array: T[] | null | undefined | any, 
+  reducer: (accumulator: U, item: T, index: number) => U, 
+  initialValue: U
+): U {
+  // Handle null, undefined, or non-array inputs
+  if (!array || !Array.isArray(array)) {
+    console.warn('safeReduce: Input is not an array:', typeof array, array);
+    return initialValue;
+  }
+  
+  try {
+    return array.reduce(reducer, initialValue);
+  } catch (error) {
+    console.error('safeReduce error:', error);
+    return initialValue;
+  }
+}
+
+/**
+ * Safely gets the length of an array
+ */
+export function safeLength(array: any[] | null | undefined | any): number {
+  if (!array || !Array.isArray(array)) {
+    return 0;
+  }
+  return array.length;
+}
+
+/**
+ * Safely checks if an array includes a value
+ */
+export function safeIncludes<T>(array: T[] | null | undefined | any, value: T): boolean {
+  if (!array || !Array.isArray(array)) {
+    return false;
+  }
+  try {
+    return array.includes(value);
+  } catch (error) {
+    console.error('safeIncludes error:', error);
+    return false;
+  }
+}
+
+/**
+ * Safely finds an item in an array
+ */
+export function safeFind<T>(array: T[] | null | undefined | any, predicate: (item: T) => boolean): T | undefined {
+  if (!array || !Array.isArray(array)) {
+    return undefined;
+  }
+  try {
+    return array.find(predicate);
+  } catch (error) {
+    console.error('safeFind error:', error);
+    return undefined;
+  }
+}
+
+/**
+ * Safely finds the index of an item in an array
+ */
+export function safeFindIndex<T>(array: T[] | null | undefined | any, predicate: (item: T) => boolean): number {
+  if (!array || !Array.isArray(array)) {
+    return -1;
+  }
+  try {
+    return array.findIndex(predicate);
+  } catch (error) {
+    console.error('safeFindIndex error:', error);
+    return -1;
   }
 }
 

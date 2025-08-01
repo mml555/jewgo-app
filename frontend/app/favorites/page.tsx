@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import NavTabs from '@/components/NavTabs';
+import RestaurantCard from '@/components/RestaurantCard';
 import SearchBar from '@/components/SearchBar';
 import { getFavorites, removeFromFavorites, FavoriteRestaurant } from '@/utils/favorites';
+import { safeFilter } from '@/utils/validation';
 import { formatDistance } from '@/utils/distance';
 
 export default function FavoritesPage() {
@@ -52,7 +54,7 @@ export default function FavoritesPage() {
     // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(favorite => 
+      filtered = safeFilter(filtered, favorite => 
         favorite.name.toLowerCase().includes(query) ||
         favorite.address?.toLowerCase().includes(query) ||
         favorite.short_description?.toLowerCase().includes(query) ||
@@ -63,21 +65,21 @@ export default function FavoritesPage() {
 
     // Apply agency filter
     if (activeFilters.agency && activeFilters.agency !== 'all') {
-      filtered = filtered.filter(favorite => 
+      filtered = safeFilter(filtered, favorite => 
         favorite.certifying_agency?.toLowerCase() === activeFilters.agency?.toLowerCase()
       );
     }
 
     // Apply dietary filter
     if (activeFilters.dietary && activeFilters.dietary !== 'all') {
-      filtered = filtered.filter(favorite => 
+      filtered = safeFilter(filtered, favorite => 
         favorite.kosher_category?.toLowerCase() === activeFilters.dietary?.toLowerCase()
       );
     }
 
     // Apply category filter
     if (activeFilters.category && activeFilters.category !== 'all') {
-      filtered = filtered.filter(favorite => 
+      filtered = safeFilter(filtered, favorite => 
         favorite.listing_type?.toLowerCase() === activeFilters.category?.toLowerCase()
       );
     }
@@ -121,8 +123,10 @@ export default function FavoritesPage() {
     setActiveTab(tab);
   };
 
-  const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query);
+  const handleSearch = useMemo(() => {
+    return (query: string) => {
+      setSearchQuery(query);
+    };
   }, []);
 
   // ✅ Phase 1: Implement handler function
@@ -290,16 +294,12 @@ export default function FavoritesPage() {
                   <div className="text-2xl font-bold text-jewgo-primary">{favorites.length}</div>
                   <div className="text-sm text-gray-600">Total Favorites</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-jewgo-primary">
-                    {favorites.filter(f => f.certifying_agency === 'ORB').length}
-                  </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-jewgo-primary">{safeFilter(favorites, (f: FavoriteRestaurant) => f.certifying_agency === 'ORB').length}</div>
                   <div className="text-sm text-gray-600">ORB Certified</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-jewgo-primary">
-                    {favorites.filter(f => f.kosher_category === 'meat').length}
-                  </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-jewgo-primary">{safeFilter(favorites, (f: FavoriteRestaurant) => f.kosher_category === 'meat').length}</div>
                   <div className="text-sm text-gray-600">Meat Restaurants</div>
                 </div>
               </div>

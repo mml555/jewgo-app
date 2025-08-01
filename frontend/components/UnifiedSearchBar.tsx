@@ -45,7 +45,7 @@ export default function UnifiedSearchBar({
     
     // Generate suggestions based on input
     if (value.trim().length > 2) {
-      const filteredSuggestions = safeFilter(restaurants, restaurant => 
+      const filteredSuggestions = safeFilter(restaurants, (restaurant: any) => 
         (restaurant.name?.toLowerCase().includes(value.toLowerCase()) || false) ||
         (restaurant.address?.toLowerCase().includes(value.toLowerCase()) || false) ||
         (restaurant.city?.toLowerCase().includes(value.toLowerCase()) || false)

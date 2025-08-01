@@ -21,23 +21,13 @@ export default function SimpleMapEmbed({ restaurants, maxRestaurants = 50 }: Sim
   const [apiLoaded, setApiLoaded] = useState(false);
 
   // Filter restaurants with coordinates
-  const restaurantsWithCoords = safeFilter(restaurants, restaurant => {
+  const restaurantsWithCoords = safeFilter(restaurants, (restaurant: any) => {
     // Check if coordinates exist and are valid numbers
     if (!restaurant.latitude || !restaurant.longitude) return false;
     
     const lat = parseFloat(restaurant.latitude.toString());
     const lng = parseFloat(restaurant.longitude.toString());
-    
-    if (isNaN(lat) || isNaN(lng)) return false;
-    
-    // Check if coordinates are not zero (invalid coordinates)
-    if (lat === 0 && lng === 0) return false;
-    
-    // Check if coordinates are within reasonable bounds for Miami area
-    // Miami area roughly: lat 25.5-26.5, lng -80.5 to -80.0
-    if (lat < 24 || lat > 27 || lng < -81 || lng > -79) return false;
-    
-    return true;
+    return !isNaN(lat) && !isNaN(lng);
   }).map(restaurant => ({
     ...restaurant,
     latitude: parseFloat(restaurant.latitude!.toString()),

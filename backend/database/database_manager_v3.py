@@ -426,14 +426,14 @@ class EnhancedDatabaseManager:
             'kosher_category': restaurant.kosher_category,
             'listing_type': restaurant.listing_type,
             'hours_of_operation': restaurant.hours_of_operation,
-            'hours_json': restaurant.hours_json,
+            'hours_json': self._parse_hours_json_field(restaurant.hours_json),
             'hours_last_updated': restaurant.hours_last_updated.isoformat() if restaurant.hours_last_updated else None,
             'short_description': restaurant.short_description,
             'price_range': restaurant.price_range,
             'image_url': restaurant.image_url,
             'latitude': restaurant.latitude,
             'longitude': restaurant.longitude,
-            'specials': restaurant.specials or [],
+            'specials': self._parse_specials_field(restaurant.specials),
             'is_cholov_yisroel': restaurant.is_cholov_yisroel,
             'is_pas_yisroel': restaurant.is_pas_yisroel,
             'certifying_agency': restaurant.certifying_agency,
@@ -471,6 +471,68 @@ class EnhancedDatabaseManager:
             })
         
         return restaurant_data
+    
+    def _parse_specials_field(self, specials_data) -> List[Dict[str, Any]]:
+        """Parse the specials field from JSON string to list of dictionaries."""
+        if not specials_data:
+            return []
+        
+        try:
+            # If it's already a list, return it
+            if isinstance(specials_data, list):
+                return specials_data
+            
+            # If it's a string, try to parse it as JSON
+            if isinstance(specials_data, str):
+                import json
+                parsed = json.loads(specials_data)
+                if isinstance(parsed, list):
+                    return parsed
+                else:
+                    logger.warning(f"Specials data is not a list: {type(parsed)}")
+                    return []
+            
+            # If it's any other type, log and return empty list
+            logger.warning(f"Unexpected specials data type: {type(specials_data)}")
+            return []
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse specials JSON: {e}")
+            return []
+        except Exception as e:
+            logger.error(f"Error parsing specials field: {e}")
+            return []
+    
+    def _parse_hours_json_field(self, hours_json_data) -> Dict[str, Any]:
+        """Parse the hours_json field from JSON string to dictionary."""
+        if not hours_json_data:
+            return {}
+        
+        try:
+            # If it's already a dict, return it
+            if isinstance(hours_json_data, dict):
+                return hours_json_data
+            
+            # If it's a string, try to parse it as JSON
+            if isinstance(hours_json_data, str):
+                import json
+                parsed = json.loads(hours_json_data)
+                if isinstance(parsed, dict):
+                    return parsed
+                else:
+                    logger.warning(f"Hours JSON data is not a dict: {type(parsed)}")
+                    return {}
+            
+            # If it's any other type, log and return empty dict
+            logger.warning(f"Unexpected hours JSON data type: {type(hours_json_data)}")
+            return {}
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse hours JSON: {e}")
+            return {}
+        except Exception as e:
+            logger.error(f"Error parsing hours JSON field: {e}")
+            return {}
     
     def get_restaurant_by_name(self, name: str) -> Optional[Dict[str, Any]]:
         """Get restaurant by name."""

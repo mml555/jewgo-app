@@ -10,6 +10,7 @@ import PasswordChangeModal from '@/components/ui/PasswordChangeModal';
 import { showToast } from '@/components/ui/Toast';
 import { mockExportUserData, mockDeleteAccount } from '@/lib/api/mock';
 import { getFavorites } from '@/utils/favorites';
+import { safeFilter } from '@/utils/validation';
 
 export default function ProfilePage() {
   const [activeFilters, setActiveFilters] = useState<{
@@ -269,7 +270,7 @@ export default function ProfilePage() {
                           if (e.target.checked) {
                             updateProfile('dietaryPreferences', [...userProfile.dietaryPreferences, preference]);
                           } else {
-                            updateProfile('dietaryPreferences', userProfile.dietaryPreferences.filter(p => p !== preference));
+                            updateProfile('dietaryPreferences', safeFilter(userProfile.dietaryPreferences, p => p !== preference));
                           }
                         }}
                         className="w-4 h-4 text-jewgo-primary border-gray-300 rounded focus:ring-jewgo-primary"
@@ -291,7 +292,7 @@ export default function ProfilePage() {
                           if (e.target.checked) {
                             updateProfile('favoriteCertifications', [...userProfile.favoriteCertifications, certification]);
                           } else {
-                            updateProfile('favoriteCertifications', userProfile.favoriteCertifications.filter(c => c !== certification));
+                            updateProfile('favoriteCertifications', safeFilter(userProfile.favoriteCertifications, c => c !== certification));
                           }
                         }}
                         className="w-4 h-4 text-jewgo-primary border-gray-300 rounded focus:ring-jewgo-primary"

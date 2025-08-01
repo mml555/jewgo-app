@@ -193,7 +193,7 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
     { label: 'Boca Raton', value: 'Boca', icon: '🌴', color: 'bg-accent-green' }
   ];
 
-  const filteredSuggestions = safeFilter(searchSuggestions, suggestion =>
+  const filteredSuggestions = safeFilter(searchSuggestions, (suggestion: any) =>
     suggestion.label.toLowerCase().includes(query.toLowerCase()) ||
     suggestion.value.toLowerCase().includes(query.toLowerCase())
   );

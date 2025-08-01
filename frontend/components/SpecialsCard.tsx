@@ -11,7 +11,7 @@ interface SpecialsCardProps {
 
 export default function SpecialsCard({ specials, maxDisplay = 3 }: SpecialsCardProps) {
   // Only show paid specials
-  const paidSpecials = safeFilter(specials, special => special.is_paid && special.is_active);
+  const paidSpecials = safeFilter(specials, (special: any) => special.is_paid && special.is_active);
   
   if (paidSpecials.length === 0) {
     return null;

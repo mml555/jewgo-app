@@ -104,7 +104,7 @@ export default function HomePageClient() {
   const filteredRestaurants = useMemo(() => {
     try {
       // Use safeFilter to ensure allRestaurants is an array and filter valid restaurants
-      const validRestaurants = safeFilter(allRestaurants, restaurant => 
+      const validRestaurants = safeFilter(allRestaurants, (restaurant: any) => 
         Boolean(restaurant && typeof restaurant === 'object' && restaurant.id)
       );
       

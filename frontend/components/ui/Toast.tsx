@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { safeFilter } from '@/utils/validation';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -114,9 +115,9 @@ export function ToastContainer() {
     setMounted(true);
   }, []);
 
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  };
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => safeFilter(prev, toast => toast.id !== id));
+  }, []);
 
   const showToast = (message: string, type: ToastType = 'info', duration?: number) => {
     const id = Math.random().toString(36).substr(2, 9);

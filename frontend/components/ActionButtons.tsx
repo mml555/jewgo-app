@@ -203,7 +203,7 @@ export default function ActionButtons({
       case 'categories':
         return activeFilters?.category && activeFilters.category !== 'all' ? 1 : 0;
       case 'kosherFeatures':
-        return safeFilter(Object.values(activeFilters || {}), value => 
+        return Object.values(activeFilters || {}).filter(value => 
           typeof value === 'boolean' && value === true && 
           ['is_cholov_yisroel', 'is_pas_yisroel', 'is_glatt', 'is_mehadrin', 'is_bishul_yisroel'].includes(Object.keys(activeFilters || {}).find(key => activeFilters[key] === value) || '')
         ).length;
@@ -229,7 +229,7 @@ export default function ActionButtons({
   };
 
   const handleFeatureToggle = (feature: string) => {
-    const currentFeatures = activeFilters?.features || [];
+    const currentFeatures = Array.isArray(activeFilters?.features) ? activeFilters.features : [];
     const newFeatures = currentFeatures.includes(feature)
       ? safeFilter(currentFeatures, (f: string) => f !== feature)
       : [...currentFeatures, feature];

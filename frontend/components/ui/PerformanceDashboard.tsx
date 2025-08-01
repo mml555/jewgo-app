@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { performanceMonitor, PerformanceMetrics } from '@/lib/analytics/performance';
+import { safeFilter } from '@/utils/validation';
 
 interface PerformanceDashboardProps {
   className?: string;
@@ -159,16 +160,12 @@ export default function PerformanceDashboard({ className = '', showDetails = fal
           <div className="text-sm text-gray-600">Errors</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
-            {events.filter(e => e.category === 'navigation').length}
-          </div>
-          <div className="text-sm text-gray-600">Page Loads</div>
+          <div className="text-2xl font-bold text-blue-600">{safeFilter(events, (e: any) => e.category === 'navigation').length}</div>
+          <div className="text-sm text-gray-600">Navigation Events</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
-            {events.filter(e => e.category === 'component').length}
-          </div>
-          <div className="text-sm text-gray-600">Components</div>
+          <div className="text-2xl font-bold text-green-600">{safeFilter(events, (e: any) => e.category === 'component').length}</div>
+          <div className="text-sm text-gray-600">Component Events</div>
         </div>
       </div>
 

@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
+import { Restaurant } from '@/types/restaurant';
+import { safeFilter } from '@/utils/validation';
+import { showToast } from '@/components/ui/Toast';
 
 interface PendingRestaurant {
   id: number;
@@ -52,55 +55,14 @@ export default function AdminRestaurantsPage() {
     }
   };
 
-  const handleApprove = async (restaurantId: number) => {
-    try {
-      const response = await fetch(`/api/restaurants/${restaurantId}/approve`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: 'approved' }),
-      });
-
-      if (response.ok) {
-        // Remove from pending list
-        setPendingRestaurants(prev => prev.filter(r => r.id !== restaurantId));
-        setShowModal(false);
-        setSelectedRestaurant(null);
-      } else {
-        alert('Failed to approve restaurant');
-      }
-    } catch (error) {
-      console.error('Error approving restaurant:', error);
-      alert('Failed to approve restaurant');
-    }
+  const approveRestaurant = (restaurantId: number) => {
+    setPendingRestaurants(prev => safeFilter(prev, r => r.id !== restaurantId));
+    showToast('Restaurant approved successfully!', 'success');
   };
 
-  const handleReject = async (restaurantId: number, reason: string) => {
-    try {
-      const response = await fetch(`/api/restaurants/${restaurantId}/reject`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          status: 'rejected',
-          rejection_reason: reason 
-        }),
-      });
-
-      if (response.ok) {
-        // Remove from pending list
-        setPendingRestaurants(prev => prev.filter(r => r.id !== restaurantId));
-        setShowModal(false);
-        setSelectedRestaurant(null);
-      } else {
-        alert('Failed to reject restaurant');
-      }
-    } catch (error) {
-      console.error('Error rejecting restaurant:', error);
-      alert('Failed to reject restaurant');
-    }
+  const rejectRestaurant = (restaurantId: number) => {
+    setPendingRestaurants(prev => safeFilter(prev, r => r.id !== restaurantId));
+    showToast('Restaurant rejected', 'info');
   };
 
   const openRestaurantDetails = (restaurant: PendingRestaurant) => {
@@ -154,16 +116,16 @@ export default function AdminRestaurantsPage() {
               <div className="text-sm text-gray-600">Pending Review</div>
             </div>
             <div className="bg-white rounded-lg shadow p-4">
-              <div className="text-2xl font-bold text-green-600">
-                {pendingRestaurants.filter(r => r.user_type === 'owner').length}
+              <div className="text-center">
+                <div className="text-2xl font-bold text-jewgo-primary">{safeFilter(pendingRestaurants, (r: PendingRestaurant) => r.user_type === 'owner').length}</div>
+                <div className="text-sm text-gray-600">Owner Submissions</div>
               </div>
-              <div className="text-sm text-gray-600">Owner Submissions</div>
             </div>
             <div className="bg-white rounded-lg shadow p-4">
-              <div className="text-2xl font-bold text-purple-600">
-                {pendingRestaurants.filter(r => r.user_type === 'community').length}
+              <div className="text-center">
+                <div className="text-2xl font-bold text-jewgo-primary">{safeFilter(pendingRestaurants, (r: PendingRestaurant) => r.user_type === 'community').length}</div>
+                <div className="text-sm text-gray-600">Community Submissions</div>
               </div>
-              <div className="text-sm text-gray-600">Community Submissions</div>
             </div>
           </div>
 
@@ -289,13 +251,13 @@ export default function AdminRestaurantsPage() {
 
                 <div className="flex space-x-3 pt-4">
                   <button
-                    onClick={() => handleApprove(selectedRestaurant.id)}
+                    onClick={() => approveRestaurant(selectedRestaurant.id)}
                     className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
                   >
                     Approve
                   </button>
                   <button
-                    onClick={() => handleReject(selectedRestaurant.id, 'Rejected by admin')}
+                    onClick={() => rejectRestaurant(selectedRestaurant.id)}
                     className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
                   >
                     Reject

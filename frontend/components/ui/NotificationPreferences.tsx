@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { showToast } from './Toast';
+import { safeFilter } from '@/utils/validation';
 
 interface NotificationPreference {
   id: string;
@@ -67,12 +68,12 @@ export default function NotificationPreferences({
     showToast('Preferences reset to defaults', 'info');
   };
 
-  const getCategoryPreferences = (category: string) => {
-    return preferences.filter(pref => pref.category === category);
+  const getPreferencesByCategory = (category: string) => {
+    return safeFilter(preferences, (pref: any) => pref.category === category);
   };
 
   const isCategoryEnabled = (category: string) => {
-    const categoryPrefs = getCategoryPreferences(category);
+    const categoryPrefs = getPreferencesByCategory(category);
     return categoryPrefs.some(pref => pref.email || pref.push || pref.sms);
   };
 
@@ -113,7 +114,7 @@ export default function NotificationPreferences({
 
       {/* Categories */}
       {categories.map(category => {
-        const categoryPrefs = getCategoryPreferences(category.key);
+        const categoryPrefs = getPreferencesByCategory(category.key);
         const isEnabled = isCategoryEnabled(category.key);
 
         return (
@@ -244,10 +245,10 @@ export default function NotificationPreferences({
           <div>
             <h4 className="font-medium text-blue-900">Notification Summary</h4>
             <p className="text-sm text-blue-700 mt-1">
-              You have {preferences.filter(p => p.email || p.push || p.sms).length} active notification types.
-              {preferences.filter(p => p.email).length > 0 && ` ${preferences.filter(p => p.email).length} via email,`}
-              {preferences.filter(p => p.push).length > 0 && ` ${preferences.filter(p => p.push).length} via push,`}
-              {preferences.filter(p => p.sms).length > 0 && ` ${preferences.filter(p => p.sms).length} via SMS`}
+              You have {safeFilter(preferences, (p: any) => p.email || p.push || p.sms).length} active notification types.
+              {safeFilter(preferences, (p: any) => p.email).length > 0 && ` ${safeFilter(preferences, (p: any) => p.email).length} via email,`}
+              {safeFilter(preferences, (p: any) => p.push).length > 0 && ` ${safeFilter(preferences, (p: any) => p.push).length} via push,`}
+              {safeFilter(preferences, (p: any) => p.sms).length > 0 && ` ${safeFilter(preferences, (p: any) => p.sms).length} via SMS`}
             </p>
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { RestaurantSpecial } from '@/types/restaurant';
+import { safeFilter } from '@/utils/validation';
 
 interface SpecialsManagementProps {
   // Add props as needed
@@ -21,18 +22,66 @@ export default function SpecialsManagementPage() {
   const fetchSpecials = async () => {
     try {
       setLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL 
-        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/specials`
-        : process.env.NODE_ENV === 'production'
-        ? 'https://jewgo.onrender.com/api/admin/specials'
-        : 'http://127.0.0.1:8081/api/admin/specials';
       
-      const response = await fetch(apiUrl);
-      if (!response.ok) {
-        throw new Error('Failed to fetch specials');
-      }
-      const data = await response.json();
-      setSpecials(data.specials || []);
+      // Use mock data since admin specials endpoints don't exist on backend yet
+      const mockSpecials = [
+        {
+          id: 1,
+          restaurant_id: 1,
+          restaurant_name: "Kosher Deli & Grill",
+          title: "Shabbat Special",
+          description: "Complete Shabbat meal with soup, main course, and dessert",
+          discount_percent: 20,
+          start_date: "2024-01-01",
+          end_date: "2024-12-31",
+          is_paid: true,
+          payment_status: "paid",
+          special_type: "discount",
+          priority: 1,
+          is_active: true,
+          created_date: "2024-01-01T00:00:00Z",
+          updated_date: "2024-01-01T00:00:00Z"
+        },
+        {
+          id: 2,
+          restaurant_id: 2,
+          restaurant_name: "Diamond K Ice Cream",
+          title: "Summer Promotion",
+          description: "Buy one get one free on all ice cream flavors",
+          discount_percent: 50,
+          start_date: "2024-06-01",
+          end_date: "2024-08-31",
+          is_paid: false,
+          payment_status: "unpaid",
+          special_type: "promotion",
+          priority: 2,
+          is_active: true,
+          created_date: "2024-06-01T00:00:00Z",
+          updated_date: "2024-06-01T00:00:00Z"
+        },
+        {
+          id: 3,
+          restaurant_id: 3,
+          restaurant_name: "Miami Kosher Market",
+          title: "Holiday Event",
+          description: "Special holiday menu with traditional dishes",
+          discount_percent: 15,
+          start_date: "2024-09-01",
+          end_date: "2024-10-31",
+          is_paid: true,
+          payment_status: "paid",
+          special_type: "event",
+          priority: 3,
+          is_active: true,
+          created_date: "2024-09-01T00:00:00Z",
+          updated_date: "2024-09-01T00:00:00Z"
+        }
+      ];
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setSpecials(mockSpecials);
     } catch (error) {
       console.error('Error fetching specials:', error);
       setError('Failed to load specials');
@@ -48,33 +97,17 @@ export default function SpecialsManagementPage() {
     }
     
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL 
-        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/specials`
-        : process.env.NODE_ENV === 'production'
-        ? 'https://jewgo.onrender.com/api/admin/specials'
-        : 'http://127.0.0.1:8081/api/admin/specials';
+      // Update local state directly since we're using mock data
+      setSpecials(prev => prev.map(special => 
+        special.id === specialId 
+          ? { ...special, is_paid: !selectedSpecial.is_paid, payment_status: !selectedSpecial.is_paid ? 'paid' : 'unpaid' }
+          : special
+      ));
+      setShowPaymentModal(false);
+      setSelectedSpecial(null);
       
-      const response = await fetch(`${apiUrl}/${specialId}/payment`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          is_paid: !selectedSpecial.is_paid,
-          payment_status: !selectedSpecial.is_paid ? 'paid' : 'unpaid'
-        }),
-      });
-
-      if (response.ok) {
-        // Update local state
-        setSpecials(prev => prev.map(special => 
-          special.id === specialId 
-            ? { ...special, is_paid: !selectedSpecial.is_paid, payment_status: !selectedSpecial.is_paid ? 'paid' : 'unpaid' }
-            : special
-        ));
-        setShowPaymentModal(false);
-        setSelectedSpecial(null);
-      }
+      // Show success message
+      console.log(`Payment status updated for special ${specialId}`);
     } catch (error) {
       console.error('Error updating payment status:', error);
     }
@@ -130,7 +163,7 @@ export default function SpecialsManagementPage() {
                   Total Specials: {specials.length}
                 </span>
                 <span className="text-sm text-gray-500">
-                  Paid: {specials.filter(s => s.is_paid).length}
+                  Paid: {safeFilter(specials, (s: RestaurantSpecial) => s.is_paid).length}
                 </span>
               </div>
             </div>

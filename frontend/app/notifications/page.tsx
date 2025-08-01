@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
+import { safeFilter } from '@/utils/validation';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([
@@ -79,14 +80,14 @@ export default function NotificationsPage() {
   };
 
   const deleteNotification = (id: number) => {
-    setNotifications(prev => prev.filter(notification => notification.id !== id));
+    setNotifications(prev => safeFilter(prev, (notification: any) => notification.id !== id));
   };
 
   const filteredNotifications = activeFilter === 'all' 
     ? notifications 
-    : notifications.filter(notification => notification.type === activeFilter);
+    : safeFilter(notifications, (notification: any) => notification.type === activeFilter);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = safeFilter(notifications, (n: any) => !n.read).length;
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -144,10 +145,10 @@ export default function NotificationsPage() {
             <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
               {[
                 { id: 'all', name: 'All', count: notifications.length },
-                { id: 'special', name: 'Specials', count: notifications.filter(n => n.type === 'special').length },
-                { id: 'restaurant', name: 'Restaurants', count: notifications.filter(n => n.type === 'restaurant').length },
-                { id: 'update', name: 'Updates', count: notifications.filter(n => n.type === 'update').length },
-                { id: 'reminder', name: 'Reminders', count: notifications.filter(n => n.type === 'reminder').length }
+                { id: 'special', name: 'Specials', count: safeFilter(notifications, (n: any) => n.type === 'special').length },
+                { id: 'restaurant', name: 'Restaurants', count: safeFilter(notifications, (n: any) => n.type === 'restaurant').length },
+                { id: 'update', name: 'Updates', count: safeFilter(notifications, (n: any) => n.type === 'update').length },
+                { id: 'reminder', name: 'Reminders', count: safeFilter(notifications, (n: any) => n.type === 'reminder').length }
               ].map((filter) => (
                 <button
                   key={filter.id}

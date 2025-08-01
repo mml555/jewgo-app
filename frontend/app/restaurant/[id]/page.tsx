@@ -9,6 +9,7 @@ import Reviews from '@/components/Reviews';
 import BottomNavigation from '@/components/BottomNavigation';
 import { formatWeeklyHoursArray, getHoursStatus } from '@/utils/hours';
 import HoursDisplay from '@/components/HoursDisplay';
+import { safeFilter } from '@/utils/validation';
 
 const RestaurantDetailPage: React.FC = () => {
   const params = useParams();
@@ -240,7 +241,7 @@ const RestaurantDetailPage: React.FC = () => {
   }
 
   // Filter out free specials, keep only paid ones
-  const paidSpecials = restaurant.specials?.filter(special => special.is_paid) || [];
+  const paidSpecials = safeFilter(restaurant.specials, (special: any) => special.is_paid) || [];
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -573,7 +574,7 @@ const RestaurantDetailPage: React.FC = () => {
                 const isFavorite = favorites.includes(restaurant.id);
                 
                 if (isFavorite) {
-                  const newFavorites = favorites.filter((id: number) => id !== restaurant.id);
+                  const newFavorites = safeFilter(favorites, (id: number) => id !== restaurant.id);
                   localStorage.setItem('favorites', JSON.stringify(newFavorites));
                 } else {
                   favorites.push(restaurant.id);
@@ -674,7 +675,7 @@ const RestaurantDetailPage: React.FC = () => {
               const isFavorite = favorites.includes(restaurant.id);
               
               if (isFavorite) {
-                const newFavorites = favorites.filter((id: number) => id !== restaurant.id);
+                const newFavorites = safeFilter(favorites, (id: number) => id !== restaurant.id);
                 localStorage.setItem('favorites', JSON.stringify(newFavorites));
               } else {
                 favorites.push(restaurant.id);
