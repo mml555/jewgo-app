@@ -108,7 +108,7 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                 "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200",
                 "hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-jewgo-primary/20",
                 !activeFilters.agency
-                  ? "bg-jewgo-primary text-white shadow-md"
+                  ? "bg-green-500 text-white shadow-md"
                   : "bg-gray-200 text-gray-600 hover:bg-gray-300"
               )}
             >
@@ -187,7 +187,7 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                 "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200",
                 "hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-jewgo-primary/20",
                 !activeFilters.dietary
-                  ? "bg-jewgo-primary text-white shadow-md"
+                  ? "bg-green-500 text-white shadow-md"
                   : "bg-gray-200 text-gray-600 hover:bg-gray-300"
               )}
             >
@@ -247,7 +247,7 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                 "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200",
                 "hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-jewgo-primary/20",
                 !activeFilters.category
-                  ? "bg-jewgo-primary text-white shadow-md"
+                  ? "bg-green-500 text-white shadow-md"
                   : "bg-gray-200 text-gray-600 hover:bg-gray-300"
               )}
             >

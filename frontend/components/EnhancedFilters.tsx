@@ -105,7 +105,7 @@ const EnhancedFilters: React.FC<EnhancedFiltersProps> = ({
           </svg>
           <h3 className="text-lg font-semibold text-gray-900">Advanced Filters</h3>
           {hasActiveFilters && (
-            <span className="ml-2 px-2 py-1 bg-jewgo-primary text-white text-xs rounded-full">
+                            <span className="ml-2 px-2 py-1 bg-green-500 text-white text-xs rounded-full">
               {getActiveFilterCount()}
             </span>
           )}
@@ -243,7 +243,7 @@ const EnhancedFilters: React.FC<EnhancedFiltersProps> = ({
                   "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200",
                   "hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-jewgo-primary/20",
                   !filters.certifying_agency
-                    ? "bg-jewgo-primary text-white shadow-md"
+                    ? "bg-green-500 text-white shadow-md"
                     : "bg-gray-200 text-gray-600 hover:bg-gray-300"
                 )}
               >
@@ -282,7 +282,7 @@ const EnhancedFilters: React.FC<EnhancedFiltersProps> = ({
                   "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200",
                   "hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-jewgo-primary/20",
                   !filters.kosher_category
-                    ? "bg-jewgo-primary text-white shadow-md"
+                    ? "bg-green-500 text-white shadow-md"
                     : "bg-gray-200 text-gray-600 hover:bg-gray-300"
                 )}
               >
@@ -399,7 +399,7 @@ const EnhancedFilters: React.FC<EnhancedFiltersProps> = ({
                   "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200",
                   "hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-jewgo-primary/20",
                   !filters.listing_type
-                    ? "bg-jewgo-primary text-white shadow-md"
+                    ? "bg-green-500 text-white shadow-md"
                     : "bg-gray-200 text-gray-600 hover:bg-gray-300"
                 )}
               >
@@ -433,7 +433,7 @@ const EnhancedFilters: React.FC<EnhancedFiltersProps> = ({
                   "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200",
                   "hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-jewgo-primary/20",
                   !filters.price_range
-                    ? "bg-jewgo-primary text-white shadow-md"
+                    ? "bg-green-500 text-white shadow-md"
                     : "bg-gray-200 text-gray-600 hover:bg-gray-300"
                 )}
               >

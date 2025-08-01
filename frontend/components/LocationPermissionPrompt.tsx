@@ -121,7 +121,7 @@ export default function LocationPermissionPrompt({
           <button
             onClick={requestLocation}
             disabled={isRequesting}
-            className="flex-1 px-4 py-3 bg-jewgo-primary text-white hover:bg-jewgo-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+            className="flex-1 px-4 py-3 bg-green-500 text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md"
           >
             {isRequesting ? (
               <div className="flex items-center justify-center space-x-2">
