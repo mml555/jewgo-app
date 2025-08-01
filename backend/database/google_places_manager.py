@@ -485,7 +485,7 @@ class GooglePlacesManager:
             logger.error(f"Error running periodic updates: {e}")
             return stats
     
-    def cleanup_old_data(self, days_old: int = 30) -> int:
+    def cleanup_old_data(self, days_old: int = 7) -> int:
         """
         Clean up old Google Places data.
         
