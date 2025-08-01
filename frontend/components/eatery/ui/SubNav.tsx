@@ -37,7 +37,7 @@ export default function SubNav({ className = "" }: SubNavProps) {
 
   return (
     <div className={`w-full ${className}`}>
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         {navItems.map((item) => {
           const IconComponent = item.icon;
           
@@ -45,10 +45,10 @@ export default function SubNav({ className = "" }: SubNavProps) {
             <button
               key={item.id}
               onClick={item.onClick}
-              className="flex items-center justify-center space-x-2 px-4 py-3 bg-white border border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 flex-1 sm:flex-none"
+              className="flex items-center justify-center space-x-2.5 px-5 py-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 hover:shadow-md transition-all duration-200 flex-1 sm:flex-none shadow-sm"
             >
-              <IconComponent className="w-4 h-4 text-gray-700" />
-              <span className="text-sm font-medium text-gray-900">{item.label}</span>
+              <IconComponent className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-semibold text-gray-800">{item.label}</span>
             </button>
           );
         })}

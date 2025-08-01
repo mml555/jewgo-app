@@ -44,7 +44,7 @@ export default function CategoryTabs({
 }: CategoryTabsProps) {
   return (
     <div className={`w-full ${className}`}>
-      <div className="flex space-x-2 overflow-x-auto scrollbar-hide pb-2">
+      <div className="flex space-x-3 overflow-x-auto scrollbar-hide pb-3">
         {categories.map((category) => {
           const IconComponent = category.icon;
           const isActive = activeCategory === category.id;
@@ -53,24 +53,24 @@ export default function CategoryTabs({
             <button
               key={category.id}
               onClick={() => onCategoryChange(category.id)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-full border transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
+              className={`flex items-center space-x-2.5 px-5 py-3 rounded-full border transition-all duration-300 whitespace-nowrap flex-shrink-0 shadow-sm ${
                 isActive
-                  ? 'bg-black text-white border-black'
-                  : 'bg-white text-black border-gray-300 hover:border-gray-400'
+                  ? 'bg-black text-white border-black shadow-md'
+                  : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:shadow-md hover:bg-gray-50'
               }`}
             >
-              <IconComponent className="w-4 h-4" />
-              <span className="text-sm font-medium">{category.label}</span>
+              <IconComponent className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-600'}`} />
+              <span className="text-sm font-semibold">{category.label}</span>
             </button>
           );
         })}
       </div>
       
       {/* Active indicator line */}
-      <div className="relative mt-2">
-        <div className="h-0.5 bg-gray-200 rounded-full">
+      <div className="relative mt-3">
+        <div className="h-1 bg-gray-100 rounded-full">
           <div 
-            className="h-full bg-black rounded-full transition-all duration-300"
+            className="h-full bg-black rounded-full transition-all duration-500 ease-out"
             style={{
               width: '20%',
               transform: `translateX(${categories.findIndex(c => c.id === activeCategory) * 100}%)`

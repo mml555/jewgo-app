@@ -34,7 +34,7 @@ export default function SearchBar({
     <div className={`relative w-full ${className}`}>
       <div className="relative flex items-center">
         {/* Search Icon */}
-        <div className="absolute left-3 text-gray-500">
+        <div className="absolute left-4 text-gray-400">
           <Search className="w-5 h-5" />
         </div>
         
@@ -44,13 +44,13 @@ export default function SearchBar({
           value={query}
           onChange={handleInputChange}
           placeholder={placeholder}
-          className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-full text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+          className="w-full pl-12 pr-14 py-4 bg-white border border-gray-200 rounded-full text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
         />
         
         {/* Filter Icon */}
         <button
           onClick={handleFilterClick}
-          className="absolute right-3 p-1 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+          className="absolute right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-all duration-200"
           aria-label="Filter options"
         >
           <SlidersHorizontal className="w-5 h-5" />

@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import SearchBar from '@/components/eatery/ui/SearchBar';
-import CategoryTabs from '@/components/eatery/ui/CategoryTabs';
-import SubNav from '@/components/eatery/ui/SubNav';
+import Header from '@/components/Header';
+import EnhancedSearch from '@/components/EnhancedSearch';
+import NavTabs from '@/components/NavTabs';
+import ActionButtons from '@/components/ActionButtons';
 import EateryCard from '@/components/eatery/ui/EateryCard';
-import BottomTabBar from '@/components/eatery/ui/BottomTabBar';
+import BottomNavigation from '@/components/BottomNavigation';
 import { Restaurant } from '@/types/restaurant';
 
 // Sample data for demo
@@ -78,8 +79,21 @@ const sampleRestaurants: Restaurant[] = [
 
 export default function DemoPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('eatery');
+  const [activeTab, setActiveTab] = useState('eatery');
   const [filteredRestaurants, setFilteredRestaurants] = useState(sampleRestaurants);
+  const [activeFilters, setActiveFilters] = useState<{
+    agency?: string;
+    kosherType?: string;
+    openNow?: boolean;
+    category?: string;
+    nearMe?: boolean;
+    distanceRadius?: number;
+    is_cholov_yisroel?: boolean;
+    is_pas_yisroel?: boolean;
+    is_glatt?: boolean;
+    is_mehadrin?: boolean;
+    is_bishul_yisroel?: boolean;
+  }>({});
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -94,52 +108,93 @@ export default function DemoPage() {
     }
   };
 
-  const handleCategoryChange = (category: string) => {
-    setActiveCategory(category);
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
     // For demo, show all restaurants for eatery category
-    if (category === 'eatery') {
+    if (tab === 'eatery') {
       setFilteredRestaurants(sampleRestaurants);
     } else {
       setFilteredRestaurants([]);
     }
   };
 
-  const handleFilterClick = () => {
-    alert('Advanced filters clicked! This would open a filter modal.');
+  const handleFilterChange = (key: string, value: any) => {
+    setActiveFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleToggleFilter = (key: string, value: boolean) => {
+    setActiveFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleDistanceChange = (distance: number) => {
+    setActiveFilters(prev => ({ ...prev, distanceRadius: distance }));
+  };
+
+  const handleClearAll = () => {
+    setActiveFilters({});
+  };
+
+  const hasActiveFilters = () => {
+    return Object.values(activeFilters).some(value => 
+      value !== undefined && value !== false && value !== ''
+    );
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-28 px-4 md:px-8 lg:px-16">
-      <div className="pt-4 space-y-4">
-        {/* Header */}
-        <div className="text-center mb-6">
+    <div className="min-h-screen bg-neutral-50">
+      <Header />
+      
+      {/* Demo Header */}
+      <div className="px-4 sm:px-6 py-4 bg-white border-b border-gray-100">
+        <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Mobile-First Demo</h1>
           <p className="text-gray-600">New Eatery Explore Page Components</p>
         </div>
-        
-        {/* Search Bar */}
-        <SearchBar 
+      </div>
+      
+      {/* Enhanced Search */}
+      <div className="px-4 sm:px-6 py-4 bg-white border-b border-gray-100">
+        <EnhancedSearch
           onSearch={handleSearch}
-          onFilterClick={handleFilterClick}
-          placeholder="Find your Eatery"
+          onResultsUpdate={(results) => {
+            console.log('Enhanced search results:', results.length, 'restaurants');
+            setFilteredRestaurants(results);
+          }}
         />
-        
-        {/* Category Tabs */}
-        <CategoryTabs 
-          activeCategory={activeCategory}
-          onCategoryChange={handleCategoryChange}
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="px-4 sm:px-6 py-2 bg-white border-b border-gray-100">
+        <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
+      </div>
+
+      {/* Action Buttons */}
+      <div className="px-4 sm:px-6 py-3 bg-white border-b border-gray-100">
+        <ActionButtons
+          onShowFilters={() => {}}
+          onShowMap={() => window.location.href = '/live-map'}
+          onAddEatery={() => window.location.href = '/add-eatery'}
+          onFilterChange={handleFilterChange}
+          onToggleFilter={handleToggleFilter}
+          onDistanceChange={handleDistanceChange}
+          onClearAll={handleClearAll}
+          onLocationReset={() => {}}
+          activeFilters={activeFilters}
+          userLocation={null}
+          locationLoading={false}
+          hasActiveFilters={hasActiveFilters()}
+          isOnMapPage={false}
         />
-        
-        {/* Sub Navigation */}
-        <SubNav />
-        
-        {/* Results Count */}
-        <div className="text-sm text-gray-600">
-          {filteredRestaurants.length} {filteredRestaurants.length === 1 ? 'restaurant' : 'restaurants'} found
-        </div>
-        
-        {/* Restaurant Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      </div>
+
+      {/* Results Count */}
+      <div className="px-4 sm:px-6 py-3 bg-gray-50 text-sm text-gray-600 border-b border-gray-200">
+        {filteredRestaurants.length} {filteredRestaurants.length === 1 ? 'restaurant' : 'restaurants'} found
+      </div>
+
+      {/* Restaurant Grid */}
+      <div className="px-4 sm:px-6 py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredRestaurants.map((restaurant) => (
             <EateryCard 
               key={restaurant.id} 
@@ -150,8 +205,8 @@ export default function DemoPage() {
         
         {/* Empty State */}
         {filteredRestaurants.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-500 text-lg mb-2">
+          <div className="text-center py-16">
+            <div className="text-gray-500 text-lg mb-3 font-medium">
               No restaurants found
             </div>
             <div className="text-gray-400 text-sm">
@@ -160,9 +215,9 @@ export default function DemoPage() {
           </div>
         )}
       </div>
-      
-      {/* Bottom Tab Bar */}
-      <BottomTabBar />
+
+      {/* Bottom Navigation */}
+      <BottomNavigation />
     </div>
   );
 } 
