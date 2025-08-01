@@ -44,6 +44,18 @@ export default function HomePageClient() {
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
   const [locationPromptShown, setLocationPromptShown] = useState(false);
 
+  // Helper function to calculate distance between two points
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 3959; // Earth's radius in miles
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
   useEffect(() => {
     setMounted(true);
     
@@ -159,25 +171,35 @@ export default function HomePageClient() {
       
       // Sort by distance if user location is available
       if (userLocation) {
-        filtered.sort((a, b) => {
-          if (!a.latitude || !a.longitude) return 1;
-          if (!b.latitude || !b.longitude) return -1;
-          
-          const distanceA = calculateDistance(
-            userLocation.latitude, 
-            userLocation.longitude, 
-            a.latitude, 
-            a.longitude
-          );
-          const distanceB = calculateDistance(
-            userLocation.latitude, 
-            userLocation.longitude, 
-            b.latitude, 
-            b.longitude
-          );
-          
-          return distanceA - distanceB;
-        });
+        try {
+          filtered.sort((a, b) => {
+            try {
+              if (!a.latitude || !a.longitude) return 1;
+              if (!b.latitude || !b.longitude) return -1;
+              
+              const distanceA = calculateDistance(
+                userLocation.latitude, 
+                userLocation.longitude, 
+                a.latitude, 
+                a.longitude
+              );
+              const distanceB = calculateDistance(
+                userLocation.latitude, 
+                userLocation.longitude, 
+                b.latitude, 
+                b.longitude
+              );
+              
+              return distanceA - distanceB;
+            } catch (sortError) {
+              console.error('Error in sort comparison:', sortError);
+              return 0; // Keep original order on error
+            }
+          });
+        } catch (sortError) {
+          console.error('Error in sort operation:', sortError);
+          // Continue without sorting on error
+        }
       }
       
       return filtered;
@@ -354,18 +376,6 @@ export default function HomePageClient() {
   const handlePageChange = (page: number) => {
     console.log(`HomePageClient: Changing page from ${currentPage} to ${page}`);
     setCurrentPage(page);
-  };
-
-  // Helper function to calculate distance between two points
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 3959; // Earth's radius in miles
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
   };
 
   const handleLocationGranted = (location: { latitude: number; longitude: number }) => {
