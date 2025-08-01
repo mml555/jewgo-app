@@ -596,13 +596,18 @@ export default function LiveMapClient() {
       
       {/* Enhanced Search */}
       <div className="px-4 sm:px-6 py-4 bg-white border-b border-gray-100">
-                       <EnhancedSearch
-                 onSearch={handleRestaurantSearch}
-                 onResultsUpdate={(results) => {
-                   console.log('Enhanced search results:', results.length, 'restaurants');
-                   setDisplayedRestaurants(results);
-                 }}
-               />
+        <EnhancedSearch
+          onSearch={handleRestaurantSearch}
+          onResultsUpdate={(results) => {
+            console.log('Enhanced search results:', results.length, 'restaurants');
+            setDisplayedRestaurants(results);
+          }}
+        />
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="px-4 sm:px-6 py-2 bg-white border-b border-gray-100">
+        <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
 
       {/* Action Buttons */}
@@ -622,11 +627,6 @@ export default function LiveMapClient() {
           hasActiveFilters={hasActiveFilters()}
           isOnMapPage={true}
         />
-      </div>
-
-      {/* Navigation Tabs */}
-      <div className="px-4 sm:px-6 py-2 bg-white border-b border-gray-100">
-        <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
 
       {/* Location Status */}
