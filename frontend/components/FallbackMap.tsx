@@ -15,7 +15,7 @@ export default function FallbackMap({ restaurants, onRestaurantSelect }: Fallbac
 
   // Filter restaurants with coordinates
   const restaurantsWithCoords = safeFilter(restaurants, restaurant => 
-    restaurant.latitude && restaurant.longitude &&
+    Boolean(restaurant.latitude) && Boolean(restaurant.longitude) &&
     restaurant.latitude !== 0 && restaurant.longitude !== 0
   );
 
