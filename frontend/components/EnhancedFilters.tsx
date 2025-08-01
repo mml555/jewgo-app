@@ -90,9 +90,13 @@ const EnhancedFilters: React.FC<EnhancedFiltersProps> = ({
   };
 
   const getActiveFilterCount = () => {
-    return Object.values(filters).filter(
-      filter => filter !== undefined && filter !== false && filter !== '' && (!Array.isArray(filter) || filter.length > 0)
-    ).length;
+    let count = 0;
+    Object.values(filters).forEach(filter => {
+      if (filter !== undefined && filter !== false && filter !== '' && (!Array.isArray(filter) || filter.length > 0)) {
+        count++;
+      }
+    });
+    return count;
   };
 
   return (

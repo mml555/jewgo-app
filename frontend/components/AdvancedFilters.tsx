@@ -309,7 +309,15 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           <div className="pt-4 border-t border-gray-200">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">
-                {Object.values(activeFilters).filter(f => f !== undefined && f !== false && f !== '' && (!Array.isArray(f) || f.length > 0)).length} active filter(s)
+                {(() => {
+                  let count = 0;
+                  Object.values(activeFilters).forEach(f => {
+                    if (f !== undefined && f !== false && f !== '' && (!Array.isArray(f) || f.length > 0)) {
+                      count++;
+                    }
+                  });
+                  return count;
+                })()} active filter(s)
               </span>
               <button
                 onClick={onClearAll}
