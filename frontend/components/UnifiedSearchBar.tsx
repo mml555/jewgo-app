@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, MapPin, X } from 'lucide-react';
+import { safeFilter } from '@/utils/validation';
 
 interface UserLocation {
   latitude: number;
@@ -44,12 +45,11 @@ export default function UnifiedSearchBar({
     
     // Generate suggestions based on input
     if (value.trim().length > 2) {
-      const filteredSuggestions = restaurants
-        .filter(restaurant => 
-          (restaurant.name?.toLowerCase().includes(value.toLowerCase()) || false) ||
-          (restaurant.address?.toLowerCase().includes(value.toLowerCase()) || false) ||
-          (restaurant.city?.toLowerCase().includes(value.toLowerCase()) || false)
-        )
+      const filteredSuggestions = safeFilter(restaurants, restaurant => 
+        (restaurant.name?.toLowerCase().includes(value.toLowerCase()) || false) ||
+        (restaurant.address?.toLowerCase().includes(value.toLowerCase()) || false) ||
+        (restaurant.city?.toLowerCase().includes(value.toLowerCase()) || false)
+      )
         .map(restaurant => restaurant.name || 'Unknown Restaurant')
         .slice(0, 5);
       

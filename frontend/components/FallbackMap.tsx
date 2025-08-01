@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Restaurant } from '@/types/restaurant';
 import Link from 'next/link';
+import { safeFilter } from '@/utils/validation';
 
 interface FallbackMapProps {
   restaurants: Restaurant[];
@@ -13,7 +14,7 @@ export default function FallbackMap({ restaurants, onRestaurantSelect }: Fallbac
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
 
   // Filter restaurants with coordinates
-  const restaurantsWithCoords = restaurants.filter(restaurant => 
+  const restaurantsWithCoords = safeFilter(restaurants, restaurant => 
     restaurant.latitude && restaurant.longitude &&
     restaurant.latitude !== 0 && restaurant.longitude !== 0
   );

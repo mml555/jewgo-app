@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Restaurant } from '@/types/restaurant';
 import { googlePlacesAPI } from '@/lib/google/places';
+import { safeFilter } from '@/utils/validation';
 
 interface EnhancedSearchProps {
   onSearch: (query: string) => void;
@@ -366,7 +367,7 @@ export default function EnhancedSearch({
     { label: 'Boca Raton', value: 'Boca', icon: '🌴', color: 'bg-accent-green' }
   ];
 
-  const filteredSuggestions = searchSuggestions.filter(suggestion =>
+  const filteredSuggestions = safeFilter(searchSuggestions, suggestion =>
     suggestion.label.toLowerCase().includes(query.toLowerCase()) ||
     suggestion.value.toLowerCase().includes(query.toLowerCase())
   );

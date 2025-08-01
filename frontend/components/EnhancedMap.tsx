@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Restaurant } from '@/types/restaurant';
+import { safeFilter } from '@/utils/validation';
 
 interface EnhancedMapProps {
   restaurants: Restaurant[];
@@ -30,7 +31,7 @@ export default function EnhancedMap({
   const clustererRef = useRef<any>(null);
 
   // Filter restaurants with valid coordinates
-  const restaurantsWithCoords = restaurants.filter(restaurant => {
+  const restaurantsWithCoords = safeFilter(restaurants, restaurant => {
     // Check if coordinates exist and are valid numbers
     if (!restaurant.latitude || !restaurant.longitude) return false;
     

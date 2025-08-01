@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Restaurant } from '@/types/restaurant';
 import Link from 'next/link';
+import { safeFilter } from '@/utils/validation';
 
 interface SimpleMapEmbedProps {
   restaurants: Restaurant[];
@@ -20,7 +21,7 @@ export default function SimpleMapEmbed({ restaurants, maxRestaurants = 50 }: Sim
   const [apiLoaded, setApiLoaded] = useState(false);
 
   // Filter restaurants with coordinates
-  const restaurantsWithCoords = restaurants.filter(restaurant => {
+  const restaurantsWithCoords = safeFilter(restaurants, restaurant => {
     // Check if coordinates exist and are valid numbers
     if (!restaurant.latitude || !restaurant.longitude) return false;
     

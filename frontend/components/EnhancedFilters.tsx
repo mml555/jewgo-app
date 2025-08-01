@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/utils/cn';
+import { safeFilter } from '@/utils/validation';
 
 export interface FilterState {
   // Basic filters
@@ -89,7 +90,7 @@ const EnhancedFilters: React.FC<EnhancedFiltersProps> = ({
   };
 
   const getActiveFilterCount = () => {
-    return Object.values(filters).filter(
+    return safeFilter(Object.values(filters), 
       filter => filter !== undefined && filter !== false && filter !== ''
     ).length;
   };

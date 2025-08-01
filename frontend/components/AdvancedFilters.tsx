@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/utils/cn';
+import { safeFilter } from '@/utils/validation';
 
 interface AdvancedFiltersProps {
   activeFilters: {
@@ -308,7 +309,7 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           <div className="pt-4 border-t border-gray-200">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">
-                {Object.values(activeFilters).filter(f => f !== undefined && f !== false).length} active filter(s)
+                {safeFilter(Object.values(activeFilters), f => f !== undefined && f !== false).length} active filter(s)
               </span>
               <button
                 onClick={onClearAll}

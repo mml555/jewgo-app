@@ -124,7 +124,7 @@ export default function LiveMapClient() {
     // Apply search query filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
-      filtered = filtered.filter(restaurant => 
+      filtered = safeFilter(filtered, restaurant => 
         restaurant.name.toLowerCase().includes(query) ||
         restaurant.address.toLowerCase().includes(query) ||
         restaurant.city.toLowerCase().includes(query) ||
@@ -136,7 +136,7 @@ export default function LiveMapClient() {
 
     // Apply agency filter
     if (activeFilters.agency) {
-      filtered = filtered.filter(restaurant => 
+      filtered = safeFilter(filtered, restaurant => 
         restaurant.certifying_agency && 
         restaurant.certifying_agency.toLowerCase().includes(activeFilters.agency!.toLowerCase())
       );
@@ -144,7 +144,7 @@ export default function LiveMapClient() {
 
     // Apply dietary filter
     if (activeFilters.dietary) {
-      filtered = filtered.filter(restaurant => {
+      filtered = safeFilter(filtered, restaurant => {
         const kosherCategory = restaurant.kosher_category?.toLowerCase() || '';
         switch (activeFilters.dietary) {
           case 'meat':
@@ -161,7 +161,7 @@ export default function LiveMapClient() {
 
     // Apply category filter
     if (activeFilters.category) {
-      filtered = filtered.filter(restaurant => 
+      filtered = safeFilter(filtered, restaurant => 
         restaurant.listing_type && 
         restaurant.listing_type.toLowerCase().includes(activeFilters.category!.toLowerCase())
       );
@@ -170,7 +170,7 @@ export default function LiveMapClient() {
     // Apply "near me" filter
     if (activeFilters.nearMe && userLocation) {
       const maxDistance = activeFilters.distanceRadius || 10; // Default 10 miles
-      filtered = filtered.filter(restaurant => {
+      filtered = safeFilter(filtered, restaurant => {
         if (!restaurant.latitude || !restaurant.longitude) return false;
         const distance = calculateDistance(
           userLocation.latitude, 
@@ -188,7 +188,7 @@ export default function LiveMapClient() {
       const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
       const currentTime = now.getHours() * 60 + now.getMinutes(); // Convert to minutes
 
-      filtered = filtered.filter(restaurant => {
+      filtered = safeFilter(filtered, restaurant => {
         if (!restaurant.hours_of_operation) return false;
         
         try {
@@ -349,7 +349,7 @@ export default function LiveMapClient() {
     // Apply search query filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
-      filtered = filtered.filter(restaurant => 
+      filtered = safeFilter(filtered, restaurant => 
         restaurant.name.toLowerCase().includes(query) ||
         restaurant.address.toLowerCase().includes(query) ||
         restaurant.city.toLowerCase().includes(query) ||
@@ -361,7 +361,7 @@ export default function LiveMapClient() {
 
     // Apply agency filter
     if (activeFilters.agency) {
-      filtered = filtered.filter(restaurant => 
+      filtered = safeFilter(filtered, restaurant => 
         restaurant.certifying_agency && 
         restaurant.certifying_agency.toLowerCase().includes(activeFilters.agency!.toLowerCase())
       );
@@ -369,7 +369,7 @@ export default function LiveMapClient() {
 
     // Apply dietary filter
     if (activeFilters.dietary) {
-      filtered = filtered.filter(restaurant => {
+      filtered = safeFilter(filtered, restaurant => {
         const kosherCategory = restaurant.kosher_category?.toLowerCase() || '';
         switch (activeFilters.dietary) {
           case 'meat':
@@ -386,7 +386,7 @@ export default function LiveMapClient() {
 
     // Apply category filter
     if (activeFilters.category) {
-      filtered = filtered.filter(restaurant => 
+      filtered = safeFilter(filtered, restaurant => 
         restaurant.listing_type && 
         restaurant.listing_type.toLowerCase().includes(activeFilters.category!.toLowerCase())
       );
@@ -395,7 +395,7 @@ export default function LiveMapClient() {
     // Apply "near me" filter
     if (activeFilters.nearMe && userLocation) {
       const maxDistance = activeFilters.distanceRadius || 10; // Default 10 miles
-      filtered = filtered.filter(restaurant => {
+      filtered = safeFilter(filtered, restaurant => {
         if (!restaurant.latitude || !restaurant.longitude) return false;
         const distance = calculateDistance(
           userLocation.latitude, 
@@ -413,7 +413,7 @@ export default function LiveMapClient() {
       const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
       const currentTime = now.getHours() * 60 + now.getMinutes(); // Convert to minutes
 
-      filtered = filtered.filter(restaurant => {
+      filtered = safeFilter(filtered, restaurant => {
         if (!restaurant.hours_of_operation) return false;
         
         try {

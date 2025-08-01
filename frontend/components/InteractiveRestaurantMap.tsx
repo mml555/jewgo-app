@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Restaurant } from '@/types/restaurant';
+import { safeFilter } from '@/utils/validation';
 import Link from 'next/link';
 
 interface UserLocation {
@@ -40,7 +41,7 @@ export default function InteractiveRestaurantMap({
   const [apiLoaded, setApiLoaded] = useState(false);
 
   // Filter restaurants with valid coordinates and addresses
-  const restaurantsWithCoords = restaurants.filter(restaurant => {
+  const restaurantsWithCoords = safeFilter(restaurants, restaurant => {
     // Check if restaurant has valid coordinates
     if (!restaurant.latitude || !restaurant.longitude) return false;
     
