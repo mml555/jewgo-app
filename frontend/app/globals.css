@@ -325,6 +325,11 @@
   animation: filterPulse 0.3s ease-in-out;
 }
 
+/* Mobile Grid Override */
+.mobile-grid-2 {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 640px) {
   .restaurant-card {

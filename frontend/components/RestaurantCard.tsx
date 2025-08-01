@@ -143,7 +143,7 @@ export default function RestaurantCard({
     return (
       <span className="inline-flex items-center gap-1">
         <span className="text-yellow-500">⭐</span>
-        <span className="text-sm font-medium">{rating}</span>
+        <span className="text-sm font-medium">{typeof rating === 'number' ? rating.toFixed(1) : rating}</span>
       </span>
     );
   };
@@ -240,6 +240,9 @@ export default function RestaurantCard({
             <span>•</span>
           )}
           {renderRating()}
+          {!restaurant.price_range && !renderRating() && (
+            <span className="text-gray-400">No rating available</span>
+          )}
         </div>
         
         {/* Hours Display */}
