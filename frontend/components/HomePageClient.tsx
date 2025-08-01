@@ -1,16 +1,19 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import EnhancedSearch from '@/components/EnhancedSearch';
 import ActionButtons from '@/components/ActionButtons';
 import RestaurantGrid from '@/components/RestaurantGrid';
 import BottomNavigation from '@/components/BottomNavigation';
 import SplashScreen from '@/components/SplashScreen';
+import LocationPermissionPrompt from '@/components/LocationPermissionPrompt';
 import { Restaurant } from '@/types/restaurant';
 import NavTabs from '@/components/NavTabs';
 
 export default function HomePageClient() {
+  const router = useRouter();
   const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [showSplash, setShowSplash] = useState(false);
@@ -36,10 +39,22 @@ export default function HomePageClient() {
   }>({});
   const [activeTab, setActiveTab] = useState('eatery');
   const [mounted, setMounted] = useState(false);
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+  const [locationPromptShown, setLocationPromptShown] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    // Show location prompt after a short delay if user hasn't granted location access
+    const locationTimer = setTimeout(() => {
+      if (!userLocation && !locationPromptShown && navigator.geolocation) {
+        setShowLocationPrompt(true);
+        setLocationPromptShown(true);
+      }
+    }, 2000); // Show after 2 seconds
+
+    return () => clearTimeout(locationTimer);
+  }, [userLocation, locationPromptShown]);
 
   useEffect(() => {
     if (mounted) {
@@ -321,6 +336,24 @@ export default function HomePageClient() {
     return R * c;
   };
 
+  const handleLocationGranted = (location: { latitude: number; longitude: number }) => {
+    console.log('Location granted:', location);
+    setUserLocation(location);
+    setShowLocationPrompt(false);
+  };
+
+  const handleLocationDenied = () => {
+    console.log('Location denied by user');
+    setShowLocationPrompt(false);
+    // Continue without location - app will work with default behavior
+  };
+
+  const handleLocationPromptDismiss = () => {
+    console.log('Location prompt dismissed');
+    setShowLocationPrompt(false);
+    // Continue without location - app will work with default behavior
+  };
+
   // Don't render until mounted to prevent hydration issues
   if (!mounted) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -457,6 +490,13 @@ export default function HomePageClient() {
         {/* Bottom Navigation */}
         <BottomNavigation />
       </div>
+             {showLocationPrompt && (
+         <LocationPermissionPrompt
+           onLocationGranted={handleLocationGranted}
+           onLocationDenied={handleLocationDenied}
+           onDismiss={handleLocationPromptDismiss}
+         />
+       )}
     </div>
   );
 } 

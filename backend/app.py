@@ -562,54 +562,70 @@ def search_google_places(restaurant_name: str, address: str) -> str:
 
 @app.route('/api/restaurants/<int:restaurant_id>/fetch-website', methods=['POST'])
 def fetch_restaurant_website(restaurant_id):
-    """
-    Fetch website link for a specific restaurant using Google Places API.
-    This is a backup system when the restaurant doesn't have a website link.
-    """
+    """Fetch website information for a specific restaurant using Google Places API."""
     try:
-        if not db_manager:
-            return jsonify({'error': 'Database not connected'}), 500
-        
-        # Get restaurant details
+        # Get the restaurant from database
         session = db_manager.get_session()
         restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
         
         if not restaurant:
             return jsonify({'error': 'Restaurant not found'}), 404
         
-        # Check if restaurant already has a website
-        if restaurant.website and len(restaurant.website) > 10:
+        # If restaurant already has a website, return it
+        if restaurant.website:
             return jsonify({
-                'message': 'Restaurant already has a website',
-                'website': restaurant.website
-            }), 200
+                'success': True,
+                'website': restaurant.website,
+                'message': 'Restaurant already has a website'
+            })
         
-        # Search for website using Google Places API
-        website_url = search_google_places(restaurant.name, restaurant.address or "")
-        
-        if website_url:
-            # Update the restaurant with the found website
-            restaurant.website = website_url
-            session.commit()
-            
-            logger.info(f"Updated restaurant {restaurant_id} with website: {website_url}")
-            
-            return jsonify({
-                'message': 'Website found and updated',
-                'website': website_url,
-                'restaurant_id': restaurant_id,
-                'restaurant_name': restaurant.name
-            }), 200
+        # Try to get website from Google Places API if we have coordinates
+        if restaurant.latitude and restaurant.longitude:
+            try:
+                # Import Google Places helper
+                from utils.google_places_helper import GooglePlacesHelper
+                
+                places_helper = GooglePlacesHelper()
+                place_details = places_helper.get_place_details_by_coordinates(
+                    restaurant.latitude, 
+                    restaurant.longitude, 
+                    restaurant.name
+                )
+                
+                if place_details and place_details.get('website'):
+                    # Update the restaurant with the found website
+                    restaurant.website = place_details['website']
+                    session.commit()
+                    
+                    return jsonify({
+                        'success': True,
+                        'website': place_details['website'],
+                        'message': 'Website found via Google Places API'
+                    })
+                else:
+                    return jsonify({
+                        'success': False,
+                        'message': 'No website found for this restaurant'
+                    })
+                    
+            except Exception as e:
+                logger.error(f"Error fetching website from Google Places: {e}")
+                return jsonify({
+                    'success': False,
+                    'message': 'Failed to fetch website from Google Places API'
+                })
         else:
             return jsonify({
-                'message': 'No website found for this restaurant',
-                'restaurant_id': restaurant_id,
-                'restaurant_name': restaurant.name
-            }), 404
+                'success': False,
+                'message': 'Restaurant coordinates not available for website lookup'
+            })
             
     except Exception as e:
-        logger.error(f"Error fetching website for restaurant {restaurant_id}: {e}")
-        return jsonify({'error': f'Error fetching website: {str(e)}'}), 500
+        logger.error(f"Error in fetch_restaurant_website: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+    finally:
+        if 'session' in locals():
+            session.close()
 
 @app.route('/api/restaurants/fetch-missing-websites', methods=['POST'])
 def fetch_missing_websites():

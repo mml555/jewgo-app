@@ -48,12 +48,20 @@ export default function GoogleMapsLoader({ children }: GoogleMapsLoaderProps) {
       script.async = true;
       script.defer = true;
       
+      // Add timeout for script loading
+      const scriptTimeout = setTimeout(() => {
+        console.error('Google Maps script failed to load within 30 seconds');
+        setIsLoading(false);
+      }, 30000);
+      
       script.onload = () => {
+        clearTimeout(scriptTimeout);
         setIsLoaded(true);
         setIsLoading(false);
       };
       
       script.onerror = () => {
+        clearTimeout(scriptTimeout);
         console.error('Failed to load Google Maps API');
         setIsLoading(false);
       };

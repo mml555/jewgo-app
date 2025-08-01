@@ -57,10 +57,17 @@ export class ModernGooglePlacesAPI {
         }
       };
 
-      // Timeout after 10 seconds
+      // Check if API key is available
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+      if (!apiKey) {
+        reject(new Error('Google Maps API key is missing. Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your environment variables.'));
+        return;
+      }
+
+      // Timeout after 30 seconds (increased from 10)
       const timeout = setTimeout(() => {
-        reject(new Error('Google Maps failed to load within 10 seconds'));
-      }, 10000);
+        reject(new Error('Google Maps failed to load within 30 seconds. Please check your internet connection and try again.'));
+      }, 30000);
 
       checkGoogleMaps();
     });
