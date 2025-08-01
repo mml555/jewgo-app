@@ -133,6 +133,53 @@ export default function EnhancedSearch({
 
   // Convert Google Place to Restaurant format
   const convertGooglePlaceToRestaurant = (place: GooglePlace): Restaurant => {
+    // Validate place_id before using it
+    if (!place.place_id || place.place_id.trim() === '') {
+      console.warn('Invalid place_id in GooglePlace:', place);
+      // Generate a fallback ID
+      const fallbackId = Math.floor(Math.random() * 1000000);
+      return {
+        id: fallbackId,
+        name: place.name,
+        address: place.formatted_address,
+        city: extractCityFromAddress(place.formatted_address),
+        state: extractStateFromAddress(place.formatted_address),
+        zip_code: extractZipFromAddress(place.formatted_address),
+        phone_number: '',
+        website: '',
+        certificate_link: '',
+        image_url: place.photos && place.photos.length > 0 
+          ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+          : '',
+        google_listing_url: '',
+        certifying_agency: 'Unknown', // Will need to be determined
+        kosher_category: 'pareve', // Default to pareve for external restaurants
+        is_cholov_yisroel: undefined,
+        is_pas_yisroel: undefined,
+        listing_type: 'restaurant',
+        status: 'external',
+        hours_of_operation: '',
+        hours_open: '',
+        short_description: `Restaurant found via Google Places`,
+        price_range: '',
+        avg_price: '',
+        menu_pricing: {},
+        min_avg_meal_cost: 0,
+        max_avg_meal_cost: 0,
+        notes: 'External restaurant - kosher status unknown',
+        latitude: place.geometry.location.lat,
+        longitude: place.geometry.location.lng,
+        specials: [],
+        rating: place.rating || 0,
+        star_rating: place.rating || 0,
+        quality_rating: 0,
+        review_count: place.user_ratings_total || 0,
+        google_rating: place.rating || 0,
+        google_review_count: place.user_ratings_total || 0,
+        google_reviews: '[]'
+      };
+    }
+
     return {
       id: parseInt(place.place_id.replace(/\D/g, '')) || Math.floor(Math.random() * 1000000),
       name: place.name,

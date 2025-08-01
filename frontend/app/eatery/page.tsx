@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import SmartSearch from '@/components/SmartSearch';
 import NavTabs from '@/components/NavTabs';
@@ -11,6 +12,7 @@ import { Restaurant } from '@/types/restaurant';
 import { fetchRestaurants } from '@/lib/api/restaurants';
 
 export default function EateryExplorePage() {
+  const router = useRouter();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,6 +79,27 @@ export default function EateryExplorePage() {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
+    
+    // Navigate to different pages based on the selected tab
+    switch (tab) {
+      case 'mikvahs':
+        router.push('/mikvahs');
+        break;
+      case 'shuls':
+        router.push('/shuls');
+        break;
+      case 'specials':
+        router.push('/specials');
+        break;
+      case 'eatery':
+        // Already on eatery page, just update the tab
+        break;
+      case 'stores':
+        router.push('/stores');
+        break;
+      default:
+        break;
+    }
   };
 
   const handleFilterChange = (key: string, value: any) => {

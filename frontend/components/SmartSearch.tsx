@@ -316,6 +316,13 @@ export default function SmartSearch({
   // Handle Google Place selection
   const handleGooglePlaceSelect = useCallback(async (place: GooglePlaceSuggestion) => {
     try {
+      // Validate place_id before making API call
+      if (!place.place_id || place.place_id.trim() === '') {
+        console.warn('Invalid place_id in GooglePlaceSuggestion:', place);
+        handleSuggestionSelect(place.description);
+        return;
+      }
+
       // Get place details for coordinates using the Google Places API
       const placeDetails = await googlePlacesAPI.getPlaceDetails(place.place_id, ['geometry', 'formatted_address']);
       if (placeDetails && placeDetails.geometry) {

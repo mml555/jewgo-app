@@ -5,8 +5,18 @@ export async function fetchPlaceDetails(place_id: string): Promise<{
   hoursJson: any[],
   timezone: string
 }> {
+  // Validate place_id parameter
+  if (!place_id || typeof place_id !== 'string' || place_id.trim() === '') {
+    console.warn('Invalid place_id provided to fetchPlaceDetails:', place_id);
+    return {
+      hoursText: '',
+      hoursJson: [],
+      timezone: 'UTC'
+    };
+  }
+
   const res = await fetch(
-    `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&fields=opening_hours,utc_offset_minutes&key=${process.env.GOOGLE_API_KEY}`
+    `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id.trim()}&fields=opening_hours,utc_offset_minutes&key=${process.env.GOOGLE_API_KEY}`
   );
   const data = await res.json();
   const periods = data.result.opening_hours?.periods || [];
@@ -194,6 +204,12 @@ export class ModernGooglePlacesAPI {
   } = {}): Promise<any[]> {
     await this.initialize();
 
+    // Validate query parameter
+    if (!query || typeof query !== 'string' || query.trim() === '') {
+      console.warn('Invalid query provided to searchPlaces:', query);
+      return [];
+    }
+
     try {
       // Create cache key based on search parameters
       const cacheKey = `search:${query}:${JSON.stringify(options)}`;
@@ -207,7 +223,7 @@ export class ModernGooglePlacesAPI {
 
       // Use the new Place API for text search
       const request: google.maps.places.TextSearchRequest = {
-        query,
+        query: query.trim(),
         location: options.location ? new google.maps.LatLng(options.location.lat, options.location.lng) : undefined,
         radius: options.radius,
         types: options.types
@@ -260,9 +276,15 @@ export class ModernGooglePlacesAPI {
   } = {}): Promise<google.maps.places.AutocompletePrediction[]> {
     await this.initialize();
 
+    // Validate input parameter
+    if (!input || typeof input !== 'string' || input.trim() === '') {
+      console.warn('Invalid input provided to getPlacePredictions:', input);
+      return [];
+    }
+
     try {
       const request: google.maps.places.AutocompletionRequest = {
-        input,
+        input: input.trim(),
         types: options.types || ['establishment'],
         location: options.location ? new google.maps.LatLng(options.location.lat, options.location.lng) : undefined,
         radius: options.radius,
@@ -304,9 +326,15 @@ export class ModernGooglePlacesAPI {
   async getPlaceDetails(placeId: string, fields: string[] = ['name', 'formatted_address', 'geometry', 'rating', 'user_ratings_total', 'photos', 'opening_hours', 'website', 'formatted_phone_number', 'price_level']): Promise<any> {
     await this.initialize();
 
+    // Validate placeId parameter
+    if (!placeId || typeof placeId !== 'string' || placeId.trim() === '') {
+      console.warn('Invalid placeId provided to getPlaceDetails:', placeId);
+      return null;
+    }
+
     try {
       const request: google.maps.places.PlaceDetailsRequest = {
-        placeId,
+        placeId: placeId.trim(),
         fields
       };
 

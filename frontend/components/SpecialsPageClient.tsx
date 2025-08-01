@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import SearchBar from '@/components/SearchBar';
+import NavTabs from '@/components/NavTabs';
 import BottomNavigation from '@/components/BottomNavigation';
 import { RestaurantSpecial } from '@/types/restaurant';
 import { showToast } from '@/components/ui/Toast';
@@ -31,6 +32,7 @@ export default function SpecialsPageClient() {
   const [searchQuery, setSearchQuery] = useState('');
   const [claimingDeals, setClaimingDeals] = useState<Set<number>>(new Set());
   const [mounted, setMounted] = useState(false);
+  const [activeTab, setActiveTab] = useState('specials');
 
   // Initialize component
   useEffect(() => {
@@ -135,6 +137,31 @@ export default function SpecialsPageClient() {
     router.push(`/?search=${searchQuery}`);
   };
 
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    
+    // Navigate to different pages based on the selected tab
+    switch (tab) {
+      case 'mikvahs':
+        router.push('/mikvahs');
+        break;
+      case 'shuls':
+        router.push('/shuls');
+        break;
+      case 'specials':
+        // Already on specials page, just update the tab
+        break;
+      case 'eatery':
+        router.push('/eatery');
+        break;
+      case 'stores':
+        router.push('/stores');
+        break;
+      default:
+        break;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
@@ -151,6 +178,11 @@ export default function SpecialsPageClient() {
       {/* Search Bar */}
       <div className="px-4 py-4">
         <SearchBar onSearch={handleSearch} />
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="px-4 sm:px-6 py-2 bg-white border-b border-gray-100">
+        <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
 
       {/* Back Navigation */}
