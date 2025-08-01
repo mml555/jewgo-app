@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/utils/cn';
+import { safeFilter } from '@/utils/validation';
 
 // Custom slider styles
 const sliderStyles = `
@@ -202,7 +203,7 @@ export default function ActionButtons({
       case 'categories':
         return activeFilters?.category && activeFilters.category !== 'all' ? 1 : 0;
       case 'kosherFeatures':
-        return Object.values(activeFilters || {}).filter(value => 
+        return safeFilter(Object.values(activeFilters || {}), value => 
           typeof value === 'boolean' && value === true && 
           ['is_cholov_yisroel', 'is_pas_yisroel', 'is_glatt', 'is_mehadrin', 'is_bishul_yisroel'].includes(Object.keys(activeFilters || {}).find(key => activeFilters[key] === value) || '')
         ).length;
@@ -230,7 +231,7 @@ export default function ActionButtons({
   const handleFeatureToggle = (feature: string) => {
     const currentFeatures = activeFilters?.features || [];
     const newFeatures = currentFeatures.includes(feature)
-      ? currentFeatures.filter((f: string) => f !== feature)
+      ? safeFilter(currentFeatures, (f: string) => f !== feature)
       : [...currentFeatures, feature];
     
     onFilterChange?.('features', newFeatures);

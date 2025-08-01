@@ -8,6 +8,7 @@ import BottomNavigation from '@/components/BottomNavigation';
 import { RestaurantSpecial } from '@/types/restaurant';
 import { showToast } from '@/components/ui/Toast';
 import { fetchSpecials, claimDeal, getMockSpecials } from '@/lib/api/specials';
+import { safeFilter } from '@/utils/validation';
 
 interface Special {
   id: number;
@@ -65,26 +66,37 @@ export default function SpecialsPageClient() {
   // Memoized categories and filtered specials
   const categories = useMemo(() => [
     { id: 'all', name: 'All Specials', count: specials.length },
-    { id: 'shabbat', name: 'Shabbat', count: specials.filter(s => s.category === 'shabbat').length },
-    { id: 'lunch', name: 'Lunch', count: specials.filter(s => s.category === 'lunch').length },
-    { id: 'dinner', name: 'Dinner', count: specials.filter(s => s.category === 'dinner').length },
-    { id: 'breakfast', name: 'Breakfast', count: specials.filter(s => s.category === 'breakfast').length },
-    { id: 'dessert', name: 'Dessert', count: specials.filter(s => s.category === 'dessert').length },
-    { id: 'catering', name: 'Catering', count: specials.filter(s => s.category === 'catering').length },
-    { id: 'promotion', name: 'Promotions', count: specials.filter(s => s.category === 'promotion').length },
-    { id: 'discount', name: 'Discounts', count: specials.filter(s => s.category === 'discount').length },
-    { id: 'event', name: 'Events', count: specials.filter(s => s.category === 'event').length }
+    { id: 'shabbat', name: 'Shabbat', count: safeFilter(specials, s => s.category === 'shabbat').length },
+    { id: 'lunch', name: 'Lunch', count: safeFilter(specials, s => s.category === 'lunch').length },
+    { id: 'dinner', name: 'Dinner', count: safeFilter(specials, s => s.category === 'dinner').length },
+    { id: 'breakfast', name: 'Breakfast', count: safeFilter(specials, s => s.category === 'breakfast').length },
+    { id: 'dessert', name: 'Dessert', count: safeFilter(specials, s => s.category === 'dessert').length },
+    { id: 'catering', name: 'Catering', count: safeFilter(specials, s => s.category === 'catering').length },
+    { id: 'promotion', name: 'Promotions', count: safeFilter(specials, s => s.category === 'promotion').length },
+    { id: 'discount', name: 'Discounts', count: safeFilter(specials, s => s.category === 'discount').length },
+    { id: 'event', name: 'Events', count: safeFilter(specials, s => s.category === 'event').length }
   ], [specials]);
 
   const filteredSpecials = useMemo(() => {
-    return specials
-      .filter(special => categoryTab === 'all' || special.category === categoryTab)
-      .filter(special => 
+    try {
+      // First filter by category
+      let filtered = safeFilter(specials, special => 
+        categoryTab === 'all' || special.category === categoryTab
+      );
+      
+      // Then filter by search query
+      filtered = safeFilter(filtered, special => 
         !searchQuery.trim() || 
         special.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         special.restaurant.toLowerCase().includes(searchQuery.toLowerCase()) ||
         special.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
+      
+      return filtered;
+    } catch (error) {
+      console.error('Error in filteredSpecials useMemo:', error);
+      return [];
+    }
   }, [specials, categoryTab, searchQuery]);
 
   const formatDate = (dateString: string) => {
