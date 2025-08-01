@@ -89,106 +89,119 @@ export default function HomePageClient() {
 
   // Memoized filtered restaurants to prevent unnecessary recalculations
   const filteredRestaurants = useMemo(() => {
-    if (allRestaurants.length === 0) return [];
-    
-    let filtered = [...allRestaurants];
-    
-    // Apply search query filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase().trim();
-      filtered = filtered.filter(restaurant => 
-        restaurant.name?.toLowerCase().includes(query) ||
-        restaurant.address?.toLowerCase().includes(query) ||
-        restaurant.city?.toLowerCase().includes(query) ||
-        restaurant.state?.toLowerCase().includes(query) ||
-        restaurant.certifying_agency?.toLowerCase().includes(query) ||
-        restaurant.listing_type?.toLowerCase().includes(query) ||
-        restaurant.kosher_category?.toLowerCase().includes(query)
-      );
-    }
-    
-    // Apply agency filter
-    if (activeFilters.agency) {
-      filtered = filtered.filter(restaurant => 
-        restaurant.certifying_agency && 
-        restaurant.certifying_agency.toLowerCase().includes(activeFilters.agency!.toLowerCase())
-      );
-    }
-    
-    // Apply kosher type filter
-    if (activeFilters.kosherType && activeFilters.kosherType !== 'all') {
-      filtered = filtered.filter(restaurant => {
-        const kosherCategory = restaurant.kosher_category?.toLowerCase() || '';
-        return kosherCategory === activeFilters.kosherType!.toLowerCase();
-      });
-    }
-    
-    // Apply kosher features filters
-    if (activeFilters.is_cholov_yisroel) {
-      filtered = filtered.filter(restaurant => restaurant.is_cholov_yisroel === true);
-    }
-    
-    if (activeFilters.is_pas_yisroel) {
-      filtered = filtered.filter(restaurant => restaurant.is_pas_yisroel === true);
-    }
-    
-    // Apply category filter
-    if (activeFilters.category) {
-      filtered = filtered.filter(restaurant => 
-        restaurant.listing_type && 
-        restaurant.listing_type.toLowerCase().includes(activeFilters.category!.toLowerCase())
-      );
-    }
-    
-    // Apply "near me" filter
-    if (activeFilters.nearMe && userLocation) {
-      const maxDistance = activeFilters.distanceRadius || 10; // Default 10 miles
+    try {
+      if (!allRestaurants || allRestaurants.length === 0) return [];
       
-      filtered = filtered.filter(restaurant => {
-        if (!restaurant.latitude || !restaurant.longitude) return false;
-        const distance = calculateDistance(
-          userLocation.latitude, 
-          userLocation.longitude, 
-          restaurant.latitude, 
-          restaurant.longitude
+      let filtered = [...allRestaurants];
+      
+      // Apply search query filter
+      if (searchQuery && searchQuery.trim()) {
+        const query = searchQuery.toLowerCase().trim();
+        filtered = filtered.filter(restaurant => 
+          restaurant.name?.toLowerCase().includes(query) ||
+          restaurant.address?.toLowerCase().includes(query) ||
+          restaurant.city?.toLowerCase().includes(query) ||
+          restaurant.state?.toLowerCase().includes(query) ||
+          restaurant.certifying_agency?.toLowerCase().includes(query) ||
+          restaurant.listing_type?.toLowerCase().includes(query) ||
+          restaurant.kosher_category?.toLowerCase().includes(query)
         );
-        return distance <= maxDistance;
-      });
-    }
-    
-    // Sort by distance if user location is available
-    if (userLocation) {
-      filtered.sort((a, b) => {
-        if (!a.latitude || !a.longitude) return 1;
-        if (!b.latitude || !b.longitude) return -1;
+      }
+      
+      // Apply agency filter
+      if (activeFilters?.agency) {
+        filtered = filtered.filter(restaurant => 
+          restaurant.certifying_agency && 
+          restaurant.certifying_agency.toLowerCase().includes(activeFilters.agency!.toLowerCase())
+        );
+      }
+      
+      // Apply kosher type filter
+      if (activeFilters?.kosherType && activeFilters.kosherType !== 'all') {
+        filtered = filtered.filter(restaurant => {
+          const kosherCategory = restaurant.kosher_category?.toLowerCase() || '';
+          return kosherCategory === activeFilters.kosherType!.toLowerCase();
+        });
+      }
+      
+      // Apply kosher features filters
+      if (activeFilters?.is_cholov_yisroel) {
+        filtered = filtered.filter(restaurant => restaurant.is_cholov_yisroel === true);
+      }
+      
+      if (activeFilters?.is_pas_yisroel) {
+        filtered = filtered.filter(restaurant => restaurant.is_pas_yisroel === true);
+      }
+      
+      // Apply category filter
+      if (activeFilters?.category) {
+        filtered = filtered.filter(restaurant => 
+          restaurant.listing_type && 
+          restaurant.listing_type.toLowerCase().includes(activeFilters.category!.toLowerCase())
+        );
+      }
+      
+      // Apply "near me" filter
+      if (activeFilters?.nearMe && userLocation) {
+        const maxDistance = activeFilters.distanceRadius || 10; // Default 10 miles
         
-        const distanceA = calculateDistance(
-          userLocation.latitude, 
-          userLocation.longitude, 
-          a.latitude, 
-          a.longitude
-        );
-        const distanceB = calculateDistance(
-          userLocation.latitude, 
-          userLocation.longitude, 
-          b.latitude, 
-          b.longitude
-        );
-        
-        return distanceA - distanceB;
-      });
+        filtered = filtered.filter(restaurant => {
+          if (!restaurant.latitude || !restaurant.longitude) return false;
+          const distance = calculateDistance(
+            userLocation.latitude, 
+            userLocation.longitude, 
+            restaurant.latitude, 
+            restaurant.longitude
+          );
+          return distance <= maxDistance;
+        });
+      }
+      
+      // Sort by distance if user location is available
+      if (userLocation) {
+        filtered.sort((a, b) => {
+          if (!a.latitude || !a.longitude) return 1;
+          if (!b.latitude || !b.longitude) return -1;
+          
+          const distanceA = calculateDistance(
+            userLocation.latitude, 
+            userLocation.longitude, 
+            a.latitude, 
+            a.longitude
+          );
+          const distanceB = calculateDistance(
+            userLocation.latitude, 
+            userLocation.longitude, 
+            b.latitude, 
+            b.longitude
+          );
+          
+          return distanceA - distanceB;
+        });
+      }
+      
+      return filtered;
+    } catch (error) {
+      console.error('Error in filteredRestaurants useMemo:', error);
+      return [];
     }
-    
-    return filtered;
   }, [allRestaurants, searchQuery, activeFilters, userLocation]);
 
   // Memoized paginated restaurants
   const displayedRestaurants = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const result = filteredRestaurants.slice(startIndex, endIndex);
-    console.log(`Pagination: Page ${currentPage}, showing ${result.length} restaurants (${startIndex}-${endIndex} of ${filteredRestaurants.length})`);
-    return result;
+    try {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const result = filteredRestaurants.slice(startIndex, endIndex);
+      
+      console.log(`Pagination: Page ${currentPage}, showing ${result.length} restaurants (${startIndex}-${endIndex} of ${filteredRestaurants.length})`);
+      console.log(`Total pages calculation: ${filteredRestaurants.length} restaurants, ${itemsPerPage} per page = ${Math.ceil(filteredRestaurants.length / itemsPerPage)} pages`);
+      
+      return result;
+    } catch (error) {
+      console.error('Error in displayedRestaurants useMemo:', error);
+      return [];
+    }
   }, [filteredRestaurants, currentPage, itemsPerPage]);
 
   // Memoized total count and pages

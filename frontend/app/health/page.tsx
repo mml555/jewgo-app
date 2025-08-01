@@ -7,7 +7,7 @@ export const revalidate = 0
 
 interface HealthStatus {
   frontend: 'healthy' | 'degraded' | 'down'
-  backend: 'healthy' | 'degraded' | 'down'
+  backend: 'healthy' | 'degraded' | 'down' | 'unknown'
   database: 'healthy' | 'degraded' | 'down' | 'unknown'
   timestamp: string
   version: string
@@ -16,6 +16,18 @@ interface HealthStatus {
 
 async function getHealthStatus(): Promise<HealthStatus> {
   try {
+    // Skip health check during static generation
+    if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+      return {
+        frontend: 'healthy',
+        backend: 'unknown',
+        database: 'unknown',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+        commit: process.env.VERCEL_GIT_COMMIT_SHA || 'unknown'
+      };
+    }
+
     const backendResponse = await fetch('https://jewgo.onrender.com/health', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
