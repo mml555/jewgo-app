@@ -325,9 +325,18 @@
   animation: filterPulse 0.3s ease-in-out;
 }
 
-/* Mobile Grid Override */
+/* Mobile Grid Override - Force 2 columns on mobile */
 .mobile-grid-2 {
   grid-template-columns: repeat(2, 1fr) !important;
+  max-width: 100% !important;
+}
+
+/* Additional mobile grid enforcement */
+@media (max-width: 768px) {
+  .mobile-grid-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    display: grid !important;
+  }
 }
 
 /* Responsive Adjustments */
