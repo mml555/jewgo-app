@@ -1,6 +1,10 @@
 import { Suspense } from 'react'
 import RefreshButton from '@/components/ui/RefreshButton'
 
+// Force dynamic rendering to prevent static generation timeout
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 interface HealthStatus {
   frontend: 'healthy' | 'degraded' | 'down'
   backend: 'healthy' | 'degraded' | 'down'
@@ -15,7 +19,7 @@ async function getHealthStatus(): Promise<HealthStatus> {
     const backendResponse = await fetch('https://jewgo.onrender.com/health', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
-      next: { revalidate: 30 } // Cache for 30 seconds
+      cache: 'no-store' // Disable caching for real-time health checks
     })
 
     if (backendResponse.ok) {

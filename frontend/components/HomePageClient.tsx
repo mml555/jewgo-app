@@ -45,15 +45,37 @@ export default function HomePageClient() {
   useEffect(() => {
     setMounted(true);
     
-    // Show location prompt after a short delay if user hasn't granted location access
-    const locationTimer = setTimeout(() => {
-      if (!userLocation && !locationPromptShown && navigator.geolocation) {
+    // Restore stored location if available
+    const storedLocation = localStorage.getItem('userLocation');
+    if (storedLocation && !userLocation) {
+      try {
+        const location = JSON.parse(storedLocation);
+        setUserLocation(location);
+        console.log('Restored stored location:', location);
+      } catch (error) {
+        console.error('Error parsing stored location:', error);
+        localStorage.removeItem('userLocation');
+      }
+    }
+    
+    // Check if location permission has been explicitly granted or denied
+    const checkLocationPermission = async () => {
+      if (!navigator.geolocation) {
+        console.log('Geolocation not supported');
+        return;
+      }
+
+      // Check if we have a stored location or if permission has been explicitly handled
+      const hasStoredLocation = localStorage.getItem('userLocation');
+      const hasHandledPermission = localStorage.getItem('locationPermissionHandled');
+      
+      if (!userLocation && !hasStoredLocation && !hasHandledPermission && !locationPromptShown) {
         setShowLocationPrompt(true);
         setLocationPromptShown(true);
       }
-    }, 2000); // Show after 2 seconds
+    };
 
-    return () => clearTimeout(locationTimer);
+    checkLocationPermission();
   }, [userLocation, locationPromptShown]);
 
   useEffect(() => {
@@ -340,18 +362,48 @@ export default function HomePageClient() {
     console.log('Location granted:', location);
     setUserLocation(location);
     setShowLocationPrompt(false);
+    
+    // Store location and permission state
+    localStorage.setItem('userLocation', JSON.stringify(location));
+    localStorage.setItem('locationPermissionHandled', 'granted');
   };
 
   const handleLocationDenied = () => {
     console.log('Location denied by user');
     setShowLocationPrompt(false);
+    
+    // Store that permission was handled (denied)
+    localStorage.setItem('locationPermissionHandled', 'denied');
+    
     // Continue without location - app will work with default behavior
   };
 
   const handleLocationPromptDismiss = () => {
     console.log('Location prompt dismissed');
     setShowLocationPrompt(false);
+    
+    // Store that permission was handled (dismissed)
+    localStorage.setItem('locationPermissionHandled', 'dismissed');
+    
     // Continue without location - app will work with default behavior
+  };
+
+  const handleLocationReset = () => {
+    console.log('Resetting location permission');
+    
+    // Clear stored location and permission state
+    localStorage.removeItem('userLocation');
+    localStorage.removeItem('locationPermissionHandled');
+    
+    // Reset state
+    setUserLocation(null);
+    setLocationPromptShown(false);
+    
+    // Show location prompt again
+    if (navigator.geolocation) {
+      setShowLocationPrompt(true);
+      setLocationPromptShown(true);
+    }
   };
 
   // Don't render until mounted to prevent hydration issues
@@ -402,6 +454,7 @@ export default function HomePageClient() {
                 userLocation={userLocation ? { lat: userLocation.latitude, lng: userLocation.longitude } : null}
                 locationLoading={locationLoading}
                 hasActiveFilters={Object.values(activeFilters || {}).some(filter => filter !== undefined && filter !== false)}
+                onLocationReset={handleLocationReset}
               />
             </div>
 

@@ -65,11 +65,15 @@ This guide helps you resolve common issues with the JewGo application.
 2. **Reset location permissions**:
    - Clear browser data for your site
    - Refresh the page
-   - The location prompt should appear after 2 seconds
+   - The location prompt should appear immediately when the page loads
 
 3. **Manual location request**:
    - Click the "Near Me" filter in the action buttons
    - This will trigger a location request
+
+4. **Reset location permission in the app**:
+   - If you previously denied location access, the app remembers this
+   - Use the location reset feature in the action buttons to show the prompt again
 
 ### Location access denied
 

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+// Force dynamic rendering for API routes
+export const dynamic = 'force-dynamic'
+
 // Validation schema for restaurant submission
 const RestaurantSubmissionSchema = z.object({
   // Basic Info
@@ -121,7 +124,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     
     // Pagination
     const limit = parseInt(searchParams.get('limit') || '50');

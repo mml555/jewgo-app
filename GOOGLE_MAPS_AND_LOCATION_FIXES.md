@@ -46,10 +46,12 @@
 - ✅ Mobile-responsive design with accessibility features
 
 #### B. Enhanced HomePageClient Component (`frontend/components/HomePageClient.tsx`)
-- ✅ Automatic location prompt after 2 seconds
+- ✅ **Immediate location prompt** when website opens (no delay)
 - ✅ Integration with LocationPermissionPrompt component
 - ✅ Proper state management for location permission
 - ✅ Graceful handling of location denial
+- ✅ **Persistent storage** of location permission state in localStorage
+- ✅ **Location reset functionality** for users to change their choice
 
 ## New Features Added
 
@@ -126,8 +128,10 @@ cat TROUBLESHOOTING.md
 ## Testing Checklist
 
 - [ ] Google Maps API loads successfully with valid API key
-- [ ] Location permission prompt appears after 2 seconds
+- [ ] **Location permission prompt appears immediately when website opens**
 - [ ] Location permission can be granted and denied gracefully
+- [ ] **Location permission state is remembered across sessions**
+- [ ] **Users can reset location permission to show prompt again**
 - [ ] Error messages are clear and actionable
 - [ ] Environment check script works correctly
 - [ ] Application works without location access

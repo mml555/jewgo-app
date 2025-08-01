@@ -52,6 +52,7 @@ interface ActionButtonsProps {
   locationLoading?: boolean;
   hasActiveFilters?: boolean;
   isOnMapPage?: boolean;
+  onLocationReset?: () => void;
 }
 
 // Enhanced filter options - Updated to match actual database data
@@ -127,7 +128,8 @@ export default function ActionButtons({
   userLocation,
   locationLoading,
   hasActiveFilters,
-  isOnMapPage = false
+  isOnMapPage = false,
+  onLocationReset
 }: ActionButtonsProps) {
   const [showFilters, setShowFilters] = useState(false);
   const [expandedSections, setExpandedSections] = useState({

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Force dynamic rendering for API routes
+export const dynamic = 'force-dynamic'
+
 /**
  * API Route: GET /api/restaurants/search
  * 
@@ -10,8 +13,8 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function GET(request: NextRequest) {
   try {
-    // Get search parameters from the URL
-    const { searchParams } = new URL(request.url);
+    // Get search parameters directly from the request
+    const { searchParams } = request.nextUrl;
     
     // Get backend URL from environment
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://jewgo.onrender.com';
