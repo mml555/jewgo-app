@@ -24,11 +24,10 @@ export default function SpecialsManagementPage() {
       setLoading(true);
       
       // Use mock data since admin specials endpoints don't exist on backend yet
-      const mockSpecials = [
+      const mockSpecials: RestaurantSpecial[] = [
         {
           id: 1,
           restaurant_id: 1,
-          restaurant_name: "Kosher Deli & Grill",
           title: "Shabbat Special",
           description: "Complete Shabbat meal with soup, main course, and dessert",
           discount_percent: 20,
@@ -45,7 +44,6 @@ export default function SpecialsManagementPage() {
         {
           id: 2,
           restaurant_id: 2,
-          restaurant_name: "Diamond K Ice Cream",
           title: "Summer Promotion",
           description: "Buy one get one free on all ice cream flavors",
           discount_percent: 50,
@@ -62,7 +60,6 @@ export default function SpecialsManagementPage() {
         {
           id: 3,
           restaurant_id: 3,
-          restaurant_name: "Miami Kosher Market",
           title: "Holiday Event",
           description: "Special holiday menu with traditional dishes",
           discount_percent: 15,
