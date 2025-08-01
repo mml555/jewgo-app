@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placeholder Image Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .placeholder {
+            width: 400px;
+            height: 300px;
+            margin: 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .pizza { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+        .sushi { background: linear-gradient(135deg, #4834d4, #686de0); }
+        .grill { background: linear-gradient(135deg, #6c5ce7, #a29bfe); }
+        .bakery { background: linear-gradient(135deg, #fdcb6e, #e17055); }
+        .cafe { background: linear-gradient(135deg, #00b894, #00cec9); }
+        .dessert { background: linear-gradient(135deg, #fd79a8, #fdcb6e); }
+        .default { background: linear-gradient(135deg, #74b9ff, #0984e3); }
+        
+        .download-btn {
+            background: #00b894;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 14px;
+        }
+        .download-btn:hover {
+            background: #00a085;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Restaurant Placeholder Images</h1>
+        <p>Right-click on each image and "Save image as..." to download the placeholders.</p>
+        
+        <div class="placeholder pizza" id="pizza">
+            🍕 Pizza Placeholder
+        </div>
+        <button class="download-btn" onclick="downloadImage('pizza', 'pizza-placeholder.jpg')">Download Pizza</button>
+        
+        <div class="placeholder sushi" id="sushi">
+            🍣 Sushi Placeholder
+        </div>
+        <button class="download-btn" onclick="downloadImage('sushi', 'sushi-placeholder.jpg')">Download Sushi</button>
+        
+        <div class="placeholder grill" id="grill">
+            🥩 Grill Placeholder
+        </div>
+        <button class="download-btn" onclick="downloadImage('grill', 'grill-placeholder.jpg')">Download Grill</button>
+        
+        <div class="placeholder bakery" id="bakery">
+            🥖 Bakery Placeholder
+        </div>
+        <button class="download-btn" onclick="downloadImage('bakery', 'bakery-placeholder.jpg')">Download Bakery</button>
+        
+        <div class="placeholder cafe" id="cafe">
+            ☕ Cafe Placeholder
+        </div>
+        <button class="download-btn" onclick="downloadImage('cafe', 'cafe-placeholder.jpg')">Download Cafe</button>
+        
+        <div class="placeholder dessert" id="dessert">
+            🍰 Dessert Placeholder
+        </div>
+        <button class="download-btn" onclick="downloadImage('dessert', 'dessert-placeholder.jpg')">Download Dessert</button>
+        
+        <div class="placeholder default" id="default">
+            🍽️ Default Restaurant
+        </div>
+        <button class="download-btn" onclick="downloadImage('default', 'default-restaurant.jpg')">Download Default</button>
+    </div>
+
+    <script>
+        function downloadImage(elementId, filename) {
+            const element = document.getElementById(elementId);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = 400;
+            canvas.height = 300;
+            
+            // Create a temporary canvas to draw the element
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = 400;
+            tempCanvas.height = 300;
+            
+            // Draw the background gradient
+            const gradient = ctx.createLinearGradient(0, 0, 400, 300);
+            const colors = getGradientColors(elementId);
+            gradient.addColorStop(0, colors[0]);
+            gradient.addColorStop(1, colors[1]);
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 400, 300);
+            
+            // Add text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(element.textContent, 200, 150);
+            
+            // Download the image
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        function getGradientColors(elementId) {
+            const colors = {
+                pizza: ['#ff6b6b', '#ee5a24'],
+                sushi: ['#4834d4', '#686de0'],
+                grill: ['#6c5ce7', '#a29bfe'],
+                bakery: ['#fdcb6e', '#e17055'],
+                cafe: ['#00b894', '#00cec9'],
+                dessert: ['#fd79a8', '#fdcb6e'],
+                default: ['#74b9ff', '#0984e3']
+            };
+            return colors[elementId] || colors.default;
+        }
+    </script>
+</body>
+</html> 

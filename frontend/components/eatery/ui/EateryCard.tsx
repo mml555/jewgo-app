@@ -24,26 +24,33 @@ export default function EateryCard({ restaurant, className = "" }: EateryCardPro
     setIsFavorited(!isFavorited);
   };
 
-  const getKosherBadgeClass = (category: string) => {
-    const typeLower = category.toLowerCase();
-    if (typeLower === 'dairy') {
-      return 'bg-blue-100 text-blue-800';
-    } else if (typeLower === 'meat') {
-      return 'bg-[#A70000] text-white';
-    } else {
-      return 'bg-yellow-100 text-yellow-800';
-    }
+  // Get category-based placeholder image
+  const getCategoryPlaceholder = (category: string) => {
+    const categoryLower = category?.toLowerCase() || '';
+    if (categoryLower.includes('pizza')) return '/images/placeholders/pizza-placeholder.jpg';
+    if (categoryLower.includes('sushi') || categoryLower.includes('japanese')) return '/images/placeholders/sushi-placeholder.jpg';
+    if (categoryLower.includes('grill') || categoryLower.includes('steak')) return '/images/placeholders/grill-placeholder.jpg';
+    if (categoryLower.includes('bakery')) return '/images/placeholders/bakery-placeholder.jpg';
+    if (categoryLower.includes('cafe') || categoryLower.includes('coffee')) return '/images/placeholders/cafe-placeholder.jpg';
+    if (categoryLower.includes('ice cream') || categoryLower.includes('dessert')) return '/images/placeholders/dessert-placeholder.jpg';
+    return '/images/default-restaurant.jpg';
   };
 
-  const getKosherLabel = (category: string) => {
-    const typeLower = category.toLowerCase();
-    if (typeLower === 'dairy') {
-      return 'Dairy';
-    } else if (typeLower === 'meat') {
-      return 'Meat';
-    } else {
-      return 'Pareve';
-    }
+  // Get kosher type color for tag
+  const getKosherTypeColor = (kosherType: string) => {
+    const typeLower = kosherType?.toLowerCase() || '';
+    if (typeLower === 'dairy') return 'bg-blue-500';
+    if (typeLower === 'meat') return 'bg-[#A70000]';
+    if (typeLower === 'pareve') return 'bg-green-500';
+    return 'bg-gray-500';
+  };
+
+  // Title case function
+  const titleCase = (str: string) => {
+    if (!str) return '';
+    return str.replace(/\w\S*/g, (txt) => 
+      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    );
   };
 
   const formatPriceRange = () => {
@@ -66,13 +73,12 @@ export default function EateryCard({ restaurant, className = "" }: EateryCardPro
     if (restaurant.image_url && !imageError) {
       return restaurant.image_url;
     }
-    // Use a placeholder image if no image or image failed to load
-    return 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop&crop=center';
+    return getCategoryPlaceholder(restaurant.kosher_category || restaurant.listing_type);
   };
 
   return (
     <div 
-      className={`bg-white rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-300 ${className}`}
+      className={`bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg hover:scale-[1.01] transition-all duration-200 ${className}`}
       onClick={handleCardClick}
     >
       {/* Image Container */}
@@ -80,47 +86,56 @@ export default function EateryCard({ restaurant, className = "" }: EateryCardPro
         <img
           src={getHeroImage()}
           alt={restaurant.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           onError={() => setImageError(true)}
+          loading="lazy"
         />
         
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+        
         {/* Kosher Category Badge - Top Left */}
-        <div className="absolute top-2 left-2">
-          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getKosherBadgeClass(restaurant.kosher_category)}`}>
-            {getKosherLabel(restaurant.kosher_category)}
-          </span>
-        </div>
+        {restaurant.kosher_category && (
+          <div className="absolute top-2 left-2">
+            <span className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getKosherTypeColor(restaurant.kosher_category)}`}>
+              {titleCase(restaurant.kosher_category)}
+            </span>
+          </div>
+        )}
         
         {/* Favorite Button - Top Right */}
         <button
           onClick={handleFavoriteClick}
-          className="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1.5 hover:bg-opacity-100 hover:scale-110 transition-all duration-200"
+          className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md transition-all duration-200 hover:scale-110"
           aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
         >
           <Heart 
-            className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-800 hover:text-red-400'}`} 
+            className={`w-4 h-4 ${isFavorited ? 'fill-pink-500 text-pink-500' : 'text-gray-800 hover:text-pink-500'}`} 
           />
         </button>
       </div>
       
       {/* Content */}
-      <div className="p-2">
+      <div className="px-3 py-2">
         {/* Restaurant Name */}
-        <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-1">
-          {restaurant.name}
+        <h3 className="text-[15px] font-semibold leading-snug text-gray-900 mb-2 line-clamp-2 group-hover:text-green-600 transition-colors tracking-tight">
+          {titleCase(restaurant.name)}
         </h3>
         
-        {/* Price Range */}
-        <p className="text-xs text-gray-500 mb-1">
-          {formatPriceRange()}
-        </p>
-        
-        {/* Rating */}
-        <div className="flex items-center">
-          <Star className="w-3.5 h-3.5 text-yellow-400 fill-current" />
-          <span className="ml-1 text-xs font-medium text-gray-700">
-            {getRating().toFixed(1)}
-          </span>
+        {/* Price Range and Rating - Aligned in one row */}
+        <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
+          {formatPriceRange() && (
+            <span>{formatPriceRange()}</span>
+          )}
+          {formatPriceRange() && getRating() > 0 && (
+            <span>•</span>
+          )}
+          {getRating() > 0 && (
+            <span className="inline-flex items-center gap-1">
+              <Star className="w-3.5 h-3.5 text-yellow-500 fill-current" />
+              <span className="text-sm font-medium">{getRating().toFixed(1)}</span>
+            </span>
+          )}
         </div>
       </div>
     </div>

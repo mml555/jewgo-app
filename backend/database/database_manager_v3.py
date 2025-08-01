@@ -30,6 +30,7 @@ Last Updated: 2024
 
 import os
 import logging
+import json
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Boolean, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
@@ -315,8 +316,20 @@ class EnhancedDatabaseManager:
             if session:
                 session.close()
     
+    def search_restaurants(self, limit: int = 1000, offset: int = 0) -> List[Dict[str, Any]]:
+        """Search restaurants and return as list of dictionaries."""
+        try:
+            session = self.get_session()
+            restaurants = session.query(Restaurant).limit(limit).offset(offset).all()
+            return [self._restaurant_to_unified_dict(restaurant) for restaurant in restaurants]
+        except Exception as e:
+            logger.error(f"Error searching restaurants: {e}")
+            return []
+        finally:
+            session.close()
+    
     def search_restaurants_near_location(self, lat: float, lng: float, radius: float = 50, 
-                                       query: str = None, category: str = None, limit: int = 50, offset: int = 0) -> List[Restaurant]:
+                                      query: str = None, category: str = None, limit: int = 50, offset: int = 0) -> List[Restaurant]:
         """Search restaurants near a specific location using distance calculation."""
         try:
             session = self.get_session()
@@ -619,6 +632,56 @@ class EnhancedDatabaseManager:
         except Exception as e:
             logger.error(f"Error adding restaurant {name}: {e}")
             return False
+    
+    def get_restaurant_specials(self, restaurant_id: int, paid_only: bool = False) -> List[Dict[str, Any]]:
+        """Get specials for a specific restaurant."""
+        try:
+            session = self.get_session()
+            restaurant = session.query(Restaurant).filter(Restaurant.id == restaurant_id).first()
+            if restaurant and restaurant.specials:
+                specials = self._parse_specials_field(restaurant.specials)
+                if paid_only:
+                    specials = [s for s in specials if s.get('is_paid', False)]
+                return specials
+            return []
+        except Exception as e:
+            logger.error(f"Error getting specials for restaurant {restaurant_id}: {e}")
+            return []
+        finally:
+            session.close()
+    
+    def update_special_payment_status(self, special_id: int, is_paid: bool, payment_status: str = 'paid') -> bool:
+        """Update payment status for a special."""
+        try:
+            session = self.get_session()
+            # Find the restaurant that contains this special
+            restaurants = session.query(Restaurant).all()
+            
+            for restaurant in restaurants:
+                if restaurant.specials:
+                    specials = self._parse_specials_field(restaurant.specials)
+                    for special in specials:
+                        if special.get('id') == special_id:
+                            # Update the special
+                            special['is_paid'] = is_paid
+                            special['payment_status'] = payment_status
+                            special['updated_at'] = datetime.utcnow().isoformat()
+                            
+                            # Save back to database
+                            restaurant.specials = json.dumps(specials)
+                            restaurant.updated_at = datetime.utcnow()
+                            session.commit()
+                            logger.info(f"Updated special {special_id} payment status")
+                            return True
+            
+            logger.warning(f"Special {special_id} not found")
+            return False
+        except Exception as e:
+            logger.error(f"Error updating special {special_id} payment status: {e}")
+            session.rollback()
+            return False
+        finally:
+            session.close()
     
     def disconnect(self):
         """Disconnect from the database."""

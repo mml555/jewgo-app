@@ -71,54 +71,39 @@ export default function RestaurantCard({
     fetchWebsiteIfNeeded();
   }, [restaurant.id, websiteLink, isFetchingWebsite]);
 
-  const getAgencyBadgeClass = (agency: string) => {
-    const agencyLower = agency.toLowerCase();
-    if (agencyLower.includes('orb')) {
-      return 'bg-sky-100 text-sky-800 border-sky-200';
-    } else if (agencyLower.includes('km')) {
-      return 'bg-pink-100 text-pink-800 border-pink-200';
-    } else if (agencyLower.includes('kdm')) {
-      return 'bg-gray-100 text-gray-800 border-gray-200';
-    } else if (agencyLower.includes('diamond k')) {
-      return 'bg-purple-100 text-purple-800 border-purple-200';
-    } else if (agencyLower.includes('ou') || agencyLower.includes('orthodox union')) {
-      return 'bg-blue-100 text-blue-800 border-blue-200';
-    } else if (agencyLower.includes('ok') || agencyLower.includes('ok kosher')) {
-      return 'bg-green-100 text-green-800 border-green-200';
-    } else if (agencyLower.includes('star-k') || agencyLower.includes('star k')) {
-      return 'bg-purple-100 text-purple-800 border-purple-200';
-    } else if (agencyLower.includes('crc') || agencyLower.includes('chicago rabbinical')) {
-      return 'bg-orange-100 text-orange-800 border-orange-200';
-    } else if (agencyLower.includes('kof-k')) {
-      return 'bg-red-100 text-red-800 border-red-200';
-    }
-    return 'bg-gray-100 text-gray-800 border-gray-200';
+  // Get category-based placeholder image
+  const getCategoryPlaceholder = (category: string) => {
+    const categoryLower = category?.toLowerCase() || '';
+    if (categoryLower.includes('pizza')) return '/images/placeholders/pizza-placeholder.jpg';
+    if (categoryLower.includes('sushi') || categoryLower.includes('japanese')) return '/images/placeholders/sushi-placeholder.jpg';
+    if (categoryLower.includes('grill') || categoryLower.includes('steak')) return '/images/placeholders/grill-placeholder.jpg';
+    if (categoryLower.includes('bakery')) return '/images/placeholders/bakery-placeholder.jpg';
+    if (categoryLower.includes('cafe') || categoryLower.includes('coffee')) return '/images/placeholders/cafe-placeholder.jpg';
+    if (categoryLower.includes('ice cream') || categoryLower.includes('dessert')) return '/images/placeholders/dessert-placeholder.jpg';
+    return '/images/default-restaurant.jpg';
   };
 
-  const getKosherTypeBadgeClass = (kosherType: string) => {
-    const typeLower = kosherType.toLowerCase();
-    if (typeLower === 'dairy') {
-      return 'bg-sky-300 text-sky-900 border-sky-400';
-    } else if (typeLower === 'meat') {
-      return 'bg-red-700 text-white border-red-800';
-    } else if (typeLower === 'pareve') {
-      return 'bg-yellow-300 text-yellow-900 border-yellow-400';
-    }
-    return 'bg-gray-500 text-white border-gray-600';
+  // Get kosher type color for tag
+  const getKosherTypeColor = (kosherType: string) => {
+    const typeLower = kosherType?.toLowerCase() || '';
+    if (typeLower === 'dairy') return 'bg-blue-500';
+    if (typeLower === 'meat') return 'bg-[#A70000]';
+    if (typeLower === 'pareve') return 'bg-green-500';
+    return 'bg-gray-500';
   };
 
-  const getKosherBadgeClass = (category: string) => {
-    const categoryLower = category.toLowerCase();
-    if (categoryLower.includes('glatt')) {
-      return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-    } else if (categoryLower.includes('chassidish')) {
-      return 'bg-indigo-100 text-indigo-800 border-indigo-200';
-    } else if (categoryLower.includes('mehadrin')) {
-      return 'bg-amber-100 text-amber-800 border-amber-200';
-    } else if (categoryLower.includes('chalav yisrael') || categoryLower.includes('chalav yisroel')) {
-      return 'bg-pink-100 text-pink-800 border-pink-200';
-    }
-    return 'bg-gray-100 text-gray-800 border-gray-200';
+  // Title case function
+  const titleCase = (str: string) => {
+    if (!str) return '';
+    return str.replace(/\w\S*/g, (txt) => 
+      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    );
+  };
+
+  // Get random placeholder price if missing
+  const getPlaceholderPrice = () => {
+    const prices = ['$', '$$', '$$$'];
+    return prices[Math.floor(Math.random() * prices.length)];
   };
 
   const formatDistance = (distance: number) => {
@@ -130,43 +115,9 @@ export default function RestaurantCard({
 
   const getHeroImage = () => {
     if (imageError || !restaurant.image_url) {
-      return '/images/default-restaurant.jpg';
+      return getCategoryPlaceholder(restaurant.kosher_category || restaurant.listing_type);
     }
     return restaurant.image_url;
-  };
-
-  const getCategoryIcon = (category: string) => {
-    const categoryLower = category.toLowerCase();
-    if (categoryLower.includes('restaurant')) {
-      return (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      );
-    } else if (categoryLower.includes('bakery')) {
-      return (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      );
-    } else if (categoryLower.includes('cafe')) {
-      return (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-        </svg>
-      );
-    } else if (categoryLower.includes('grocery')) {
-      return (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-        </svg>
-      );
-    }
-    return (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-      </svg>
-    );
   };
 
   // Clean address formatting - remove trailing commas
@@ -189,11 +140,10 @@ export default function RestaurantCard({
     const rating = restaurant.google_rating || restaurant.rating;
     if (!rating) return null;
     
-    const stars = '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
     return (
       <span className="inline-flex items-center gap-1">
-        <span className="text-yellow-500">{stars}</span>
-        <span className="text-sm font-medium">{rating}/5</span>
+        <span className="text-yellow-500">⭐</span>
+        <span className="text-sm font-medium">{rating}</span>
       </span>
     );
   };
@@ -201,8 +151,8 @@ export default function RestaurantCard({
   return (
     <div
       className={cn(
-        "group relative bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-200",
-        "hover:shadow-lg hover:border-gray-300 active:scale-[0.98]",
+        "group relative bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden transition-all duration-200",
+        "hover:shadow-lg hover:scale-[1.01] active:scale-[0.98]",
         "focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2",
         "touch-manipulation cursor-pointer",
         isPressed && "scale-[0.98] shadow-md",
@@ -225,7 +175,7 @@ export default function RestaurantCard({
       }}
     >
       {/* Image Section */}
-      <div className="relative h-44 sm:h-48 overflow-hidden bg-gray-100">
+      <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
         <img
           src={getHeroImage()}
           alt={`${restaurant.name} restaurant`}
@@ -237,199 +187,125 @@ export default function RestaurantCard({
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
         
-        {/* Heart/Share Buttons - Top Right */}
-        <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <button
-            className={cn(
-              "p-1.5 rounded-full shadow-sm transition-colors border",
-              isFavorited 
-                ? "bg-pink-200 text-pink-600 border-white" 
-                : "bg-transparent text-white border-white hover:bg-pink-200 hover:text-pink-600"
-            )}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsFavorited(!isFavorited);
-            }}
-            aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
-          >
-            <svg className="w-3.5 h-3.5" fill={isFavorited ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </button>
-          <button
-            className="bg-transparent text-white border border-white p-1.5 rounded-full shadow-sm hover:bg-white hover:text-gray-700 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              // Share functionality
-              if (navigator.share) {
-                navigator.share({
-                  title: restaurant.name,
-                  text: `Check out ${restaurant.name} on JewGo!`,
-                  url: `${window.location.origin}/restaurant/${restaurant.id}`
-                });
-              } else {
-                // Fallback: copy to clipboard
-                navigator.clipboard.writeText(`${window.location.origin}/restaurant/${restaurant.id}`);
-              }
-            }}
-            aria-label="Share restaurant"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-            </svg>
-          </button>
-        </div>
+        {/* Kosher Type Tag - Top Left */}
+        {restaurant.kosher_category && (
+          <span className={cn(
+            "absolute top-2 left-2 text-white text-xs font-medium px-2 py-1 rounded-full",
+            getKosherTypeColor(restaurant.kosher_category)
+          )}>
+            {titleCase(restaurant.kosher_category)}
+          </span>
+        )}
         
-        {/* Bottom Badges - Split layout with spacing */}
-        <div className="absolute bottom-3 left-3">
-          {/* Certification Badge - Left side */}
-          {restaurant.certifying_agency && (
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-transparent text-white border border-black shadow-sm hover:bg-white hover:text-gray-900 transition-colors duration-200">
-              {restaurant.certifying_agency === 'ORB Kosher' ? 'ORB' : restaurant.certifying_agency}
-            </span>
+        {/* Heart Button - Top Right */}
+        <button
+          className={cn(
+            "absolute top-2 right-2 bg-white rounded-full p-1 shadow-md transition-all duration-200",
+            isFavorited 
+              ? "text-pink-500" 
+              : "text-gray-800 hover:text-pink-500"
           )}
-        </div>
-        
-        {/* Kosher Type and Chalav Badges - Right side */}
-        <div className="absolute bottom-3 right-3 flex flex-row gap-2">
-          {/* Kosher Type Badge */}
-          {restaurant.kosher_category && (
-            <span className={cn(
-              "inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold border shadow-sm",
-              getKosherTypeBadgeClass(restaurant.kosher_category)
-            )}>
-              {restaurant.kosher_category.charAt(0).toUpperCase() + restaurant.kosher_category.slice(1)}
-            </span>
-          )}
-          
-          {/* Chalav Yisrael/Chalav Stam Badge - Only for dairy restaurants */}
-          {restaurant.kosher_category === 'dairy' && (
-            <span className={cn(
-              "inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold border shadow-sm",
-              restaurant.is_cholov_yisroel 
-                ? "bg-pink-100 text-pink-800 border-pink-200" 
-                : "bg-gray-100 text-gray-800 border-gray-200"
-            )}>
-              {restaurant.is_cholov_yisroel ? "Chalav Yisrael" : "Chalav Stam"}
-            </span>
-          )}
-          
-          {/* Pas Yisroel Badge - Only for specific restaurants that are Pas Yisroel */}
-          {(restaurant.kosher_category === 'meat' || restaurant.kosher_category === 'pareve') && 
-           restaurant.is_pas_yisroel === true && (
-            <span className={cn(
-              "inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold border shadow-sm",
-              "bg-purple-100 text-purple-800 border-purple-200"
-            )}>
-              Pas Yisroel
-            </span>
-          )}
-        </div>
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsFavorited(!isFavorited);
+          }}
+          aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+        >
+          <svg className="w-4 h-4" fill={isFavorited ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
         
         {/* Distance Badge (if needed) */}
         {showDistance && distance !== undefined && (
-          <div className="absolute top-12 right-3 bg-white/90 backdrop-blur-sm text-gray-800 px-2 py-1 rounded-full text-xs font-medium shadow-sm">
+          <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm text-gray-800 px-2 py-1 rounded-full text-xs font-medium shadow-sm">
             {formatDistance(distance)}
           </div>
         )}
       </div>
 
       {/* Content Section */}
-      <div className="p-3 sm:p-4">
-        {/* Header */}
-        <div className="mb-4">
-          {/* Restaurant Name - Enhanced styling */}
-          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-green-600 transition-colors leading-tight">
-            {restaurant.name}
-          </h3>
-          
-          {/* Rating and Description */}
-          <div className="text-sm text-gray-600 mb-3 space-y-1">
-            {renderRating() && (
-              <div className="flex items-center gap-2">
-                {renderRating()}
-                {restaurant.price_range && (
-                  <span className="text-gray-500">•</span>
-                )}
-                {restaurant.price_range && (
-                  <span className="capitalize">{restaurant.price_range} pricing</span>
-                )}
-              </div>
-            )}
-            <div>
-              {restaurant.short_description ? (
-                <span>{restaurant.short_description}</span>
-              ) : (
-                <span>Specializes in {(restaurant.listing_type || 'Restaurant').charAt(0).toUpperCase() + (restaurant.listing_type || 'Restaurant').slice(1)}.</span>
-              )}
-            </div>
-          </div>
-          
-          {/* Hours Display */}
-          <div className="mb-3">
-            <HoursDisplay 
-              hoursOfOperation={restaurant.hours_of_operation}
-              hoursJson={restaurant.hours_json ? (typeof restaurant.hours_json === 'string' ? JSON.parse(restaurant.hours_json) : restaurant.hours_json) : undefined}
-              hoursLastUpdated={restaurant.hours_last_updated}
-            />
-          </div>
-          
-          {/* Address */}
-          <div className="flex items-start gap-2 text-sm text-gray-600 mb-2">
-            <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span className="line-clamp-2">
-              {formatAddress(restaurant.address, restaurant.city, restaurant.state)}
-            </span>
-          </div>
-          
-          {/* Phone Number - Right under address */}
-          {restaurant.phone_number && (
-            <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              <a 
-                href={`tel:${restaurant.phone_number}`}
-                onClick={(e) => e.stopPropagation()}
-                className="text-green-600 hover:text-green-700 underline transition-colors"
-              >
-                {restaurant.phone_number}
-              </a>
-            </div>
+      <div className="px-3 py-2">
+        {/* Restaurant Name */}
+        <h3 className="text-[15px] font-semibold leading-snug text-gray-900 mb-2 line-clamp-2 group-hover:text-green-600 transition-colors tracking-tight">
+          {titleCase(restaurant.name)}
+        </h3>
+        
+        {/* Rating and Price - Aligned in one row */}
+        <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
+          {restaurant.price_range && (
+            <span>{restaurant.price_range}</span>
           )}
-          
-          {/* Action Button - Below Address */}
-          <div className="mb-4">
-            <button
-              className="w-full bg-transparent text-green-600 py-2 px-4 rounded-full font-semibold border-2 border-green-300 hover:bg-green-100 hover:border-green-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 touch-manipulation shadow-sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleCardClick();
-              }}
+          {restaurant.price_range && renderRating() && (
+            <span>•</span>
+          )}
+          {renderRating()}
+        </div>
+        
+        {/* Hours Display */}
+        <div className="mb-2">
+          <HoursDisplay 
+            hoursOfOperation={restaurant.hours_of_operation}
+            hoursJson={restaurant.hours_json ? (typeof restaurant.hours_json === 'string' ? JSON.parse(restaurant.hours_json) : restaurant.hours_json) : undefined}
+            hoursLastUpdated={restaurant.hours_last_updated}
+          />
+        </div>
+        
+        {/* Address */}
+        <div className="flex items-start gap-2 text-sm text-gray-600 mb-2">
+          <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span className="line-clamp-2">
+            {formatAddress(restaurant.address, restaurant.city, restaurant.state)}
+          </span>
+        </div>
+        
+        {/* Phone Number */}
+        {restaurant.phone_number && (
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+            <a 
+              href={`tel:${restaurant.phone_number}`}
+              onClick={(e) => e.stopPropagation()}
+              className="text-green-600 hover:text-green-700 underline transition-colors"
             >
-              View More
-            </button>
+              {restaurant.phone_number}
+            </a>
           </div>
+        )}
+        
+        {/* Action Button */}
+        <div className="mt-3">
+          <button
+            className="w-full bg-transparent text-green-600 py-2 px-4 rounded-full font-semibold border-2 border-green-300 hover:bg-green-100 hover:border-green-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 touch-manipulation shadow-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCardClick();
+            }}
+          >
+            View More
+          </button>
         </div>
 
         {/* Badges Section - Only show unique badges, no redundancy */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mt-3">
           {/* Listing Type - Only if no certifying agency to avoid duplication */}
           {restaurant.listing_type && !restaurant.certifying_agency && (
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
               <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
-              {restaurant.listing_type.charAt(0).toUpperCase() + restaurant.listing_type.slice(1)}
+              {titleCase(restaurant.listing_type)}
             </span>
           )}
         </div>
 
         {/* Contact Information */}
-        <div className="space-y-2 text-sm text-gray-600 mb-4">
+        <div className="space-y-2 text-sm text-gray-600 mt-3">
           {/* Website and Additional Links */}
           <div className="flex items-center justify-between">
             {/* Website Link - Left */}
@@ -504,8 +380,6 @@ export default function RestaurantCard({
             </button>
           </div>
         </div>
-
-
       </div>
 
       {/* Hover Effect Overlay */}

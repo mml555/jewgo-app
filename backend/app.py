@@ -59,7 +59,11 @@ from config.config import get_config
 app.config.from_object(get_config())
 
 # Initialize CORS with configuration
-CORS(app, origins=app.config.get('CORS_ORIGINS', ['*']))
+CORS(app, 
+     origins=app.config.get('CORS_ORIGINS', ['*']),
+     methods=app.config.get('CORS_METHODS', ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']),
+     allow_headers=app.config.get('CORS_ALLOW_HEADERS', ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']),
+     supports_credentials=True)
 
 # Initialize database manager
 db_manager = None
@@ -1060,6 +1064,46 @@ def update_restaurant_hours():
     except Exception as e:
         logger.error(f"Error updating restaurant hours: {e}")
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/admin/specials', methods=['GET'])
+def get_admin_specials():
+    """API endpoint for getting all specials (admin only)."""
+    try:
+        # Get all specials (both paid and unpaid)
+        all_specials = []
+        
+        # Get all restaurants and their specials
+        restaurants = db_manager.search_restaurants(limit=1000)
+        for restaurant in restaurants:
+            specials = db_manager.get_restaurant_specials(restaurant['id'], paid_only=False)
+            all_specials.extend(specials)
+        
+        return jsonify({
+            'success': True,
+            'specials': all_specials
+        })
+    except Exception as e:
+        logger.error(f"API error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/admin/specials/<int:special_id>/payment', methods=['PUT'])
+def update_special_payment(special_id):
+    """API endpoint for updating special payment status."""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        is_paid = data.get('is_paid', False)
+        payment_status = data.get('payment_status', 'paid')
+        
+        if db_manager.update_special_payment_status(special_id, is_paid, payment_status):
+            return jsonify({'success': True, 'message': 'Payment status updated successfully'})
+        else:
+            return jsonify({'success': False, 'error': 'Failed to update payment status'}), 500
+    except Exception as e:
+        logger.error(f"API error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 def offset_to_timezone(offset_minutes):
     """Convert UTC offset to timezone name."""
