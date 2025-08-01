@@ -203,10 +203,15 @@ export default function ActionButtons({
       case 'categories':
         return activeFilters?.category && activeFilters.category !== 'all' ? 1 : 0;
       case 'kosherFeatures':
-        return Object.values(activeFilters || {}).filter(value => 
-          typeof value === 'boolean' && value === true && 
-          ['is_cholov_yisroel', 'is_pas_yisroel', 'is_glatt', 'is_mehadrin', 'is_bishul_yisroel'].includes(Object.keys(activeFilters || {}).find(key => activeFilters[key] === value) || '')
-        ).length;
+        // Count boolean kosher features that are true
+        let kosherFeatureCount = 0;
+        const kosherFeatures = ['is_cholov_yisroel', 'is_pas_yisroel', 'is_glatt', 'is_mehadrin', 'is_bishul_yisroel'];
+        kosherFeatures.forEach(feature => {
+          if (activeFilters?.[feature] === true) {
+            kosherFeatureCount++;
+          }
+        });
+        return kosherFeatureCount;
       case 'price':
         return activeFilters?.priceRange && activeFilters.priceRange !== 'all' ? 1 : 0;
       case 'features':
