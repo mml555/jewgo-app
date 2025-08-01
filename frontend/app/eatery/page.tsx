@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
-import SmartSearch from '@/components/SmartSearch';
-import NavTabs from '@/components/NavTabs';
-import ActionButtons from '@/components/ActionButtons';
-import EateryCard from '@/components/eatery/ui/EateryCard';
-import BottomNavigation from '@/components/BottomNavigation';
+import SearchHeader from '@/components/layout/SearchHeader';
+import CategoryTabs from '@/components/layout/CategoryTabs';
+import ActionButtons from '@/components/layout/ActionButtons';
+import RestaurantGrid from '@/components/restaurant/RestaurantGrid';
+import BottomNavigation from '@/components/layout/BottomNavigation';
 import { Restaurant } from '@/types/restaurant';
 import { fetchRestaurants } from '@/lib/api/restaurants';
 
@@ -134,41 +133,26 @@ export default function EateryExplorePage() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      <Header />
-      
-                   {/* Smart Search with Database */}
-             <div className="px-4 sm:px-6 py-4 bg-white border-b border-gray-100">
-               <SmartSearch
-                 onSearch={handleSearch}
-                 placeholder="Search for kosher restaurants, agencies, or locations..."
-                 showAdvancedFilters={true}
-                 useGoogleAPI={false}
-               />
-             </div>
+      {/* Search Header */}
+      <SearchHeader
+        onSearch={handleSearch}
+        placeholder="Search for kosher restaurants, agencies, or locations..."
+        showFilters={true}
+        onShowFilters={() => {}}
+      />
 
-      {/* Navigation Tabs */}
-      <div className="px-4 sm:px-6 py-2 bg-white border-b border-gray-100">
-        <NavTabs activeTab={activeTab} onTabChange={handleTabChange} />
-      </div>
+      {/* Category Tabs */}
+      <CategoryTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
       {/* Action Buttons */}
-      <div className="px-4 sm:px-6 py-3 bg-white border-b border-gray-100">
-        <ActionButtons
-          onShowFilters={() => {}}
-          onShowMap={() => window.location.href = '/live-map'}
-          onAddEatery={() => window.location.href = '/add-eatery'}
-          onFilterChange={handleFilterChange}
-          onToggleFilter={handleToggleFilter}
-          onDistanceChange={handleDistanceChange}
-          onClearAll={handleClearAll}
-          onLocationReset={() => {}}
-          activeFilters={activeFilters}
-          userLocation={null}
-          locationLoading={false}
-          hasActiveFilters={hasActiveFilters()}
-          isOnMapPage={false}
-        />
-      </div>
+      <ActionButtons
+        onShowFilters={() => {}}
+        onShowMap={() => window.location.href = '/live-map'}
+        onAddEatery={() => window.location.href = '/add-eatery'}
+        hasActiveFilters={hasActiveFilters()}
+        onClearFilters={handleClearAll}
+        isOnMapPage={false}
+      />
 
       {/* Results Count */}
       <div className="px-4 sm:px-6 py-3 bg-gray-50 text-sm text-gray-600 border-b border-gray-200">
@@ -176,28 +160,14 @@ export default function EateryExplorePage() {
       </div>
 
       {/* Restaurant Grid */}
-      <div className="px-4 py-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filteredRestaurants.map((restaurant) => (
-            <EateryCard 
-              key={restaurant.id} 
-              restaurant={restaurant}
-            />
-          ))}
-        </div>
-        
-        {/* Empty State */}
-        {filteredRestaurants.length === 0 && !loading && (
-          <div className="text-center py-16">
-            <div className="text-gray-500 text-lg mb-3 font-medium">
-              No restaurants found
-            </div>
-            <div className="text-gray-400 text-sm">
-              Try adjusting your search or filters
-            </div>
-          </div>
-        )}
-      </div>
+      <RestaurantGrid
+        restaurants={filteredRestaurants}
+        loading={loading}
+        onRestaurantClick={(restaurant) => {
+          // Handle restaurant click - could navigate to detail page
+          console.log('Restaurant clicked:', restaurant.name);
+        }}
+      />
 
       {/* Bottom Navigation */}
       <BottomNavigation />
