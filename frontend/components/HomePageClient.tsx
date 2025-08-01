@@ -11,6 +11,8 @@ import SplashScreen from '@/components/SplashScreen';
 import LocationPermissionPrompt from '@/components/LocationPermissionPrompt';
 import { Restaurant } from '@/types/restaurant';
 import NavTabs from '@/components/NavTabs';
+import { fetchRestaurants, getMockRestaurants } from '@/lib/api/restaurants';
+import ApiHealthIndicator from '@/components/ApiHealthIndicator';
 
 export default function HomePageClient() {
   const router = useRouter();
@@ -275,28 +277,23 @@ export default function HomePageClient() {
   const fetchAllRestaurants = async () => {
     try {
       console.log('Fetching restaurants...');
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://jewgo.onrender.com';
-      const response = await fetch(`${backendUrl}/api/restaurants?limit=1000`);
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      const data = await fetchRestaurants(1000);
+      console.log('Restaurants fetched:', data.restaurants?.length || 0);
       
-      const data = await response.json();
-      console.log('Restaurants fetched:', data.restaurants?.length || data.data?.length || 0);
-      
-      if (data.restaurants) {
+      if (data.restaurants && data.restaurants.length > 0) {
         setAllRestaurants(data.restaurants);
-        // Removed setDisplayedRestaurants since we now use memoized displayedRestaurants
-      } else if (data.data) {
-        // Handle case where frontend API route returns data in different format
-        setAllRestaurants(data.data);
+        setApiError(null);
       } else {
-        setApiError('No restaurants data received');
+        console.warn('No restaurants received from API, using mock data');
+        setAllRestaurants(getMockRestaurants());
+        setApiError('Using fallback data - API temporarily unavailable');
       }
     } catch (error) {
       console.error('Error fetching restaurants:', error);
-      setApiError('Failed to fetch restaurants');
+      console.log('Falling back to mock data');
+      setAllRestaurants(getMockRestaurants());
+      setApiError('Using fallback data - API temporarily unavailable');
     } finally {
       setLoading(false);
       setShowSplash(false);
@@ -543,13 +540,17 @@ export default function HomePageClient() {
         {/* Bottom Navigation */}
         <BottomNavigation />
       </div>
-             {showLocationPrompt && (
-         <LocationPermissionPrompt
-           onLocationGranted={handleLocationGranted}
-           onLocationDenied={handleLocationDenied}
-           onDismiss={handleLocationPromptDismiss}
-         />
-       )}
+      
+      {/* API Health Indicator */}
+      <ApiHealthIndicator />
+      
+      {showLocationPrompt && (
+        <LocationPermissionPrompt
+          onLocationGranted={handleLocationGranted}
+          onLocationDenied={handleLocationDenied}
+          onDismiss={handleLocationPromptDismiss}
+        />
+      )}
     </div>
   );
 } 

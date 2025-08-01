@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Force dynamic rendering for API routes
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     // Fetch actual data from the backend API to get real filter options
@@ -7,6 +10,14 @@ export async function GET(request: NextRequest) {
     
     // Get restaurants to extract unique values
     const restaurantsResponse = await fetch(`${backendUrl}/api/restaurants?limit=1000`);
+    
+    // Check if response is JSON
+    const contentType = restaurantsResponse.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.warn('Backend returned non-JSON response for restaurants:', contentType);
+      throw new Error('Backend service unavailable');
+    }
+    
     const restaurantsData = await restaurantsResponse.json();
     const restaurants = restaurantsData.restaurants || restaurantsData.data || [];
     

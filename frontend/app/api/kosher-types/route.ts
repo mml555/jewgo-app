@@ -27,6 +27,19 @@ export async function GET(request: NextRequest) {
       }
     );
 
+    // Check if response is JSON
+    const contentType = backendResponse.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.warn('Backend returned non-JSON response for kosher-types:', contentType);
+      return NextResponse.json(
+        { 
+          error: 'Backend service unavailable',
+          message: 'Kosher types service is currently unavailable'
+        },
+        { status: 503 }
+      );
+    }
+
     const data = await backendResponse.json();
 
     // Return the same status and data from the backend

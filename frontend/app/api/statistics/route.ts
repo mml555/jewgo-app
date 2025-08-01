@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Force dynamic rendering for API routes
+export const dynamic = 'force-dynamic'
+
 /**
  * API Route: GET /api/statistics
  * 
@@ -23,6 +26,19 @@ export async function GET(request: NextRequest) {
         },
       }
     );
+
+    // Check if response is JSON
+    const contentType = backendResponse.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.warn('Backend returned non-JSON response:', contentType);
+      return NextResponse.json(
+        { 
+          error: 'Backend service unavailable',
+          message: 'Statistics service is currently unavailable'
+        },
+        { status: 503 }
+      );
+    }
 
     const data = await backendResponse.json();
 
