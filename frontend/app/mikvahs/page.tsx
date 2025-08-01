@@ -173,8 +173,8 @@ export default function MikvahsPage() {
       </div>
 
       {/* Restaurant Grid */}
-      <div className="px-4 py-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="px-4 py-6 pb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredRestaurants.map((restaurant) => (
             <EateryCard 
               key={restaurant.id} 

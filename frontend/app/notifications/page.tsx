@@ -170,7 +170,7 @@ export default function NotificationsPage() {
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📭</div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">No Notifications</h3>
-              <p className="text-gray-600">You're all caught up!</p>
+              <p className="text-gray-600">You&apos;re all caught up!</p>
             </div>
           ) : (
             <div className="space-y-3">

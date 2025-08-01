@@ -21,7 +21,7 @@ interface SearchSuggestion {
   icon: string;
   color: string;
   action: () => void;
-  metadata?: any;
+  metadata?: unknown;
 }
 
 interface GooglePlaceSuggestion {
@@ -129,7 +129,7 @@ export default function SmartSearch({
   ]);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -273,6 +273,34 @@ export default function SmartSearch({
     return allSuggestions;
   }, [addressDatabase]);
 
+  // Handle Google Place selection
+  const handleGooglePlaceSelect = useCallback(async (place: GooglePlaceSuggestion) => {
+    try {
+      // Validate place_id before making API call
+      if (!place.place_id || place.place_id.trim() === '') {
+        console.warn('Invalid place_id in GooglePlaceSuggestion:', place);
+        return;
+      }
+
+      // Get place details for coordinates using the Google Places API
+      const placeDetails = await googlePlacesAPI.getPlaceDetails(place.place_id, ['geometry', 'formatted_address']);
+      if (placeDetails && placeDetails.geometry) {
+        const { lat, lng } = placeDetails.geometry.location;
+        const locationData = {
+          lat,
+          lng,
+          address: place.description
+        };
+        
+        if (onLocationSelect) {
+          onLocationSelect(locationData);
+        }
+      }
+    } catch (error) {
+      console.error('Error getting place details:', error);
+    }
+  }, [onLocationSelect]);
+
   // Generate Google Places suggestions
   const generateGoogleSuggestions = useCallback(async (searchQuery: string) => {
     if (searchQuery.length < 3) return [];
@@ -302,7 +330,7 @@ export default function SmartSearch({
     } finally {
       setIsLoadingGoogle(false);
     }
-  }, []);
+  }, [handleGooglePlaceSelect]);
 
   // Generate search suggestions based on API type
   const generateSuggestions = useCallback(async (searchQuery: string) => {
@@ -312,38 +340,6 @@ export default function SmartSearch({
       return generateDatabaseSuggestions(searchQuery);
     }
   }, [useGoogleAPI, generateGoogleSuggestions, generateDatabaseSuggestions]);
-
-  // Handle Google Place selection
-  const handleGooglePlaceSelect = useCallback(async (place: GooglePlaceSuggestion) => {
-    try {
-      // Validate place_id before making API call
-      if (!place.place_id || place.place_id.trim() === '') {
-        console.warn('Invalid place_id in GooglePlaceSuggestion:', place);
-        handleSuggestionSelect(place.description);
-        return;
-      }
-
-      // Get place details for coordinates using the Google Places API
-      const placeDetails = await googlePlacesAPI.getPlaceDetails(place.place_id, ['geometry', 'formatted_address']);
-      if (placeDetails && placeDetails.geometry) {
-        const { lat, lng } = placeDetails.geometry.location;
-        const locationData = {
-          lat,
-          lng,
-          address: place.description
-        };
-        
-        if (onLocationSelect) {
-          onLocationSelect(locationData);
-        }
-        
-        handleSuggestionSelect(place.description);
-      }
-    } catch (error) {
-      console.error('Error getting place details:', error);
-      handleSuggestionSelect(place.description);
-    }
-  }, [onLocationSelect]);
 
   // Handle input change with debouncing
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -488,7 +484,7 @@ export default function SmartSearch({
               <div className="mb-4">
                 <div className="text-xs text-gray-500 px-2 py-1 mb-2 font-medium flex items-center justify-between">
                   <span>
-                    {useGoogleAPI ? 'Google Places' : 'Database'} search results for "{query}"
+                    {useGoogleAPI ? 'Google Places' : 'Database'} search results for &quot;{query}&quot;
                   </span>
                   {isLoadingGoogle && (
                     <div className="flex items-center space-x-1">
@@ -588,7 +584,7 @@ export default function SmartSearch({
             {/* No Results */}
             {query.length > 0 && suggestions.length === 0 && !isLoadingGoogle && (
               <div className="text-center py-8">
-                <div className="text-gray-500 text-sm mb-2">No results found for "{query}"</div>
+                <div className="text-gray-500 text-sm mb-2">No results found for &quot;{query}&quot;</div>
                 <div className="text-gray-400 text-xs">Try a different search term</div>
               </div>
             )}

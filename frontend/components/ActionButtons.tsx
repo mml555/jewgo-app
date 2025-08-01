@@ -271,19 +271,18 @@ export default function ActionButtons({
       <style>{sliderStyles}</style>
       
       {/* Action Buttons Bar */}
-      <div className="px-3 sm:px-4 mb-4 sm:mb-6">
-        <div className="flex space-x-2 sm:space-x-3 bg-white rounded-full shadow-lg border border-gray-200 p-1">
+      <div className="px-4 mb-4">
+        <div className="flex space-x-3">
           <button
             onClick={onShowMap}
-            className="flex items-center justify-center gap-1 sm:gap-2 bg-transparent text-black border border-black px-3 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium shadow-sm hover:bg-green-100 hover:border-green-400 transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-300/20 flex-1 touch-manipulation"
+            className="flex items-center gap-2 px-4 py-2 text-sm rounded-full border border-gray-300 bg-white shadow-sm hover:bg-gray-50 transition-all duration-200"
           >
             {isOnMapPage ? (
               <>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                 </svg>
-                <span className="hidden sm:inline">View List</span>
-                <span className="sm:hidden">List</span>
+                <span>Live Map</span>
               </>
             ) : (
               <>
@@ -291,39 +290,35 @@ export default function ActionButtons({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>Map</span>
+                <span>Live Map</span>
               </>
             )}
           </button>
 
           <button
             onClick={onAddEatery}
-            className="flex items-center justify-center gap-1 sm:gap-2 bg-transparent text-black border border-black px-3 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium shadow-sm hover:bg-green-100 hover:border-green-400 transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-300/20 flex-1 touch-manipulation"
+            className="flex items-center gap-2 px-4 py-2 text-sm rounded-full border border-gray-300 bg-white shadow-sm hover:bg-gray-50 transition-all duration-200"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-            <span className="hidden sm:inline">Add Eatery</span>
-            <span className="sm:hidden">Add</span>
+            <span>Add a Eatery</span>
           </button>
 
           <button
             onClick={() => setShowFilters(true)}
-            className="flex items-center justify-center gap-1 sm:gap-2 bg-transparent text-black border border-black px-3 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium shadow-sm hover:bg-green-100 hover:border-green-400 transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-300/20 relative flex-1 touch-manipulation"
+            className="flex items-center gap-2 px-4 py-2 text-sm rounded-full border border-gray-300 bg-white shadow-sm hover:bg-gray-50 transition-all duration-200 relative"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
-            <span className="hidden sm:inline">Filters</span>
-            <span className="sm:hidden">Filters</span>
+            <span>Advanced Filters</span>
             {getActiveFiltersCount() > 0 && (
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white text-xs text-white flex items-center justify-center font-bold">
                 {getActiveFiltersCount()}
               </div>
             )}
           </button>
-
-
         </div>
       </div>
 
@@ -394,7 +389,7 @@ export default function ActionButtons({
                 
                 {expandedSections.distance && (
                   <div className="px-4 pb-4 space-y-3">
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                       {[5, 10, 15, 25, 50].map((distance) => (
                         <button
                           key={distance}

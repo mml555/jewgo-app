@@ -1,5 +1,7 @@
 'use client';
 
+import React from 'react';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -9,18 +11,11 @@ import ConfirmModal from '@/components/ui/ConfirmModal';
 import PasswordChangeModal from '@/components/ui/PasswordChangeModal';
 import { showToast } from '@/components/ui/Toast';
 import { mockExportUserData, mockDeleteAccount } from '@/lib/api/mock';
-import { getFavorites } from '@/utils/favorites';
 import { safeFilter } from '@/utils/validation';
 
+
 export default function ProfilePage() {
-  const [activeFilters, setActiveFilters] = useState<{
-    agency?: string;
-    dietary?: string;
-    openNow?: boolean;
-    category?: string;
-    nearMe?: boolean;
-    distanceRadius?: number;
-  }>({});
+
   const [userProfile, setUserProfile] = useState({
     name: 'Sarah Cohen',
     email: 'sarah.cohen@email.com',
@@ -47,7 +42,7 @@ export default function ProfilePage() {
   const [isExporting, setIsExporting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const updateProfile = (field: string, value: any) => {
+  const updateProfile = (field: string, value: string | string[] | boolean) => {
     setUserProfile(prev => ({
       ...prev,
       [field]: value
@@ -64,30 +59,7 @@ export default function ProfilePage() {
     }));
   };
 
-  const handleFilterChange = (key: string, value: any) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      [key]: value === 'all' ? undefined : value
-    }));
-  };
 
-  const handleToggleFilter = (key: string, value: boolean) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
-  const handleDistanceChange = (distance: number) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      distanceRadius: distance
-    }));
-  };
-
-  const handleClearAll = () => {
-    setActiveFilters({});
-  };
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -363,17 +335,17 @@ export default function ProfilePage() {
                   <div className="space-y-2">
                     <div className="flex items-center space-x-3 text-sm">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-gray-600">Added "Kosher Deli" to favorites</span>
+                      <span className="text-gray-600">Added &quot;Kosher Deli&quot; to favorites</span>
                       <span className="text-gray-400">2 hours ago</span>
                     </div>
                     <div className="flex items-center space-x-3 text-sm">
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="text-gray-600">Wrote a review for "Miami Kosher Market"</span>
+                      <span className="text-gray-600">Wrote a review for &quot;Miami Kosher Market&quot;</span>
                       <span className="text-gray-400">1 day ago</span>
                     </div>
                     <div className="flex items-center space-x-3 text-sm">
                       <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                      <span className="text-gray-600">Claimed "Shabbat Special" deal</span>
+                      <span className="text-gray-600">Claimed &quot;Shabbat Special&quot; deal</span>
                       <span className="text-gray-400">3 days ago</span>
                     </div>
                   </div>

@@ -78,7 +78,6 @@ const sampleRestaurants: Restaurant[] = [
 ];
 
 export default function DemoPage() {
-  const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('eatery');
   const [filteredRestaurants, setFilteredRestaurants] = useState(sampleRestaurants);
   const [activeFilters, setActiveFilters] = useState<{
@@ -96,7 +95,6 @@ export default function DemoPage() {
   }>({});
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
     if (query.trim()) {
       const filtered = sampleRestaurants.filter(restaurant =>
         restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -118,7 +116,7 @@ export default function DemoPage() {
     }
   };
 
-  const handleFilterChange = (key: string, value: any) => {
+  const handleFilterChange = (key: string, value: string | boolean | number) => {
     setActiveFilters(prev => ({ ...prev, [key]: value }));
   };
 
@@ -192,8 +190,8 @@ export default function DemoPage() {
       </div>
 
       {/* Restaurant Grid */}
-      <div className="px-4 py-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="px-4 py-6 pb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredRestaurants.map((restaurant) => (
             <EateryCard 
               key={restaurant.id} 

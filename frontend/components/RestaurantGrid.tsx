@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import RestaurantCard from './RestaurantCard';
 import RestaurantCardSkeleton from './RestaurantCardSkeleton';
 import { RestaurantGridProps } from '@/types/restaurant';
+import { Restaurant } from '@/types/restaurant';
 
 interface ExtendedRestaurantGridProps extends RestaurantGridProps {
   userLocation?: { latitude: number; longitude: number } | null;
@@ -22,7 +23,7 @@ const RestaurantGrid: React.FC<ExtendedRestaurantGridProps> = ({
 }) => {
   const router = useRouter();
 
-  const handleCardClick = (restaurant: any) => {
+  const handleCardClick = (restaurant: Restaurant) => {
     // Navigate to the restaurant detail page
     router.push(`/restaurant/${restaurant.id}`);
   };
@@ -76,7 +77,7 @@ const RestaurantGrid: React.FC<ExtendedRestaurantGridProps> = ({
   return (
     <div className="space-y-6">
       {/* Responsive Grid - Mobile-first design */}
-      <div className="grid grid-cols-2 gap-3 pb-10 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 sm:gap-6 mobile-grid-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 pb-10">
         {loading ? (
           // Show skeleton loaders while loading
           Array.from({ length: 20 }).map((_, index) => (

@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+
+import { useState, useEffect } from 'react';
 import { RestaurantSpecial } from '@/types/restaurant';
 import { safeFilter } from '@/utils/validation';
-
-interface SpecialsManagementProps {
-  // Add props as needed
-}
 
 export default function SpecialsManagementPage() {
   const [specials, setSpecials] = useState<RestaurantSpecial[]>([]);

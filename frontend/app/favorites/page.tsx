@@ -1,21 +1,23 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import React from 'react';
+
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import NavTabs from '@/components/NavTabs';
-import RestaurantCard from '@/components/RestaurantCard';
 import SearchBar from '@/components/SearchBar';
 import { getFavorites, removeFromFavorites, FavoriteRestaurant } from '@/utils/favorites';
 import { safeFilter } from '@/utils/validation';
 import { formatDistance } from '@/utils/distance';
+import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
 
 export default function FavoritesPage() {
   const router = useRouter();
   const [favorites, setFavorites] = useState<FavoriteRestaurant[]>([]);
   const [filteredFavorites, setFilteredFavorites] = useState<FavoriteRestaurant[]>([]);
-  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
   const [activeFilters, setActiveFilters] = useState<{
     agency?: string;
     dietary?: string;
@@ -26,6 +28,7 @@ export default function FavoritesPage() {
   }>({});
   const [activeTab, setActiveTab] = useState('eatery');
   const [searchQuery, setSearchQuery] = useState('');
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   // Load favorites on component mount
   useEffect(() => {
@@ -94,40 +97,15 @@ export default function FavoritesPage() {
     }
   };
 
-  const handleFilterChange = (key: string, value: any) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      [key]: value === 'all' ? undefined : value
-    }));
-  };
 
-  const handleToggleFilter = (key: string, value: boolean) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
-  const handleDistanceChange = (distance: number) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      distanceRadius: distance
-    }));
-  };
-
-  const handleClearAll = () => {
-    setActiveFilters({});
-  };
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
   };
 
-  const handleSearch = useMemo(() => {
-    return (query: string) => {
-      setSearchQuery(query);
-    };
-  }, []);
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
 
   // ✅ Phase 1: Implement handler function
   const handleExploreRestaurants = () => {
@@ -289,7 +267,7 @@ export default function FavoritesPage() {
           {favorites.length > 0 && (
             <div className="mt-8 bg-white rounded-lg shadow-md p-4">
               <h3 className="font-semibold text-gray-800 mb-3">Favorites Summary</h3>
-              <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="text-2xl font-bold text-jewgo-primary">{favorites.length}</div>
                   <div className="text-sm text-gray-600">Total Favorites</div>

@@ -7,7 +7,7 @@ interface GoogleMapsLoaderProps {
 }
 
 // Global state to track if Google Maps is being loaded
-let globalLoadingState = {
+const globalLoadingState = {
   isLoading: false,
   isLoaded: false,
   scriptElement: null as HTMLScriptElement | null,

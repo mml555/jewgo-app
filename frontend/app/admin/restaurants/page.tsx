@@ -1,9 +1,10 @@
 'use client';
 
+import React from 'react';
+
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
-import { Restaurant } from '@/types/restaurant';
 import { safeFilter } from '@/utils/validation';
 import { showToast } from '@/components/ui/Toast';
 

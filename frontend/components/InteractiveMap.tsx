@@ -187,7 +187,7 @@ export default function InteractiveMap({ restaurants, onRestaurantSelect, userLo
       <div className="absolute top-4 right-4 space-y-2">
         <button
           onClick={handleMyLocation}
-          className="bg-white rounded-lg p-3 shadow-lg hover:shadow-xl transition-shadow focus:outline-none focus:ring-2 focus:ring-jewgo-primary"
+                      className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-jewgo-primary"
           title="My Location"
         >
           <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,7 +225,7 @@ export default function InteractiveMap({ restaurants, onRestaurantSelect, userLo
         <div className="absolute bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 animate-fade-in-up">
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1">
-              <h3 className="font-bold text-lg text-gray-900">{selectedRestaurant.name}</h3>
+              <h3 className="text-[15px] font-semibold leading-tight text-gray-900 line-clamp-2">{selectedRestaurant.name}</h3>
               <p className="text-gray-600 text-sm mt-1">
                 {selectedRestaurant.address}
                 {selectedRestaurant.city && `, ${selectedRestaurant.city}`}

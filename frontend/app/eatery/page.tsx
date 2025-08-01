@@ -101,17 +101,7 @@ export default function EateryExplorePage() {
     }
   };
 
-  const handleFilterChange = (key: string, value: any) => {
-    setActiveFilters(prev => ({ ...prev, [key]: value }));
-  };
 
-  const handleToggleFilter = (key: string, value: boolean) => {
-    setActiveFilters(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleDistanceChange = (distance: number) => {
-    setActiveFilters(prev => ({ ...prev, distanceRadius: distance }));
-  };
 
   const handleClearAll = () => {
     setActiveFilters({});

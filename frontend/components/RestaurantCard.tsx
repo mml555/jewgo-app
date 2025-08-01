@@ -138,12 +138,12 @@ export default function RestaurantCard({
   // Enhanced rating display with stars
   const renderRating = () => {
     const rating = restaurant.google_rating || restaurant.rating;
-    if (!rating) return null;
+    if (!rating || rating === 0) return null;
     
     return (
       <span className="inline-flex items-center gap-1">
-        <span className="text-yellow-500">⭐</span>
-        <span className="text-sm font-medium">{typeof rating === 'number' ? rating.toFixed(1) : rating}</span>
+        <span className="text-yellow-500">★</span>
+        <span className="text-xs font-medium">{typeof rating === 'number' ? rating.toFixed(1) : rating}</span>
       </span>
     );
   };
@@ -151,11 +151,10 @@ export default function RestaurantCard({
   return (
     <div
       className={cn(
-        "group relative bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden transition-all duration-200",
-        "hover:shadow-lg hover:scale-[1.01] active:scale-[0.98]",
+        "group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg hover:scale-[1.01] transition-all duration-200",
         "focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2",
         "touch-manipulation cursor-pointer",
-        isPressed && "scale-[0.98] shadow-md",
+        isPressed && "scale-[0.98] shadow-lg",
         className
       )}
       onClick={handleCardClick}
@@ -184,26 +183,26 @@ export default function RestaurantCard({
           loading="lazy"
         />
         
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-        
         {/* Kosher Type Tag - Top Left */}
         {restaurant.kosher_category && (
-          <span className={cn(
-            "absolute top-2 left-2 text-white text-xs font-medium px-2 py-1 rounded-full",
-            getKosherTypeColor(restaurant.kosher_category)
-          )}>
-            {titleCase(restaurant.kosher_category)}
+          <span className={`absolute top-2 left-2 text-[11px] px-2 py-1 rounded-full shadow-sm font-medium ${
+            restaurant.kosher_category === 'meat' ? 'bg-red-100 text-red-800' :
+            restaurant.kosher_category === 'dairy' ? 'bg-blue-100 text-blue-800' :
+            'bg-green-100 text-green-800'
+          }`}>
+            {restaurant.kosher_category === 'meat' ? '🥩 Meat' :
+             restaurant.kosher_category === 'dairy' ? '🥛 Dairy' :
+             '🥬 Pareve'}
           </span>
         )}
         
         {/* Heart Button - Top Right */}
         <button
           className={cn(
-            "absolute top-2 right-2 bg-white rounded-full p-1 shadow-md transition-all duration-200",
+            "absolute top-2 right-2 bg-white p-1 rounded-full shadow hover:scale-105 transition-all duration-200",
             isFavorited 
-              ? "text-pink-500" 
-              : "text-gray-800 hover:text-pink-500"
+              ? "text-red-500" 
+              : "text-red-400"
           )}
           onClick={(e) => {
             e.stopPropagation();
@@ -211,7 +210,7 @@ export default function RestaurantCard({
           }}
           aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
         >
-          <svg className="w-4 h-4" fill={isFavorited ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill={isFavorited ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>
@@ -225,168 +224,29 @@ export default function RestaurantCard({
       </div>
 
       {/* Content Section */}
-      <div className="px-3 py-2">
+      <div className="p-3">
         {/* Restaurant Name */}
-        <h3 className="text-[15px] font-semibold leading-snug text-gray-900 mb-2 line-clamp-2 group-hover:text-green-600 transition-colors tracking-tight">
+        <h3 className="text-sm font-medium truncate mb-1 group-hover:text-green-600 transition-colors">
           {titleCase(restaurant.name)}
         </h3>
         
-        {/* Rating and Price - Aligned in one row */}
-        <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
-          {restaurant.price_range && (
-            <span>{restaurant.price_range}</span>
-          )}
-          {restaurant.price_range && renderRating() && (
-            <span>•</span>
-          )}
-          {renderRating()}
-          {!restaurant.price_range && !renderRating() && (
-            <span className="text-gray-400">No rating available</span>
-          )}
-        </div>
-        
-        {/* Hours Display */}
-        <div className="mb-2">
-          <HoursDisplay 
-            hoursOfOperation={restaurant.hours_of_operation}
-            hoursJson={restaurant.hours_json ? (typeof restaurant.hours_json === 'string' ? JSON.parse(restaurant.hours_json) : restaurant.hours_json) : undefined}
-            hoursLastUpdated={restaurant.hours_last_updated}
-          />
-        </div>
-        
-        {/* Address */}
-        <div className="flex items-start gap-2 text-sm text-gray-600 mb-2">
-          <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <span className="line-clamp-2">
-            {formatAddress(restaurant.address, restaurant.city, restaurant.state)}
-          </span>
-        </div>
-        
-        {/* Phone Number */}
-        {restaurant.phone_number && (
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
-            <a 
-              href={`tel:${restaurant.phone_number}`}
-              onClick={(e) => e.stopPropagation()}
-              className="text-green-600 hover:text-green-700 underline transition-colors"
-            >
-              {restaurant.phone_number}
-            </a>
-          </div>
+        {/* Price Range */}
+        {restaurant.price_range && (
+          <p className="text-xs text-gray-500 truncate mb-1">
+            Price range {restaurant.price_range}
+          </p>
         )}
         
-        {/* Action Button */}
-        <div className="mt-3">
-          <button
-            className="w-full bg-transparent text-green-600 py-2 px-4 rounded-full font-semibold border-2 border-green-300 hover:bg-green-100 hover:border-green-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 touch-manipulation shadow-sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCardClick();
-            }}
-          >
-            View More
-          </button>
-        </div>
-
-        {/* Badges Section - Only show unique badges, no redundancy */}
-        <div className="flex flex-wrap gap-2 mt-3">
-          {/* Listing Type - Only if no certifying agency to avoid duplication */}
-          {restaurant.listing_type && !restaurant.certifying_agency && (
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              {titleCase(restaurant.listing_type)}
-            </span>
-          )}
-        </div>
-
-        {/* Contact Information */}
-        <div className="space-y-2 text-sm text-gray-600 mt-3">
-          {/* Website and Additional Links */}
-          <div className="flex items-center justify-between">
-            {/* Website Link - Left */}
-            {websiteLink ? (
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-                </svg>
-                <a 
-                  href={websiteLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="text-green-600 hover:text-green-700 underline transition-colors truncate"
-                >
-                  {isFetchingWebsite ? 'Finding Website...' : 'Visit Website'}
-                </a>
-              </div>
-            ) : (
-              // Show fallback options when no website is available
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-                </svg>
-                {isFetchingWebsite ? (
-                  <span className="text-gray-500 text-sm">Finding website...</span>
-                ) : (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Try to fetch website manually
-                      const fallbackLink = getFallbackWebsiteLink(restaurant);
-                      if (fallbackLink) {
-                        window.open(fallbackLink, '_blank');
-                      }
-                    }}
-                    className="text-gray-500 hover:text-green-600 underline transition-colors text-sm"
-                  >
-                    Find on Google
-                  </button>
-                )}
-              </div>
-            )}
-            
-            {/* Verified Badge - Center */}
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-black text-white border border-gray-800">
-              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              Verified
-            </span>
-            
-            {/* Maps Button - Right */}
-            <button
-              className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium hover:bg-gray-200 transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (restaurant.google_listing_url) {
-                  window.open(restaurant.google_listing_url, '_blank');
-                } else {
-                  // Fallback to Google Maps search
-                  const address = formatAddress(restaurant.address, restaurant.city, restaurant.state);
-                  const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
-                  window.open(mapsUrl, '_blank');
-                }
-              }}
-            >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-              Maps
-            </button>
+        {/* Rating */}
+        {renderRating() && (
+          <div className="flex items-center gap-1 text-yellow-500 text-sm">
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <span className="text-gray-700">{restaurant.rating?.toFixed(2) || '0.00'}</span>
           </div>
-        </div>
+        )}
       </div>
-
-      {/* Hover Effect Overlay */}
-      <div className="absolute inset-0 bg-green-500 opacity-0 group-hover:opacity-5 transition-opacity duration-200 pointer-events-none" />
     </div>
   );
 } 

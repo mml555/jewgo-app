@@ -40,7 +40,7 @@ export default function SpecialsCard({ specials, maxDisplay = 3 }: SpecialsCardP
         {displaySpecials.map((special) => (
           <div
             key={special.id}
-            className="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow flex-shrink-0 w-48"
+            className="bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex-shrink-0 w-48"
           >
             {/* Food Image - Better visuals with fallback icons */}
             <div className="h-32 bg-gray-200 relative">

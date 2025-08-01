@@ -28,8 +28,8 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
   const [placesApiError, setPlacesApiError] = useState<string | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
-  const placesTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const placesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteServiceRef = useRef<any>(null);
   const placesServiceRef = useRef<any>(null);
@@ -207,8 +207,8 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
       <form onSubmit={(e) => e.preventDefault()}>
         <div className="relative">
           {/* Search Icon */}
-          <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-            <svg className={`h-5 w-5 transition-colors duration-200 ${isFocused ? 'text-jewgo-400' : 'text-neutral-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <svg className={`h-5 w-5 transition-colors duration-200 ${isFocused ? 'text-green-500' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
           </div>
@@ -217,23 +217,23 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
           <input
             ref={inputRef}
             type="text"
-            placeholder={placeholder}
+            placeholder="Find your Eatery"
             value={query}
             onChange={handleInputChange}
             onFocus={handleFocus}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            className="w-full pl-12 pr-12 py-2.5 sm:py-3 rounded-xl bg-white border border-neutral-300 focus:border-jewgo-400 focus:ring-jewgo-400/20 focus:outline-none transition-all duration-200 shadow-soft text-base"
+            className="w-full pl-12 pr-12 py-3 rounded-full bg-white border border-gray-200 focus:border-green-500 focus:ring-green-500/20 focus:outline-none transition-all duration-200 shadow-md text-base"
             autoComplete="off"
           />
 
           {/* Right Side Actions */}
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+          <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
             {query && (
               <button
                 type="button"
                 onClick={handleClear}
-                className="p-1 text-neutral-400 hover:text-jewgo-400 transition-colors duration-200"
+                className="p-1 text-gray-400 hover:text-green-500 transition-colors duration-200"
                 title="Clear search"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -241,6 +241,16 @@ export default function SearchBar({ onSearch, placeholder = "Search restaurants,
                 </svg>
               </button>
             )}
+            {/* Filter Icon */}
+            <button
+              type="button"
+              className="p-1 text-gray-500 hover:text-green-500 transition-colors duration-200 ml-2"
+              title="Filters"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+              </svg>
+            </button>
           </div>
         </div>
       </form>

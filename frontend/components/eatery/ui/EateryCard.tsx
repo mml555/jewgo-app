@@ -66,7 +66,8 @@ export default function EateryCard({ restaurant, className = "" }: EateryCardPro
   };
 
   const getRating = () => {
-    return restaurant.rating || restaurant.star_rating || restaurant.google_rating || 0;
+    const rating = restaurant.rating || restaurant.star_rating || restaurant.google_rating;
+    return rating && rating > 0 ? rating : null;
   };
 
   const getHeroImage = () => {
@@ -78,7 +79,7 @@ export default function EateryCard({ restaurant, className = "" }: EateryCardPro
 
   return (
     <div 
-      className={`bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg hover:scale-[1.01] transition-all duration-200 ${className}`}
+      className={`bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg hover:scale-[1.01] transition-all duration-200 cursor-pointer ${className}`}
       onClick={handleCardClick}
     >
       {/* Image Container */}
@@ -91,52 +92,54 @@ export default function EateryCard({ restaurant, className = "" }: EateryCardPro
           loading="lazy"
         />
         
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-        
         {/* Kosher Category Badge - Top Left */}
         {restaurant.kosher_category && (
-          <div className="absolute top-2 left-2">
-            <span className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getKosherTypeColor(restaurant.kosher_category)}`}>
-              {titleCase(restaurant.kosher_category)}
-            </span>
-          </div>
+          <span className={`absolute top-2 left-2 text-[11px] px-2 py-1 rounded-full shadow-sm font-medium ${
+            restaurant.kosher_category === 'meat' ? 'bg-red-100 text-red-800' :
+            restaurant.kosher_category === 'dairy' ? 'bg-blue-100 text-blue-800' :
+            'bg-green-100 text-green-800'
+          }`}>
+            {restaurant.kosher_category === 'meat' ? '🥩 Meat' :
+             restaurant.kosher_category === 'dairy' ? '🥛 Dairy' :
+             '🥬 Pareve'}
+          </span>
         )}
         
         {/* Favorite Button - Top Right */}
         <button
           onClick={handleFavoriteClick}
-          className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md transition-all duration-200 hover:scale-110"
+          className="absolute top-2 right-2 bg-white p-1 rounded-full shadow hover:scale-105 transition-all duration-200"
           aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
         >
           <Heart 
-            className={`w-4 h-4 ${isFavorited ? 'fill-pink-500 text-pink-500' : 'text-gray-800 hover:text-pink-500'}`} 
+            className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-red-400'}`} 
           />
         </button>
       </div>
       
       {/* Content */}
-      <div className="px-3 py-2">
+      <div className="p-3">
         {/* Restaurant Name */}
-        <h3 className="text-[15px] font-semibold leading-snug text-gray-900 mb-2 line-clamp-2 group-hover:text-green-600 transition-colors tracking-tight">
+        <h3 className="text-sm font-medium truncate mb-1 group-hover:text-green-600 transition-colors">
           {titleCase(restaurant.name)}
         </h3>
         
-        {/* Price Range and Rating - Aligned in one row */}
-        <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
-          {formatPriceRange() && (
-            <span>{formatPriceRange()}</span>
-          )}
-          {formatPriceRange() && getRating() > 0 && (
-            <span>•</span>
-          )}
-          {getRating() > 0 && (
-            <span className="inline-flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 text-yellow-500 fill-current" />
-              <span className="text-sm font-medium">{getRating().toFixed(1)}</span>
-            </span>
-          )}
-        </div>
+        {/* Price Range */}
+        {formatPriceRange() && (
+          <p className="text-xs text-gray-500 truncate mb-1">
+            Price range {formatPriceRange()}
+          </p>
+        )}
+        
+        {/* Rating */}
+        {getRating() && (
+          <div className="flex items-center gap-1 text-yellow-500 text-sm">
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <span className="text-gray-700">{getRating()!.toFixed(2)}</span>
+          </div>
+        )}
       </div>
     </div>
   );

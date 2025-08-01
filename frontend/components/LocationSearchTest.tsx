@@ -102,16 +102,16 @@ export default function LocationSearchTest() {
             <div className="bg-blue-50 p-4 rounded-lg">
               <p className="text-sm font-semibold mb-2">Try these location searches:</p>
               <ul className="text-sm space-y-1">
-                <li>• <strong>Zip Codes:</strong> "33139", "33019", "33487"</li>
-                <li>• <strong>Cities:</strong> "Miami Beach, FL", "Boca Raton", "Hollywood"</li>
-                <li>• <strong>Addresses:</strong> "123 Main St", "456 Oak Avenue"</li>
+                <li>• <strong>Zip Codes:</strong> &quot;33139&quot;, &quot;33019&quot;, &quot;33487&quot;</li>
+                <li>• <strong>Cities:</strong> &quot;Miami Beach, FL&quot;, &quot;Boca Raton&quot;, &quot;Hollywood&quot;</li>
+                <li>• <strong>Addresses:</strong> &quot;123 Main St&quot;, &quot;456 Oak Avenue&quot;</li>
                 <li>• <strong>Any Location:</strong> Type any address or place name</li>
               </ul>
               
               <p className="text-sm font-semibold mt-3 mb-2">Restaurant searches:</p>
               <ul className="text-sm space-y-1">
-                <li>• <strong>Names:</strong> "Pizza", "Sushi", "Burger"</li>
-                <li>• <strong>Filters:</strong> "ORB Certified", "Meat Restaurants"</li>
+                <li>• <strong>Names:</strong> &quot;Pizza&quot;, &quot;Sushi&quot;, &quot;Burger&quot;</li>
+                <li>• <strong>Filters:</strong> &quot;ORB Certified&quot;, &quot;Meat Restaurants&quot;</li>
               </ul>
             </div>
           </div>

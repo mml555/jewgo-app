@@ -196,7 +196,7 @@ export default function AddEateryPage() {
         // Handle validation errors from API
         if (result.errors) {
           const apiErrors: FormErrors = {};
-          result.errors.forEach((error: any) => {
+          result.errors.forEach((error: { path: string[]; message: string }) => {
             apiErrors[error.path[0]] = error.message;
           });
           setErrors(apiErrors);
@@ -251,7 +251,7 @@ export default function AddEateryPage() {
                       <span className="text-lg">👨‍💼</span>
                       <div>
                         <div className="font-medium text-gray-900">I own this establishment</div>
-                        <div className="text-sm text-gray-600">I'm the owner or manager and want to list my business</div>
+                        <div className="text-sm text-gray-600">I&apos;m the owner or manager and want to list my business</div>
                       </div>
                     </div>
                   </div>
@@ -285,11 +285,11 @@ export default function AddEateryPage() {
                     <div className="text-sm text-blue-800">
                       {userType === 'owner' ? (
                         <>
-                          <strong>Owner submission:</strong> We'll contact you to verify ownership and help you set up your listing with additional features like menu updates and special announcements.
+                          <strong>Owner submission:</strong> We&apos;ll contact you to verify ownership and help you set up your listing with additional features like menu updates and special announcements.
                         </>
                       ) : (
                         <>
-                          <strong>Community submission:</strong> We'll review and verify the information before adding it to our directory. Thank you for helping the community!
+                          <strong>Community submission:</strong> We&apos;ll review and verify the information before adding it to our directory. Thank you for helping the community!
                         </>
                       )}
                     </div>

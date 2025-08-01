@@ -2,11 +2,13 @@ import { Metadata } from 'next'
 
 interface RestaurantLayoutProps {
   children: React.ReactNode
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
+    const { id } = await params;
+    
     // Fetch restaurant data for metadata
     const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL 
       ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/restaurants`
@@ -14,7 +16,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       ? 'https://jewgo.onrender.com/api/restaurants'
       : 'http://127.0.0.1:8081/api/restaurants'
     
-    const response = await fetch(`${apiUrl}/${params.id}`, {
+    const response = await fetch(`${apiUrl}/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +55,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
         type: 'website',
         title,
         description,
-        url: `https://jewgo.com/restaurant/${params.id}`,
+        url: `https://jewgo.com/restaurant/${id}`,
         siteName: 'Jewgo',
         images: [
           {

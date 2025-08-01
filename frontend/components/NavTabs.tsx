@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/utils/cn';
 
   // Icon components
@@ -68,7 +70,7 @@ interface NavTabsProps {
 export default function NavTabs({ activeTab, onTabChange, className }: NavTabsProps) {
   return (
     <div className={cn("px-4 py-2 bg-white border-b border-gray-100", className)}>
-      <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
         {navTabs.map(({ key, icon, label }) => (
           <button
             key={key}

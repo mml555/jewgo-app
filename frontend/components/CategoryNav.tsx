@@ -82,7 +82,7 @@ export default function CategoryNav({ selectedFilters, onFilterChange, onToggleF
             Certifying Agencies
             <span className="text-xs text-gray-400 ml-2">(click to toggle)</span>
           </h4>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
             {agencyFilters.map((filter) => (
               <button
                 key={filter.value}
@@ -109,7 +109,7 @@ export default function CategoryNav({ selectedFilters, onFilterChange, onToggleF
             Dietary Preferences
             <span className="text-xs text-gray-400 ml-2">(click to toggle)</span>
           </h4>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {dietaryFilters.map((filter) => (
               <button
                 key={filter.value}
@@ -132,7 +132,7 @@ export default function CategoryNav({ selectedFilters, onFilterChange, onToggleF
             Categories
             <span className="text-xs text-gray-400 ml-2">(click to toggle)</span>
           </h4>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {categoryFilters.map((filter) => (
               <button
                 key={filter.value}

@@ -15,13 +15,13 @@ interface GoogleMapsStyleSearchProps {
 
 interface SearchSuggestion {
   id: string;
-  type: 'place' | 'category' | 'agency' | 'location' | 'popular';
+  type: 'category' | 'agency' | 'location' | 'address' | 'popular' | 'google_place';
   title: string;
   subtitle?: string;
   icon: string;
   color: string;
   action: () => void;
-  metadata?: any;
+  metadata?: unknown;
 }
 
 export default function GoogleMapsStyleSearch({
@@ -52,7 +52,7 @@ export default function GoogleMapsStyleSearch({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -83,7 +83,7 @@ export default function GoogleMapsStyleSearch({
       { text: 'KM', icon: '🥛', color: 'bg-blue-500' },
       { text: 'Star-K', icon: '⭐', color: 'bg-yellow-500' },
       { text: 'OU', icon: '🕎', color: 'bg-purple-500' },
-      { text: 'dairy', icon: '��', color: 'bg-blue-400' },
+      { text: 'dairy', icon: '🥛', color: 'bg-blue-400' },
       { text: 'meat', icon: '🥩', color: 'bg-red-500' },
       { text: 'pareve', icon: '🥬', color: 'bg-green-500' },
       { text: 'restaurant', icon: '🍽️', color: 'bg-orange-500' },

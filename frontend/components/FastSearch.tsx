@@ -44,7 +44,7 @@ export default function FastSearch({
   ]);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -397,7 +397,7 @@ export default function FastSearch({
             {query.length > 0 && suggestions.length > 0 && (
               <div className="mb-4">
                 <div className="text-xs text-gray-500 px-2 py-1 mb-2 font-medium">
-                  Search results for "{query}"
+                  Search results for &quot;{query}&quot;
                 </div>
                 <div className="space-y-1">
                   {suggestions.map((suggestion, index) => (
@@ -483,7 +483,7 @@ export default function FastSearch({
             {/* No Results */}
             {query.length > 0 && suggestions.length === 0 && (
               <div className="text-center py-8">
-                <div className="text-gray-500 text-sm mb-2">No results found for "{query}"</div>
+                <div className="text-gray-500 text-sm mb-2">No results found for &quot;{query}&quot;</div>
                 <div className="text-gray-400 text-xs">Try a different search term</div>
               </div>
             )}

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Star, MapPin, Clock, Phone, ExternalLink } from 'lucide-react';
+import { Star, MapPin, Clock, Phone, ExternalLink, Heart } from 'lucide-react';
 import { Restaurant } from '@/types/restaurant';
 
 interface RestaurantCardProps {
@@ -42,16 +42,17 @@ export default function RestaurantCard({ restaurant, onClick }: RestaurantCardPr
 
   return (
     <div 
-      className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition min-w-0 cursor-pointer"
       onClick={onClick}
     >
       {/* Image Section */}
-      <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200">
+      <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200">
         {restaurant.image_url ? (
           <img
             src={restaurant.image_url}
             alt={restaurant.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover rounded-t-xl"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
@@ -61,24 +62,28 @@ export default function RestaurantCard({ restaurant, onClick }: RestaurantCardPr
         
         {/* Kosher Type Badge */}
         {restaurant.kosher_category && (
-          <div className="absolute top-3 left-3">
-            <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getKosherTypeColor(restaurant.kosher_category)}`}>
+          <div className="absolute top-2 left-2">
+            <span className="px-2 py-1 text-[11px] font-medium rounded-full shadow-sm bg-white text-gray-700">
               {restaurant.kosher_category}
             </span>
           </div>
         )}
 
-        {/* Status Badge */}
-        <div className="absolute top-3 right-3">
-          <span className={`px-2 py-1 rounded-lg text-xs font-medium bg-white/90 ${getStatusColor(restaurant.is_open || false)}`}>
-            {getStatusText(restaurant.is_open || false)}
-          </span>
+        {/* Favorite Button */}
+        <div className="absolute top-2 right-2">
+          <button 
+            className="bg-white p-1 rounded-full shadow hover:scale-105 transition"
+            aria-label="Add to favorites"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Heart size={16} className="w-5 h-5 text-red-500" />
+          </button>
         </div>
 
         {/* Rating */}
         {restaurant.rating && (
-          <div className="absolute bottom-3 left-3 bg-white/90 rounded-lg px-2 py-1 flex items-center space-x-1">
-            <Star size={12} className="text-yellow-500 fill-current" />
+          <div className="absolute bottom-2 left-2 bg-white/90 rounded-lg px-2 py-1 flex items-center gap-1 text-yellow-500 text-sm">
+            <Star size={12} className="fill-current" />
             <span className="text-xs font-medium text-gray-700">
               {restaurant.rating.toFixed(1)}
             </span>
@@ -87,66 +92,30 @@ export default function RestaurantCard({ restaurant, onClick }: RestaurantCardPr
       </div>
 
       {/* Content Section */}
-      <div className="p-4">
-        {/* Restaurant Name and Agency */}
-        <div className="mb-2">
-          <h3 className="font-semibold text-gray-900 text-lg mb-1 line-clamp-1">
-            {restaurant.name}
-          </h3>
-          {restaurant.certifying_agency && (
-            <p className="text-sm text-blue-600 font-medium">
-              {restaurant.certifying_agency}
-            </p>
-          )}
-        </div>
-
+      <div className="px-3 py-2 flex flex-col gap-1">
+        {/* Restaurant Name */}
+        <h3 className="text-sm font-medium truncate text-gray-900">
+          {restaurant.name}
+        </h3>
+        
+        {/* Price and Agency */}
+        <p className="text-xs text-gray-500 truncate">
+          {restaurant.certifying_agency && `${restaurant.certifying_agency} • `}
+          {restaurant.kosher_category}
+        </p>
+        
         {/* Location */}
-        <div className="flex items-start space-x-2 mb-3">
-          <MapPin size={14} className="text-gray-400 mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-gray-600 line-clamp-2">
-            {restaurant.address}, {restaurant.city}, {restaurant.state} {restaurant.zip_code}
-          </p>
+        <p className="text-xs text-gray-500 truncate">
+          {restaurant.city}, {restaurant.state}
+        </p>
+        
+        {/* Status */}
+        <div className="flex items-center gap-1">
+          <div className={`w-2 h-2 rounded-full ${restaurant.is_open ? 'bg-green-500' : 'bg-red-500'}`}></div>
+          <span className="text-xs text-gray-500">
+            {getStatusText(restaurant.is_open || false)}
+          </span>
         </div>
-
-        {/* Hours */}
-        {restaurant.hours_of_operation && (
-          <div className="flex items-center space-x-2 mb-3">
-            <Clock size={14} className="text-gray-400 flex-shrink-0" />
-            <p className="text-sm text-gray-600">
-              {restaurant.hours_of_operation}
-            </p>
-          </div>
-        )}
-
-        {/* Phone */}
-        {restaurant.phone_number && (
-          <div className="flex items-center space-x-2 mb-3">
-            <Phone size={14} className="text-gray-400 flex-shrink-0" />
-            <a 
-              href={`tel:${restaurant.phone_number}`}
-              className="text-sm text-blue-600 hover:text-blue-800"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {formatPhone(restaurant.phone_number)}
-            </a>
-          </div>
-        )}
-
-        {/* Website */}
-        {restaurant.website && (
-          <div className="flex items-center space-x-2">
-            <ExternalLink size={14} className="text-gray-400 flex-shrink-0" />
-            <a 
-              href={restaurant.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-blue-600 hover:text-blue-800 line-clamp-1"
-              onClick={(e) => e.stopPropagation()}
-            >
-              Visit Website
-            </a>
-          </div>
-        )}
       </div>
     </div>
   );

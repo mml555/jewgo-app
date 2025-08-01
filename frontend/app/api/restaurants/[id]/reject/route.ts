@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const restaurantId = parseInt(params.id);
+    const { id } = await params;
+    const restaurantId = parseInt(id);
     
     if (isNaN(restaurantId)) {
       return NextResponse.json({
@@ -15,18 +16,17 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { status, rejection_reason } = body;
+    const { status } = body;
 
     // TODO: Update restaurant status in database
     // For now, we'll simulate the database update
-    console.log(`Rejecting restaurant ${restaurantId} with reason: ${rejection_reason}`);
+    console.log(`Rejecting restaurant ${restaurantId} with status: ${status}`);
     
     // In a real implementation, you would:
     // 1. Connect to your database
     // 2. Update the restaurant status to 'rejected'
-    // 3. Store the rejection reason
-    // 4. Send notification emails to the submitter
-    // 5. Update any related records
+    // 3. Send notification emails if needed
+    // 4. Update any related records
 
     return NextResponse.json({
       success: true,
@@ -34,7 +34,6 @@ export async function PUT(
       data: {
         id: restaurantId,
         status: 'rejected',
-        rejection_reason,
         updated_at: new Date().toISOString()
       }
     });

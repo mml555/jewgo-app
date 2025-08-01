@@ -17,16 +17,15 @@ export default function RestaurantGrid({
 }: RestaurantGridProps) {
   if (loading) {
     return (
-      <div className="px-4 py-6 pb-24">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="container mx-auto px-4 py-6 pb-24">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
-              <div className="h-48 bg-gray-200"></div>
-              <div className="p-4 space-y-3">
+            <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden animate-pulse min-w-0">
+              <div className="relative aspect-[4/3] bg-gray-200"></div>
+              <div className="px-3 py-2 flex flex-col gap-1">
                 <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                 <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                 <div className="h-3 bg-gray-200 rounded w-full"></div>
-                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
               </div>
             </div>
           ))}
@@ -37,7 +36,7 @@ export default function RestaurantGrid({
 
   if (restaurants.length === 0) {
     return (
-      <div className="px-4 py-6 pb-24">
+      <div className="container mx-auto px-4 py-6 pb-24">
         <div className="text-center py-16">
           <div className="text-gray-400 text-6xl mb-4">🍽️</div>
           <div className="text-gray-500 text-lg mb-3 font-medium">
@@ -52,8 +51,8 @@ export default function RestaurantGrid({
   }
 
   return (
-    <div className="px-4 py-6 pb-24">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className="container mx-auto px-4 py-6 pb-24">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
         {restaurants.map((restaurant) => (
           <RestaurantCard
             key={restaurant.id}

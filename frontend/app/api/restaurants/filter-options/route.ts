@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // Force dynamic rendering for API routes
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Fetch actual data from the backend API to get real filter options
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://jewgo.onrender.com';
@@ -22,12 +22,12 @@ export async function GET(request: NextRequest) {
     const restaurants = restaurantsData.restaurants || restaurantsData.data || [];
     
     // Extract unique values from actual data
-    const cities = Array.from(new Set(restaurants.map((r: any) => r.city).filter(Boolean))).sort();
-    const states = Array.from(new Set(restaurants.map((r: any) => r.state).filter(Boolean))).sort();
-    const agencies = Array.from(new Set(restaurants.map((r: any) => r.certifying_agency).filter(Boolean))).sort();
-    const listingTypes = Array.from(new Set(restaurants.map((r: any) => r.listing_type || r.category).filter(Boolean))).sort();
-    const kosherCategories = Array.from(new Set(restaurants.map((r: any) => r.kosher_category || r.kosher_type).filter(Boolean))).sort();
-    const priceRanges = Array.from(new Set(restaurants.map((r: any) => r.price_range).filter(Boolean))).sort();
+    const cities = Array.from(new Set(restaurants.map((r: { city?: string }) => r.city).filter(Boolean))).sort();
+    const states = Array.from(new Set(restaurants.map((r: { state?: string }) => r.state).filter(Boolean))).sort();
+    const agencies = Array.from(new Set(restaurants.map((r: { certifying_agency?: string }) => r.certifying_agency).filter(Boolean))).sort();
+    const listingTypes = Array.from(new Set(restaurants.map((r: { listing_type?: string; category?: string }) => r.listing_type || r.category).filter(Boolean))).sort();
+    const kosherCategories = Array.from(new Set(restaurants.map((r: { kosher_category?: string; kosher_type?: string }) => r.kosher_category || r.kosher_type).filter(Boolean))).sort();
+    const priceRanges = Array.from(new Set(restaurants.map((r: { price_range?: string }) => r.price_range).filter(Boolean))).sort();
     
     const filterOptions = {
       cities,

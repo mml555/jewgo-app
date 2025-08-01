@@ -86,8 +86,6 @@ const nextConfig = {
   poweredByHeader: false,
   // React strict mode
   reactStrictMode: true,
-  // SWC minification
-  swcMinify: true,
 }
 
 module.exports = nextConfig 

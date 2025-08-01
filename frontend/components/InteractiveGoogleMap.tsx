@@ -205,12 +205,12 @@ export default function InteractiveGoogleMap({ restaurants, onRestaurantSelect }
             {restaurants.slice(0, 10).map((restaurant) => (
               <div
                 key={restaurant.id}
-                className="p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 cursor-pointer transition-all duration-200 hover:shadow-md"
+                className="p-3 bg-white rounded-xl border border-gray-200 hover:border-blue-300 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md"
                 onClick={() => handleRestaurantClick(restaurant)}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h4 className="font-medium text-sm text-gray-900 mb-1">{restaurant.name}</h4>
+                    <h4 className="text-[15px] font-semibold leading-tight text-gray-900 mb-1 line-clamp-2">{restaurant.name}</h4>
                     <p className="text-xs text-gray-600 mb-2">
                       {restaurant.address}
                       {restaurant.city && `, ${restaurant.city}`}
@@ -305,7 +305,7 @@ export default function InteractiveGoogleMap({ restaurants, onRestaurantSelect }
         <div className="absolute bottom-4 left-4 right-4 z-10 bg-white rounded-lg shadow-xl p-4 animate-fade-in-up">
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1">
-              <h3 className="font-bold text-lg text-gray-900">{selectedRestaurant.name}</h3>
+              <h3 className="text-[15px] font-semibold leading-tight text-gray-900 line-clamp-2">{selectedRestaurant.name}</h3>
               <p className="text-gray-600 text-sm mt-1">
                 {selectedRestaurant.address}
                 {selectedRestaurant.city && `, ${selectedRestaurant.city}`}

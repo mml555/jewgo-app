@@ -1,7 +1,9 @@
 'use client';
 
+import React from 'react';
+
 import { useState } from 'react';
-import { signIn, getSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export default function SignIn() {
@@ -29,7 +31,7 @@ export default function SignIn() {
         // Redirect to home page after successful sign in
         router.push('/');
       }
-    } catch (error) {
+    } catch {
       setError('An error occurred during sign in');
     } finally {
       setLoading(false);

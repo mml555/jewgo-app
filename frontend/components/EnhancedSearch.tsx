@@ -55,8 +55,8 @@ export default function EnhancedSearch({
   const [placesApiError, setPlacesApiError] = useState<string | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
-  const placesTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const placesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteServiceRef = useRef<any>(null);
   const placesServiceRef = useRef<any>(null);
@@ -475,7 +475,7 @@ export default function EnhancedSearch({
           <div className="p-2">
             {query.length > 0 && (
               <div className="text-xs text-neutral-500 px-3 py-1 border-b border-neutral-100 mb-2">
-                Search suggestions for "{query}"
+                Search suggestions for &quot;{query}&quot;
               </div>
             )}
             
@@ -556,7 +556,7 @@ export default function EnhancedSearch({
             {/* No results */}
             {!hasPlaceSuggestions && !hasSearchSuggestions && !isLoadingPlaces && !placesApiError && query.length > 0 && (
               <div className="px-3 py-2 text-sm text-neutral-500">
-                No suggestions found for "{query}"
+                No suggestions found for &quot;{query}&quot;
               </div>
             )}
 
