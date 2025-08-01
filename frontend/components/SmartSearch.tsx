@@ -2,30 +2,46 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, MapPin, Clock, Star, Filter, X } from 'lucide-react';
+import { searchGooglePlaces } from '@/lib/google/places';
 
-interface FastSearchProps {
+interface SmartSearchProps {
   onSearch: (query: string) => void;
+  onLocationSelect?: (location: { lat: number; lng: number; address: string }) => void;
   placeholder?: string;
   className?: string;
   showAdvancedFilters?: boolean;
+  useGoogleAPI?: boolean; // New prop to determine search type
 }
 
 interface SearchSuggestion {
   id: string;
-  type: 'category' | 'agency' | 'location' | 'popular';
+  type: 'category' | 'agency' | 'location' | 'address' | 'popular' | 'google_place';
   title: string;
   subtitle?: string;
   icon: string;
   color: string;
   action: () => void;
+  metadata?: any;
 }
 
-export default function FastSearch({
+interface GooglePlaceSuggestion {
+  place_id: string;
+  description: string;
+  structured_formatting: {
+    main_text: string;
+    secondary_text: string;
+  };
+  types: string[];
+}
+
+export default function SmartSearch({
   onSearch,
+  onLocationSelect,
   placeholder = "Search for kosher restaurants, agencies, or locations...",
   className = "",
-  showAdvancedFilters = true
-}: FastSearchProps) {
+  showAdvancedFilters = true,
+  useGoogleAPI = false
+}: SmartSearchProps) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -33,6 +49,8 @@ export default function FastSearch({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showFilters, setShowFilters] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
+  const [googleError, setGoogleError] = useState<string | null>(null);
   
   const [popularSearches] = useState([
     { text: 'Kosher restaurants near me', icon: '🍽️', color: 'bg-green-500' },
@@ -43,29 +61,7 @@ export default function FastSearch({
     { text: 'Boca Raton', icon: '🌴', color: 'bg-green-400' }
   ]);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
-
-  // Load recent searches from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('jewgo-recent-searches');
-    if (saved) {
-      try {
-        setRecentSearches(JSON.parse(saved));
-      } catch (error) {
-        console.error('Error loading recent searches:', error);
-      }
-    }
-  }, []);
-
-  // Save recent searches to localStorage
-  const saveRecentSearch = useCallback((search: string) => {
-    const updated = [search, ...recentSearches.filter(s => s !== search)].slice(0, 5);
-    setRecentSearches(updated);
-    localStorage.setItem('jewgo-recent-searches', JSON.stringify(updated));
-  }, [recentSearches]);
-
-  // Comprehensive address database
+  // Comprehensive address database (for non-Google API searches)
   const [addressDatabase] = useState([
     // Miami Beach addresses
     { address: '2963 Cedar Ln', city: 'Miami Beach', state: 'FL', zip: '33139', icon: '🏖️', color: 'bg-yellow-500' },
@@ -132,12 +128,34 @@ export default function FastSearch({
     { address: '5678 Loxahatchee Rd', city: 'Parkland', state: 'FL', zip: '33076', icon: '🌲', color: 'bg-green-600' }
   ]);
 
-  // Generate search suggestions (enhanced with address search)
-  const generateSuggestions = useCallback((searchQuery: string) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Load recent searches from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('jewgo-recent-searches');
+    if (saved) {
+      try {
+        setRecentSearches(JSON.parse(saved));
+      } catch (error) {
+        console.error('Error loading recent searches:', error);
+      }
+    }
+  }, []);
+
+  // Save recent searches to localStorage
+  const saveRecentSearch = useCallback((search: string) => {
+    const updated = [search, ...recentSearches.filter(s => s !== search)].slice(0, 5);
+    setRecentSearches(updated);
+    localStorage.setItem('jewgo-recent-searches', JSON.stringify(updated));
+  }, [recentSearches]);
+
+  // Generate database search suggestions (for non-Google API searches)
+  const generateDatabaseSuggestions = useCallback((searchQuery: string) => {
     const allSuggestions: SearchSuggestion[] = [];
     const queryLower = searchQuery.toLowerCase();
 
-    // Address suggestions (most comprehensive)
+    // Address suggestions
     if (searchQuery.length > 2) {
       const addressSuggestions: SearchSuggestion[] = addressDatabase
         .filter(addr => 
@@ -157,7 +175,7 @@ export default function FastSearch({
           action: () => handleSuggestionSelect(`${addr.address}, ${addr.city}, ${addr.state}`)
         }));
 
-      allSuggestions.push(...addressSuggestions.slice(0, 8)); // Limit to 8 address suggestions
+      allSuggestions.push(...addressSuggestions.slice(0, 8));
     }
 
     // Category suggestions
@@ -216,7 +234,7 @@ export default function FastSearch({
 
     allSuggestions.push(...agencySuggestions);
 
-    // Location suggestions (cities and neighborhoods)
+    // Location suggestions
     if (searchQuery.length > 2) {
       const locationSuggestions: SearchSuggestion[] = [
         { text: 'Miami Beach', state: 'FL', icon: '🏖️', color: 'bg-yellow-500' },
@@ -255,7 +273,72 @@ export default function FastSearch({
     return allSuggestions;
   }, [addressDatabase]);
 
-  // Handle input change with fast debouncing
+  // Generate Google Places suggestions
+  const generateGoogleSuggestions = useCallback(async (searchQuery: string) => {
+    if (searchQuery.length < 3) return [];
+
+    try {
+      setIsLoadingGoogle(true);
+      setGoogleError(null);
+      
+      const googlePlaces = await searchGooglePlaces(searchQuery);
+      
+      const googleSuggestions: SearchSuggestion[] = googlePlaces.map((place: GooglePlaceSuggestion) => ({
+        id: `google-${place.place_id}`,
+        type: 'google_place' as const,
+        title: place.structured_formatting.main_text,
+        subtitle: place.structured_formatting.secondary_text,
+        icon: '📍',
+        color: 'bg-blue-500',
+        action: () => handleGooglePlaceSelect(place),
+        metadata: place
+      }));
+
+      return googleSuggestions;
+    } catch (error) {
+      console.error('Google Places API error:', error);
+      setGoogleError('Failed to load location suggestions');
+      return [];
+    } finally {
+      setIsLoadingGoogle(false);
+    }
+  }, []);
+
+  // Generate search suggestions based on API type
+  const generateSuggestions = useCallback(async (searchQuery: string) => {
+    if (useGoogleAPI) {
+      return await generateGoogleSuggestions(searchQuery);
+    } else {
+      return generateDatabaseSuggestions(searchQuery);
+    }
+  }, [useGoogleAPI, generateGoogleSuggestions, generateDatabaseSuggestions]);
+
+  // Handle Google Place selection
+  const handleGooglePlaceSelect = useCallback(async (place: GooglePlaceSuggestion) => {
+    try {
+      // Get place details for coordinates
+      const placeDetails = await searchGooglePlaces(place.description, true);
+      if (placeDetails && placeDetails.geometry) {
+        const { lat, lng } = placeDetails.geometry.location;
+        const locationData = {
+          lat,
+          lng,
+          address: place.description
+        };
+        
+        if (onLocationSelect) {
+          onLocationSelect(locationData);
+        }
+        
+        handleSuggestionSelect(place.description);
+      }
+    } catch (error) {
+      console.error('Error getting place details:', error);
+      handleSuggestionSelect(place.description);
+    }
+  }, [onLocationSelect]);
+
+  // Handle input change with debouncing
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
@@ -267,14 +350,14 @@ export default function FastSearch({
     }
 
     if (value.trim()) {
-      searchTimeoutRef.current = setTimeout(() => {
-        const newSuggestions = generateSuggestions(value);
+      searchTimeoutRef.current = setTimeout(async () => {
+        const newSuggestions = await generateSuggestions(value);
         setSuggestions(newSuggestions);
-      }, 100); // Very fast - only 100ms delay
+      }, useGoogleAPI ? 300 : 100); // Longer delay for Google API
     } else {
       setSuggestions([]);
     }
-  }, [generateSuggestions]);
+  }, [generateSuggestions, useGoogleAPI]);
 
   // Handle suggestion selection
   const handleSuggestionSelect = useCallback((suggestion: string) => {
@@ -389,16 +472,31 @@ export default function FastSearch({
         </div>
       </form>
 
-      {/* Fast Suggestions Panel */}
+      {/* Enhanced Suggestions Panel */}
       {showSuggestions && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-80 overflow-y-auto">
           <div className="p-4">
             {/* Search Results */}
-            {query.length > 0 && suggestions.length > 0 && (
+            {query.length > 0 && (
               <div className="mb-4">
-                <div className="text-xs text-gray-500 px-2 py-1 mb-2 font-medium">
-                  Search results for "{query}"
+                <div className="text-xs text-gray-500 px-2 py-1 mb-2 font-medium flex items-center justify-between">
+                  <span>
+                    {useGoogleAPI ? 'Google Places' : 'Database'} search results for "{query}"
+                  </span>
+                  {isLoadingGoogle && (
+                    <div className="flex items-center space-x-1">
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-500"></div>
+                      <span className="text-xs text-blue-500">Loading...</span>
+                    </div>
+                  )}
                 </div>
+                
+                {googleError && (
+                  <div className="text-xs text-red-500 px-2 py-1 mb-2">
+                    {googleError}
+                  </div>
+                )}
+                
                 <div className="space-y-1">
                   {suggestions.map((suggestion, index) => (
                     <button
@@ -423,7 +521,7 @@ export default function FastSearch({
                           </div>
                         )}
                       </div>
-                      {suggestion.type === 'location' && (
+                      {(suggestion.type === 'location' || suggestion.type === 'address' || suggestion.type === 'google_place') && (
                         <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
                       )}
                     </button>
@@ -481,7 +579,7 @@ export default function FastSearch({
             )}
 
             {/* No Results */}
-            {query.length > 0 && suggestions.length === 0 && (
+            {query.length > 0 && suggestions.length === 0 && !isLoadingGoogle && (
               <div className="text-center py-8">
                 <div className="text-gray-500 text-sm mb-2">No results found for "{query}"</div>
                 <div className="text-gray-400 text-xs">Try a different search term</div>

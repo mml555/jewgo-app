@@ -27,11 +27,11 @@ export default function EateryCard({ restaurant, className = "" }: EateryCardPro
   const getKosherBadgeClass = (category: string) => {
     const typeLower = category.toLowerCase();
     if (typeLower === 'dairy') {
-      return 'bg-blue-100 text-blue-800 border-blue-200';
+      return 'bg-blue-100 text-blue-800';
     } else if (typeLower === 'meat') {
-      return 'bg-red-100 text-red-800 border-red-200';
+      return 'bg-[#A70000] text-white';
     } else {
-      return 'bg-green-100 text-green-800 border-green-200';
+      return 'bg-yellow-100 text-yellow-800';
     }
   };
 
@@ -72,7 +72,7 @@ export default function EateryCard({ restaurant, className = "" }: EateryCardPro
 
   return (
     <div 
-      className={`bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-300 ${className}`}
+      className={`bg-white rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-300 ${className}`}
       onClick={handleCardClick}
     >
       {/* Image Container */}
@@ -80,48 +80,47 @@ export default function EateryCard({ restaurant, className = "" }: EateryCardPro
         <img
           src={getHeroImage()}
           alt={restaurant.name}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover"
           onError={() => setImageError(true)}
         />
         
-        {/* Kosher Category Badge */}
-        <div className="absolute top-3 left-3">
-          <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm ${getKosherBadgeClass(restaurant.kosher_category)}`}>
+        {/* Kosher Category Badge - Top Left */}
+        <div className="absolute top-2 left-2">
+          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getKosherBadgeClass(restaurant.kosher_category)}`}>
             {getKosherLabel(restaurant.kosher_category)}
           </span>
         </div>
         
-        {/* Favorite Button */}
+        {/* Favorite Button - Top Right */}
         <button
           onClick={handleFavoriteClick}
-          className="absolute top-3 right-3 p-2 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100 hover:scale-110 transition-all duration-200 shadow-sm"
+          className="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1.5 hover:bg-opacity-100 hover:scale-110 transition-all duration-200"
           aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
         >
           <Heart 
-            className={`w-4 h-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-500 hover:text-red-400'}`} 
+            className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-800 hover:text-red-400'}`} 
           />
         </button>
       </div>
       
       {/* Content */}
-      <div className="p-4">
+      <div className="p-2">
         {/* Restaurant Name */}
-        <h3 className="font-semibold text-gray-900 text-sm mb-2 line-clamp-1">
+        <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-1">
           {restaurant.name}
         </h3>
         
-        {/* Price Range and Rating */}
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500 font-medium">
-            {formatPriceRange()}
+        {/* Price Range */}
+        <p className="text-xs text-gray-500 mb-1">
+          {formatPriceRange()}
+        </p>
+        
+        {/* Rating */}
+        <div className="flex items-center">
+          <Star className="w-3.5 h-3.5 text-yellow-400 fill-current" />
+          <span className="ml-1 text-xs font-medium text-gray-700">
+            {getRating().toFixed(1)}
           </span>
-          
-          <div className="flex items-center space-x-1.5">
-            <Star className="w-3.5 h-3.5 text-yellow-400 fill-current" />
-            <span className="text-xs text-gray-700 font-semibold">
-              {getRating().toFixed(1)}
-            </span>
-          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import FastSearch from '@/components/FastSearch';
+import SmartSearch from '@/components/SmartSearch';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -17,12 +17,13 @@ export default function SearchBar({
 }: SearchBarProps) {
   return (
     <div className={`w-full ${className}`}>
-      <FastSearch
-        onSearch={onSearch}
-        placeholder={placeholder}
-        showAdvancedFilters={!!onFilterClick}
-        className=""
-      />
+               <SmartSearch
+           onSearch={onSearch}
+           placeholder={placeholder}
+           showAdvancedFilters={!!onFilterClick}
+           className=""
+           useGoogleAPI={false}
+         />
     </div>
   );
 } 

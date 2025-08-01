@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
-import FastSearch from '@/components/FastSearch';
+import SmartSearch from '@/components/SmartSearch';
 import NavTabs from '@/components/NavTabs';
 import ActionButtons from '@/components/ActionButtons';
 import EateryCard from '@/components/eatery/ui/EateryCard';
@@ -113,14 +113,15 @@ export default function EateryExplorePage() {
     <div className="min-h-screen bg-neutral-50">
       <Header />
       
-      {/* Fast Search */}
-      <div className="px-4 sm:px-6 py-4 bg-white border-b border-gray-100">
-        <FastSearch
-          onSearch={handleSearch}
-          placeholder="Search for kosher restaurants, agencies, or locations..."
-          showAdvancedFilters={true}
-        />
-      </div>
+                   {/* Smart Search with Database */}
+             <div className="px-4 sm:px-6 py-4 bg-white border-b border-gray-100">
+               <SmartSearch
+                 onSearch={handleSearch}
+                 placeholder="Search for kosher restaurants, agencies, or locations..."
+                 showAdvancedFilters={true}
+                 useGoogleAPI={false}
+               />
+             </div>
 
       {/* Navigation Tabs */}
       <div className="px-4 sm:px-6 py-2 bg-white border-b border-gray-100">
@@ -152,8 +153,8 @@ export default function EateryExplorePage() {
       </div>
 
       {/* Restaurant Grid */}
-      <div className="px-4 sm:px-6 py-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="px-4 py-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredRestaurants.map((restaurant) => (
             <EateryCard 
               key={restaurant.id} 

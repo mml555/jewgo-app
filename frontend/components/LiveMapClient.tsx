@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
-import FastSearch from '@/components/FastSearch';
+import SmartSearch from '@/components/SmartSearch';
 import ActionButtons from '@/components/ActionButtons';
 import InteractiveRestaurantMap from '@/components/InteractiveRestaurantMap';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -594,12 +594,17 @@ export default function LiveMapClient() {
     <div className="min-h-screen bg-neutral-50">
       <Header />
       
-      {/* Fast Search */}
+      {/* Smart Search with Google Places API */}
       <div className="px-4 sm:px-6 py-4 bg-white border-b border-gray-100">
-        <FastSearch
+        <SmartSearch
           onSearch={handleRestaurantSearch}
+          onLocationSelect={(location) => {
+            setMapCenter({ lat: location.lat, lng: location.lng });
+            setSearchQuery(location.address);
+          }}
           placeholder="Search for kosher restaurants, agencies, or locations..."
           showAdvancedFilters={true}
+          useGoogleAPI={true}
         />
       </div>
 
