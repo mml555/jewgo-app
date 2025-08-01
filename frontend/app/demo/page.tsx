@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Header from '@/components/Header';
-import EnhancedSearch from '@/components/EnhancedSearch';
+import GoogleMapsStyleSearch from '@/components/GoogleMapsStyleSearch';
 import NavTabs from '@/components/NavTabs';
 import ActionButtons from '@/components/ActionButtons';
 import EateryCard from '@/components/eatery/ui/EateryCard';
@@ -152,14 +152,20 @@ export default function DemoPage() {
         </div>
       </div>
       
-      {/* Enhanced Search */}
+      {/* Google Maps Style Search */}
       <div className="px-4 sm:px-6 py-4 bg-white border-b border-gray-100">
-        <EnhancedSearch
+        <GoogleMapsStyleSearch
           onSearch={handleSearch}
           onResultsUpdate={(results) => {
-            console.log('Enhanced search results:', results.length, 'restaurants');
+            console.log('Google Maps search results:', results.length, 'restaurants');
             setFilteredRestaurants(results);
           }}
+          onLocationSelect={(location) => {
+            console.log('Location selected:', location);
+            // You can use this to center the map or filter by location
+          }}
+          placeholder="Search for kosher restaurants, agencies, or locations..."
+          showAdvancedFilters={true}
         />
       </div>
 

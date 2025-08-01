@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
-import EnhancedSearch from '@/components/EnhancedSearch';
+import GoogleMapsStyleSearch from '@/components/GoogleMapsStyleSearch';
 import ActionButtons from '@/components/ActionButtons';
 import InteractiveRestaurantMap from '@/components/InteractiveRestaurantMap';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -594,14 +594,21 @@ export default function LiveMapClient() {
     <div className="min-h-screen bg-neutral-50">
       <Header />
       
-      {/* Enhanced Search */}
+      {/* Google Maps Style Search */}
       <div className="px-4 sm:px-6 py-4 bg-white border-b border-gray-100">
-        <EnhancedSearch
+        <GoogleMapsStyleSearch
           onSearch={handleRestaurantSearch}
           onResultsUpdate={(results) => {
-            console.log('Enhanced search results:', results.length, 'restaurants');
+            console.log('Google Maps search results:', results.length, 'restaurants');
             setDisplayedRestaurants(results);
           }}
+          onLocationSelect={(location) => {
+            console.log('Location selected:', location);
+            // Center the map on the selected location
+            setMapCenter({ lat: location.lat, lng: location.lng });
+          }}
+          placeholder="Search for kosher restaurants, agencies, or locations..."
+          showAdvancedFilters={true}
         />
       </div>
 
