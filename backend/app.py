@@ -1069,18 +1069,11 @@ def update_restaurant_hours():
 def get_admin_specials():
     """API endpoint for getting all specials (admin only)."""
     try:
-        # Get all specials (both paid and unpaid)
-        all_specials = []
-        
-        # Get all restaurants and their specials
-        restaurants = db_manager.search_restaurants(limit=1000)
-        for restaurant in restaurants:
-            specials = db_manager.get_restaurant_specials(restaurant['id'], paid_only=False)
-            all_specials.extend(specials)
-        
+        # Simple test response first
         return jsonify({
             'success': True,
-            'specials': all_specials
+            'specials': [],
+            'message': 'Admin specials endpoint is working'
         })
     except Exception as e:
         logger.error(f"API error: {e}")
